@@ -498,6 +498,38 @@ input[type=text] {
 .transport-option.selected {
   background: #6e5532; color: #f5e6c8; border-color: #6e5532;
 }
+.transport-plan-picker {
+  display: flex;
+  flex-direction: column;
+  gap: 8px;
+  margin-top: 10px;
+}
+.transport-plan-button {
+  width: 100%;
+  text-align: left;
+  padding: 10px 12px;
+  border-radius: 12px;
+  border: 1px solid rgba(110, 85, 50, 0.22);
+  background: rgba(255,255,255,0.72);
+}
+.transport-plan-button.selected {
+  background: #6e5532;
+  color: #f5e6c8;
+  border-color: #6e5532;
+}
+.transport-plan-label {
+  display: block;
+  font-size: 14px;
+  font-weight: 700;
+}
+.transport-plan-desc {
+  display: block;
+  margin-top: 3px;
+  font-size: 12px;
+  line-height: 1.4;
+  color: #6e5532;
+}
+.transport-plan-button.selected .transport-plan-desc { color: rgba(245, 230, 200, 0.86); }
 .toggle-chip { margin-top: 10px; font-size: 12px; padding: 7px 12px; border-radius: 999px; }
 .toggle-chip.on { background: #2d6e3e; color: #f5e6c8; border-color: #2d6e3e; }
 .transport-mini { margin-top: 10px; font-size: 12px; color: #6e5532; }
@@ -993,6 +1025,12 @@ input[type=text] {
   color: #fffaf4;
   border-color: #2bb7a3;
 }
+.transport-plan-button.selected {
+  background: #2bb7a3;
+  color: #fffaf4;
+  border-color: #2bb7a3;
+}
+.transport-plan-button.selected .transport-plan-desc { color: rgba(255, 250, 244, 0.86); }
 .toggle-chip.on { background: #4543a6; border-color: #4543a6; }
 .opportunity-footer { background: rgba(255, 245, 234, 0.98); }
 </style>
@@ -1698,11 +1736,6 @@ function pickOpportunityCity(currentCity) {
     const nearbyPool = getNearbyOpportunityCities(currentCity);
     return nearbyPool.length ? rng(nearbyPool) : rng(CITIES);
   }
-  const pLocal = hasPerk('socialStar') ? 0.30 : P_LOCAL_CARD;
-  if (currentCity && Math.random() < pLocal) {
-    const sameContinent = CITIES.filter(candidate => candidate.continent === currentCity.continent && candidate.name !== currentCity.name);
-    return sameContinent.length ? rng(sameContinent) : rng(CITIES);
-  }
   return rng(CITIES);
 }
 
@@ -2119,7 +2152,7 @@ function canFutureAgendaFitFrom(originCity, availableDay, excludedMissionIds = n
     syncMissionShape(mission);
     if (!previousCity) previousCity = STATE.startCity || mission.travelFrom || mission.city;
     if (!previousCity) return false;
-    if (mission.travelLocked && mission.travelDays > 0.1 && mission.travelFrom) {
+    if (mission.travelLocked && mission.travelDays > 0.1 && mission.travelFrom && !mission.travelCancellable) {
       if (dayCursor > mission.travelStartDay + 0.001) return false;
       if (!sameCity(previousCity, mission.travelFrom)) {
         const accessOptions = getTransportOptions(
@@ -2194,6 +2227,89 @@ function buildHomeReturnOffer() {
   refreshPendingHomeSelections(card);
   return card;
 }
+function buildOutboundPlanState(originCity, availableDay, nextMission, preferredPlanType, contextKind) {
+  if (!nextMission || !originCity) {
+    return {
+      outboundOptions: [],
+      outboundPlanChoices: [],
+      outboundPlanType: 'none',
+      outboundTargetCity: nextMission ? nextMission.city : null,
+      outboundTargetDay: nextMission ? nextMission.startDay : null,
+      outboundPlannerText: '',
+      outboundBlockedReason: '',
+    };
+  }
+
+  const plans = [];
+  const hasBookedTravel = !!(nextMission.travelLocked && nextMission.travelDays > 0.1 && nextMission.travelFrom);
+
+  if (hasBookedTravel && !nextMission.travelCancellable) {
+    const catchOptions = getTransportOptions(
+      haversine(originCity, nextMission.travelFrom),
+      nextMission.travelStartDay - availableDay,
+      originCity.continent,
+      nextMission.travelFrom.continent
+    );
+    plans.push({
+      key: 'catch-booked',
+      choiceLabel: `Garder ${nextMission.travelIcon} ${nextMission.travelLabel}`,
+      choiceDesc: `Rejoins ${nextMission.travelFrom.name}, puis prends le trajet déjà réservé vers ${nextMission.city.name}.`,
+      targetCity: nextMission.travelFrom,
+      targetDay: nextMission.travelStartDay,
+      plannerText: `Rejoins ${nextMission.travelFrom.name} pour prendre ensuite ${nextMission.travelIcon} ${nextMission.travelLabel} déjà réservé vers ${nextMission.city.name}.`,
+      blockedReason: contextKind === 'home'
+        ? `Le retour empiète sur ${missionLabel(nextMission)} : impossible de rejoindre ${nextMission.travelFrom.name} à temps.`
+        : `Impossible de rejoindre ${nextMission.travelFrom.name} pour prendre ensuite ${missionLabel(nextMission)} à temps.`,
+      options: catchOptions,
+    });
+  }
+
+  const replaceOptions = getTransportOptions(
+    haversine(originCity, nextMission.city),
+    nextMission.startDay - availableDay,
+    originCity.continent,
+    nextMission.city.continent
+  );
+  plans.push({
+    key: 'replace-booked',
+    choiceLabel: hasBookedTravel ? 'Annuler et repartir de zéro' : 'Prévoir le trajet suivant',
+    choiceDesc: hasBookedTravel
+      ? (nextMission.travelCancellable
+        ? `Le trajet déjà réservé est annulé automatiquement sans frais, puis tu repars depuis ici vers ${nextMission.city.name}.`
+        : `Tu abandonnes le trajet déjà réservé, puis tu repars depuis ici vers ${nextMission.city.name}.`)
+      : `Prépare un nouveau trajet vers ${nextMission.city.name}.`,
+    targetCity: nextMission.city,
+    targetDay: nextMission.startDay,
+    plannerText: hasBookedTravel
+      ? (nextMission.travelCancellable
+        ? `Le trajet déjà réservé pour ${missionLabel(nextMission)} est annulé automatiquement, puis remplacé depuis ici.`
+        : `Remplace le trajet déjà réservé pour ${missionLabel(nextMission)}.`)
+      : `Prépare le trajet pour ${missionLabel(nextMission)}.`,
+    blockedReason: contextKind === 'home'
+      ? `Le retour empiète sur ${missionLabel(nextMission)} : impossible de repartir ensuite à temps.`
+      : `Impossible de rejoindre ensuite ${nextMission.city.name} à temps.`,
+    options: replaceOptions,
+  });
+
+  let selectedPlan = plans.find(plan => plan.key === preferredPlanType);
+  if (!selectedPlan || !selectedPlan.options.length) {
+    selectedPlan = plans.find(plan => plan.options.length) || plans[0];
+  }
+
+  return {
+    outboundOptions: selectedPlan ? selectedPlan.options : [],
+    outboundPlanChoices: plans.map(plan => ({
+      key: plan.key,
+      label: plan.choiceLabel,
+      desc: plan.choiceDesc,
+    })),
+    outboundPlanType: selectedPlan ? selectedPlan.key : 'none',
+    outboundTargetCity: selectedPlan ? selectedPlan.targetCity : nextMission.city,
+    outboundTargetDay: selectedPlan ? selectedPlan.targetDay : nextMission.startDay,
+    outboundPlannerText: selectedPlan ? selectedPlan.plannerText : '',
+    outboundBlockedReason: selectedPlan && !selectedPlan.options.length ? selectedPlan.blockedReason : '',
+  };
+}
 function refreshPendingHomeSelections(card) {
   if (!card || card.kind !== 'home') return;
   card.selectedInbound = getSelectedTransport(card.inboundOptions, card.selectedInboundMode, false);
@@ -2222,44 +2338,17 @@ function refreshPendingHomeSelections(card) {
   let outboundBlockedReason = '';
 
   if (nextMission && card.selectedInbound) {
-    const canCatchBookedTravel = nextMission.travelLocked && nextMission.travelDays > 0.1 && nextMission.travelFrom;
-    if (canCatchBookedTravel) {
-      outboundPlanType = 'catch-booked';
-      outboundTargetCity = nextMission.travelFrom;
-      outboundTargetDay = nextMission.travelStartDay;
-      outboundPlannerText = `Rejoins ${nextMission.travelFrom.name} pour prendre ensuite ${nextMission.travelIcon} ${nextMission.travelLabel} déjà réservé vers ${nextMission.city.name}.`;
-      outboundOptions = getTransportOptions(
-        haversine(card.city, nextMission.travelFrom),
-        nextMission.travelStartDay - card.arrivalDay,
-        card.city.continent,
-        nextMission.travelFrom.continent
-      );
-      if (!outboundOptions.length) {
-        outboundPlanType = 'replace-booked';
-        outboundTargetCity = nextMission.city;
-        outboundTargetDay = nextMission.startDay;
-        outboundPlannerText = `Remplace le trajet déjà réservé pour ${missionLabel(nextMission)}.`;
-      }
-    }
-    if (!outboundOptions.length) {
-      outboundOptions = getTransportOptions(
-        haversine(card.city, nextMission.city),
-        nextMission.startDay - card.arrivalDay,
-        card.city.continent,
-        nextMission.city.continent
-      );
-    }
-    if (!outboundOptions.length) {
-      outboundBlockedReason = outboundPlanType === 'catch-booked'
-        ? `Le retour empiète sur ${missionLabel(nextMission)} : impossible de rejoindre ${nextMission.travelFrom.name} à temps.`
-        : `Le retour empiète sur ${missionLabel(nextMission)} : impossible de repartir ensuite à temps.`;
-      issues.push(outboundBlockedReason);
-    } else if (outboundPlanType !== 'catch-booked') {
-      outboundPlanType = 'replace-booked';
-      outboundTargetCity = nextMission.city;
-      outboundTargetDay = nextMission.startDay;
-      outboundPlannerText = `Remplace le trajet déjà réservé pour ${missionLabel(nextMission)}.`;
-    }
+    const outboundPlan = buildOutboundPlanState(card.city, card.arrivalDay, nextMission, card.outboundPlanType, 'home');
+    outboundOptions = outboundPlan.outboundOptions;
+    card.outboundPlanChoices = outboundPlan.outboundPlanChoices;
+    outboundPlanType = outboundPlan.outboundPlanType;
+    outboundTargetCity = outboundPlan.outboundTargetCity;
+    outboundTargetDay = outboundPlan.outboundTargetDay;
+    outboundPlannerText = outboundPlan.outboundPlannerText;
+    outboundBlockedReason = outboundPlan.outboundBlockedReason;
+    if (!outboundOptions.length && outboundBlockedReason) issues.push(outboundBlockedReason);
+  } else {
+    card.outboundPlanChoices = [];
   }
 
   card.outboundOptions = outboundOptions;
@@ -2369,7 +2458,7 @@ function recomputeAgenda(logChanges) {
       }
 
       if (!previousCity) previousCity = STATE.startCity;
-      if (mission.travelLocked && mission.travelDays > 0.1 && mission.travelFrom) {
+      if (mission.travelLocked && mission.travelDays > 0.1 && mission.travelFrom && !mission.travelCancellable) {
         if (availableDay > mission.travelStartDay + 0.001) {
           mission.scheduleBroken = true;
           brokenIds.push(mission.id);
@@ -2718,44 +2807,16 @@ function buildMissionOffer(baseMission) {
   let outboundTargetCity = nextMission ? nextMission.city : null;
   let outboundTargetDay = nextMission ? nextMission.startDay : null;
   let outboundPlannerText = '';
+  let outboundPlanChoices = [];
   if (nextMission) {
-    const canCatchBookedTravel = nextMission.travelLocked && nextMission.travelDays > 0.1 && nextMission.travelFrom;
-    if (canCatchBookedTravel) {
-      outboundPlanType = 'catch-booked';
-      outboundTargetCity = nextMission.travelFrom;
-      outboundTargetDay = nextMission.travelStartDay;
-      outboundPlannerText = `Rejoins ${nextMission.travelFrom.name} pour prendre ensuite ${nextMission.travelIcon} ${nextMission.travelLabel} déjà réservé vers ${nextMission.city.name}.`;
-      outboundOptions = getTransportOptions(
-        haversine(baseMission.city, nextMission.travelFrom),
-        nextMission.travelStartDay - baseMission.endDay,
-        baseMission.city.continent,
-        nextMission.travelFrom.continent
-      );
-      if (!outboundOptions.length) {
-        outboundPlanType = 'replace-booked';
-        outboundTargetCity = nextMission.city;
-        outboundTargetDay = nextMission.startDay;
-        outboundPlannerText = `Remplace le trajet déjà réservé pour ${missionLabel(nextMission)}.`;
-      }
-    }
-    if (!outboundOptions.length) {
-      outboundOptions = getTransportOptions(
-        haversine(baseMission.city, nextMission.city),
-        nextMission.startDay - baseMission.endDay,
-        baseMission.city.continent,
-        nextMission.city.continent
-      );
-    }
-    if (!outboundOptions.length) {
-      outboundBlockedReason = outboundPlanType === 'catch-booked'
-        ? `Impossible de rejoindre ${nextMission.travelFrom.name} pour prendre ensuite ${missionLabel(nextMission)} à temps.`
-        : `Impossible de rejoindre ensuite ${nextMission.city.name} à temps.`;
-    } else if (outboundPlanType !== 'catch-booked') {
-      outboundPlanType = 'replace-booked';
-      outboundTargetCity = nextMission.city;
-      outboundTargetDay = nextMission.startDay;
-      outboundPlannerText = `Remplace le trajet déjà réservé pour ${missionLabel(nextMission)}.`;
-    }
+    const outboundPlan = buildOutboundPlanState(baseMission.city, baseMission.endDay, nextMission, null, 'mission');
+    outboundOptions = outboundPlan.outboundOptions;
+    outboundPlanChoices = outboundPlan.outboundPlanChoices;
+    outboundPlanType = outboundPlan.outboundPlanType;
+    outboundTargetCity = outboundPlan.outboundTargetCity;
+    outboundTargetDay = outboundPlan.outboundTargetDay;
+    outboundPlannerText = outboundPlan.outboundPlannerText;
+    outboundBlockedReason = outboundPlan.outboundBlockedReason;
   }
 
   const far = previousCity ? previousCity.continent !== baseMission.city.continent : false;
@@ -2768,6 +2829,7 @@ function buildMissionOffer(baseMission) {
     outboundOptions,
     nextMissionId: nextMission ? nextMission.id : null,
     nextMissionTitle: nextMission ? missionLabel(nextMission) : '',
+    outboundPlanChoices,
     outboundPlanType,
     outboundTargetCity,
     outboundTargetDay,
@@ -2822,6 +2884,7 @@ function refreshPendingMissionFromAgenda() {
     selectedInboundCancellable: card.selectedInboundCancellable,
     selectedOutboundMode: card.selectedOutboundMode,
     selectedOutboundCancellable: card.selectedOutboundCancellable,
+    outboundPlanType: card.outboundPlanType,
     nextMissionId: card.nextMissionId,
   };
   const refreshed = buildMissionOffer(buildMissionCardBase(card));
@@ -2832,11 +2895,22 @@ function refreshPendingMissionFromAgenda() {
   if (
     refreshed.nextMissionId
     && refreshed.nextMissionId === preserved.nextMissionId
-    && preserved.selectedOutboundMode
-    && refreshed.outboundOptions.some(option => option.mode === preserved.selectedOutboundMode)
   ) {
-    refreshed.selectedOutboundMode = preserved.selectedOutboundMode;
-    refreshed.selectedOutboundCancellable = !!preserved.selectedOutboundCancellable;
+    if (preserved.outboundPlanType && refreshed.outboundPlanChoices.some(choice => choice.key === preserved.outboundPlanType)) {
+      const nextMission = STATE.agenda.find(mission => mission.id === refreshed.nextMissionId);
+      const outboundPlan = buildOutboundPlanState(refreshed.city, refreshed.endDay, nextMission, preserved.outboundPlanType, 'mission');
+      refreshed.outboundOptions = outboundPlan.outboundOptions;
+      refreshed.outboundPlanChoices = outboundPlan.outboundPlanChoices;
+      refreshed.outboundPlanType = outboundPlan.outboundPlanType;
+      refreshed.outboundTargetCity = outboundPlan.outboundTargetCity;
+      refreshed.outboundTargetDay = outboundPlan.outboundTargetDay;
+      refreshed.outboundPlannerText = outboundPlan.outboundPlannerText;
+      refreshed.outboundBlockedReason = outboundPlan.outboundBlockedReason;
+    }
+    if (preserved.selectedOutboundMode && refreshed.outboundOptions.some(option => option.mode === preserved.selectedOutboundMode)) {
+      refreshed.selectedOutboundMode = preserved.selectedOutboundMode;
+      refreshed.selectedOutboundCancellable = !!preserved.selectedOutboundCancellable;
+    }
   }
   refreshPendingMissionSelections(refreshed);
   STATE.pendingCard = refreshed;
@@ -2848,6 +2922,7 @@ function refreshPendingHomeFromAgenda() {
     selectedInboundMode: card.selectedInboundMode,
     selectedOutboundMode: card.selectedOutboundMode,
     selectedOutboundCancellable: card.selectedOutboundCancellable,
+    outboundPlanType: card.outboundPlanType,
     nextMissionId: card.nextMissionId,
   };
   const refreshed = buildHomeReturnOffer();
@@ -2861,11 +2936,15 @@ function refreshPendingHomeFromAgenda() {
   if (
     refreshed.nextMissionId
     && refreshed.nextMissionId === preserved.nextMissionId
-    && preserved.selectedOutboundMode
-    && refreshed.outboundOptions.some(option => option.mode === preserved.selectedOutboundMode)
   ) {
-    refreshed.selectedOutboundMode = preserved.selectedOutboundMode;
-    refreshed.selectedOutboundCancellable = !!preserved.selectedOutboundCancellable;
+    if (preserved.outboundPlanType && refreshed.outboundPlanChoices.some(choice => choice.key === preserved.outboundPlanType)) {
+      refreshed.outboundPlanType = preserved.outboundPlanType;
+      refreshPendingHomeSelections(refreshed);
+    }
+    if (preserved.selectedOutboundMode && refreshed.outboundOptions.some(option => option.mode === preserved.selectedOutboundMode)) {
+      refreshed.selectedOutboundMode = preserved.selectedOutboundMode;
+      refreshed.selectedOutboundCancellable = !!preserved.selectedOutboundCancellable;
+    }
   }
   refreshPendingHomeSelections(refreshed);
   STATE.pendingCard = refreshed;
@@ -2935,8 +3014,39 @@ function generateOffer() {
 }
 function refreshPendingMissionSelections(card) {
   if (!card || card.kind !== 'mission') return;
+  const nextMission = card.nextMissionId
+    ? STATE.agenda.find(mission => mission.id === card.nextMissionId)
+    : null;
+  if (nextMission) {
+    const outboundPlan = buildOutboundPlanState(card.city, card.endDay, nextMission, card.outboundPlanType, 'mission');
+    card.outboundOptions = outboundPlan.outboundOptions;
+    card.outboundPlanChoices = outboundPlan.outboundPlanChoices;
+    card.outboundPlanType = outboundPlan.outboundPlanType;
+    card.outboundTargetCity = outboundPlan.outboundTargetCity;
+    card.outboundTargetDay = outboundPlan.outboundTargetDay;
+    card.outboundPlannerText = outboundPlan.outboundPlannerText;
+    card.outboundBlockedReason = outboundPlan.outboundBlockedReason;
+    if (card.outboundOptions.length && (!card.selectedOutboundMode || !card.outboundOptions.some(option => option.mode === card.selectedOutboundMode))) {
+      card.selectedOutboundMode = (card.outboundPlanType === 'replace-booked'
+        ? (card.outboundOptions.find(option => option.mode === nextMission.travelMode) || card.outboundOptions[0])
+        : card.outboundOptions[0]).mode;
+      if (card.outboundPlanType === 'replace-booked') {
+        card.selectedOutboundCancellable = !!nextMission.travelCancellable;
+      }
+    }
+  } else {
+    card.outboundOptions = [];
+    card.outboundPlanChoices = [];
+    card.outboundPlanType = 'none';
+    card.outboundTargetCity = null;
+    card.outboundTargetDay = null;
+    card.outboundPlannerText = '';
+    card.outboundBlockedReason = '';
+    card.selectedOutboundMode = null;
+    card.selectedOutboundCancellable = false;
+  }
   card.selectedInbound = getSelectedTransport(card.inboundOptions, card.selectedInboundMode, card.selectedInboundCancellable);
-  card.selectedOutbound = card.nextMissionId
+  card.selectedOutbound = nextMission
     ? getSelectedTransport(card.outboundOptions, card.selectedOutboundMode, card.selectedOutboundCancellable)
     : null;
   card.travelMode = card.selectedInbound ? card.selectedInbound.mode : null;
@@ -2959,9 +3069,6 @@ function refreshPendingMissionSelections(card) {
   if (card.nextMissionId && !card.selectedOutbound) issues.push(outboundIssue);
   card.overlapRefundCost = overlapMissions
     .reduce((sum, mission) => sum + getMissionCancellationCost(mission), 0);
-  const nextMission = card.nextMissionId
-    ? STATE.agenda.find(mission => mission.id === card.nextMissionId)
-    : null;
   card.nextMissionCancellationRefundCost = nextMission && !card.selectedOutbound
     ? getMissionCancellationCost(nextMission)
     : 0;
@@ -3006,6 +3113,16 @@ function selectPendingTransport(which, mode) {
   if (!card || (card.kind !== 'mission' && card.kind !== 'home')) return;
   if (which === 'inbound') card.selectedInboundMode = mode;
   if (which === 'outbound') card.selectedOutboundMode = mode;
+  if (card.kind === 'home') refreshPendingHomeSelections(card);
+  else refreshPendingMissionSelections(card);
+  render();
+}
+function selectPendingOutboundPlanType(planType) {
+  const card = STATE.pendingCard;
+  if (!card || (card.kind !== 'mission' && card.kind !== 'home')) return;
+  if (!card.nextMissionId) return;
+  if (!(card.outboundPlanChoices || []).some(choice => choice.key === planType)) return;
+  card.outboundPlanType = planType;
   if (card.kind === 'home') refreshPendingHomeSelections(card);
   else refreshPendingMissionSelections(card);
   render();
@@ -3846,6 +3963,19 @@ function renderTransportPlanner(card, which, title, options, selectedMode, cance
     </div>
   `;
 }
+function renderOutboundPlanChooser(card) {
+  if (!card || !card.nextMissionId || (card.outboundPlanChoices || []).length < 2) return '';
+  return `
+    <div class="transport-plan-picker">
+      ${card.outboundPlanChoices.map(choice => `
+        <button class="transport-plan-button ${card.outboundPlanType === choice.key ? 'selected' : ''}" onclick="selectPendingOutboundPlanType('${choice.key}')">
+          <span class="transport-plan-label">${choice.label}</span>
+          <span class="transport-plan-desc">${choice.desc}</span>
+        </button>
+      `).join('')}
+    </div>
+  `;
+}
 function renderPendingCardStrip(card) {
   if (!card) return '';
   const title = card.kind === 'chance'
@@ -3936,6 +4066,8 @@ function renderHomePlanning(card, nextMission) {
         false,
         `Depuis ${card.srcCity.name} · ${Math.round(card.distance)} km`
       )}
+
+      ${renderOutboundPlanChooser(card)}
 
       ${nextMission ? renderTransportPlanner(
         card,
@@ -4095,6 +4227,8 @@ function renderOpportunityPlanning(card, nextMission) {
         card.selectedInboundCancellable,
         `Depuis ${card.srcCity.name} · ${Math.round(card.distance)} km`
       )}
+
+      ${renderOutboundPlanChooser(card)}
 
       ${nextMission ? renderTransportPlanner(
         card,
@@ -4579,6 +4713,7 @@ window.minimizePendingCard = minimizePendingCard;
 window.reopenPendingCard = reopenPendingCard;
 window.setPendingCardTab = setPendingCardTab;
 window.selectPendingTransport = selectPendingTransport;
+window.selectPendingOutboundPlanType = selectPendingOutboundPlanType;
 window.togglePendingCancellable = togglePendingCancellable;
 window.updateMenuName = updateMenuName;
 window.chooseAvatar = chooseAvatar;

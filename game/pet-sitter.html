@@ -186,6 +186,7 @@ input[type=text] {
   font-size: 11px; color: #5c5c5c; margin-bottom: 5px;
   padding: 5px 8px; background: rgba(120, 120, 120, 0.08); border-left: 3px solid #9a9a9a;
 }
+.agenda-transport + .agenda-transport { margin-top: -1px; }
 .agenda-transport.cancellable {
   background-image: repeating-linear-gradient(-45deg, rgba(150,150,150,0.14) 0, rgba(150,150,150,0.14) 4px, transparent 4px, transparent 8px);
 }
@@ -429,6 +430,31 @@ input[type=text] {
 .status-note {
   margin-top: 8px; font-size: 11px; color: #6e5532;
   padding-top: 8px; border-top: 1px dotted #d4b896;
+}
+.offer-filter-panel { display: flex; flex-direction: column; gap: 10px; }
+.offer-filter-buttons { display: flex; flex-direction: column; gap: 8px; }
+.offer-filter-button {
+  width: 100%;
+  text-align: left;
+  padding: 10px 12px;
+  border-radius: 12px;
+  border-color: rgba(110, 85, 50, 0.22);
+  background: rgba(255,255,255,0.72);
+}
+.offer-filter-button.active {
+  background: #2b1f10;
+  color: #f5e6c8;
+  border-color: #2b1f10;
+}
+.offer-filter-label { font-weight: 700; font-size: 14px; }
+.offer-filter-desc { font-size: 11px; color: #6e5532; margin-top: 3px; line-height: 1.35; }
+.offer-filter-button.active .offer-filter-desc { color: rgba(245, 230, 200, 0.88); }
+.offer-filter-note {
+  font-size: 11px;
+  color: #6e5532;
+  padding-top: 8px;
+  border-top: 1px dotted #d4b896;
+  line-height: 1.35;
 }
 
 .transport-panel {
@@ -1003,6 +1029,9 @@ const VICTORY_POINTS = 100;
 const FAR_BONUS = 1.20;
 const P_RARE_HOUSING = 0.25;
 const P_POTES = 0.30;
+const NEARBY_RADIUS_KM = 3500;
+const NEARBY_MIN_POOL = 5;
+const NEARBY_MAX_POOL = 8;
 const POTES_BONUS_POINTS = 1;
 const CANCELLABLE_MULTIPLIER = 1.15;
 const SOCIAL_STAR_FREE_CHANCE = 0.50;
@@ -1014,6 +1043,16 @@ const PAY_RANGES = { dog: [35,55], cat: [25,40], bird: [30,50], house: [20,35] }
 const POINT_RANGES = { dog: [2,4], cat: [4,7], bird: [5,8], house: [3,5] };
 const TYPE_LABEL = { dog: 'Dog sitting', cat: 'Cat sitting', bird: 'Bird sitting', house: 'House sitting' };
 const TYPE_ICON = { dog: '🐕', cat: '🐈', bird: '🦜', house: '🏠' };
+const OFFER_FILTERS = {
+  anywhere: {
+    label: 'N’importe où',
+    desc: 'Même logique qu’aujourd’hui : mélange de cartes locales et lointaines.',
+  },
+  nearby: {
+    label: 'À proximité',
+    desc: 'Ne tire que des opportunités proches de là où tu te trouves.',
+  },
+};
 
 const TRANSPORT = {
   hitch:    { name: 'Auto-stop',  cost_km: 0.005, km_day:  60, trans_ocean: false, icon: '👍' },
@@ -1573,6 +1612,29 @@ function dealQuality(card) {
   const sign = pct >= 0 ? '+' : '';
   return { label, color, hint, pct: `${sign}${pct}%` };
 }
+function getNearbyOpportunityCities(currentCity) {
+  if (!currentCity) return CITIES;
+  const ranked = CITIES
+    .map(city => ({ city, distance: haversine(currentCity, city) }))
+    .sort((a, b) => a.distance - b.distance);
+  const withinRadius = ranked.filter(item => item.distance <= NEARBY_RADIUS_KM);
+  const pool = withinRadius.length >= NEARBY_MIN_POOL
+    ? withinRadius
+    : ranked.slice(0, NEARBY_MIN_POOL);
+  return pool.slice(0, NEARBY_MAX_POOL).map(item => item.city);
+}
+function pickOpportunityCity(currentCity) {
+  if (STATE.offerFilter === 'nearby' && currentCity) {
+    const nearbyPool = getNearbyOpportunityCities(currentCity);
+    return nearbyPool.length ? rng(nearbyPool) : rng(CITIES);
+  }
+  const pLocal = hasPerk('socialStar') ? 0.30 : P_LOCAL_CARD;
+  if (currentCity && Math.random() < pLocal) {
+    const sameContinent = CITIES.filter(candidate => candidate.continent === currentCity.continent && candidate.name !== currentCity.name);
+    return sameContinent.length ? rng(sameContinent) : rng(CITIES);
+  }
+  return rng(CITIES);
+}
 
 function buildDefaultState() {
   return {
@@ -1603,6 +1665,8 @@ function buildDefaultState() {
     tookPlane: false,
     activePerk: null,
     socialStarBlocked: false,
+    offerFilter: 'anywhere',
+    atParents: false,
     reputationPenaltyUntil: -1,
     nomadLastIncomeWeek: -1,
     urssafYearMarked: -1,
@@ -1718,7 +1782,7 @@ function attachMusicUnlockListeners() {
 }
 function capturePendingCalendarScroll() {
   const card = STATE.pendingCard;
-  if (!card || card.kind !== 'mission' || STATE.pendingCardMinimized || typeof document === 'undefined' || !document.querySelector) {
+  if (!card || (card.kind !== 'mission' && card.kind !== 'home') || STATE.pendingCardMinimized || typeof document === 'undefined' || !document.querySelector) {
     LAST_PENDING_CALENDAR_SCROLL = { cardId: null, scrollTop: null };
     return;
   }
@@ -1730,13 +1794,13 @@ function capturePendingCalendarScroll() {
   };
 }
 function getPendingCalendarFocusWeek(card) {
-  if (!card || card.kind !== 'mission') return null;
+  if (!card || (card.kind !== 'mission' && card.kind !== 'home')) return null;
   const focusDay = card.selectedInbound && card.travelDays > 0.1 ? card.travelStartDay : card.startDay;
   return Math.max(STATE.week, Math.floor(focusDay / 7));
 }
 function focusPendingCalendarPane() {
   const card = STATE.pendingCard;
-  if (!card || card.kind !== 'mission' || STATE.pendingCardMinimized) {
+  if (!card || (card.kind !== 'mission' && card.kind !== 'home') || STATE.pendingCardMinimized) {
     LAST_PENDING_CALENDAR_FOCUS_TOKEN = '';
     return;
   }
@@ -1776,6 +1840,15 @@ function deriveCurrentCityFromState() {
     return sorted[sorted.length - 1].city;
   }
   return STATE.startCity;
+}
+function getActiveMission() {
+  return STATE.agenda.find(mission => mission.startWeek <= STATE.week && mission.endWeek > STATE.week) || null;
+}
+function getFutureAgenda() {
+  return getSortedAgenda().filter(mission => mission.startWeek > STATE.week);
+}
+function getUpcomingAgenda() {
+  return getSortedAgenda().filter(mission => mission.endWeek > STATE.week);
 }
 function getReputationStatusText() {
   return hasReputationPenalty()
@@ -1820,9 +1893,40 @@ function syncMissionShape(mission) {
   mission.travelCost = typeof mission.travelCost === 'number' ? mission.travelCost : 0;
   mission.travelBaseCost = typeof mission.travelBaseCost === 'number' ? mission.travelBaseCost : mission.travelCost;
   mission.travelStartDay = typeof mission.travelStartDay === 'number' ? mission.travelStartDay : mission.startDay;
+  mission.travelLocked = mission.travelDays > 0.1 ? mission.travelLocked !== false : false;
+  mission.accessMode = mission.accessMode || null;
+  mission.accessCancellable = isAutoCancellableMode(mission.accessMode) || !!mission.accessCancellable;
+  mission.accessDays = typeof mission.accessDays === 'number' ? mission.accessDays : 0;
+  mission.accessCost = typeof mission.accessCost === 'number' ? mission.accessCost : 0;
+  mission.accessBaseCost = typeof mission.accessBaseCost === 'number' ? mission.accessBaseCost : mission.accessCost;
+  mission.accessStartDay = typeof mission.accessStartDay === 'number' ? mission.accessStartDay : mission.travelStartDay;
+  mission.accessFrom = mission.accessFrom || null;
+  mission.accessTo = mission.accessTo || null;
+  mission.accessLabel = mission.accessLabel || (mission.accessMode && TRANSPORT[mission.accessMode] ? TRANSPORT[mission.accessMode].name : '');
+  mission.accessIcon = mission.accessIcon || (mission.accessMode && TRANSPORT[mission.accessMode] ? TRANSPORT[mission.accessMode].icon : '');
   mission.isRareHousing = !!mission.isRareHousing;
   mission.hasPotes = !!mission.hasPotes;
   return mission;
+}
+function getMissionDepartureDay(mission) {
+  const legs = getMissionTravelLegs(mission).filter(leg => leg.mode !== 'none' && getTravelLegDays(leg) > 0.1);
+  return legs.length ? legs[0].startDay : mission.startDay;
+}
+function sameCity(a, b) {
+  if (!a || !b) return false;
+  return a.name === b.name && a.continent === b.continent;
+}
+function clearMissionAccess(mission) {
+  mission.accessMode = null;
+  mission.accessCancellable = false;
+  mission.accessLabel = '';
+  mission.accessIcon = '';
+  mission.accessDays = 0;
+  mission.accessCost = 0;
+  mission.accessBaseCost = 0;
+  mission.accessStartDay = mission.travelStartDay;
+  mission.accessFrom = null;
+  mission.accessTo = null;
 }
 function getSortedAgenda() {
   return [...STATE.agenda].sort((a, b) => {
@@ -1841,7 +1945,334 @@ function applyTransportToMission(mission, previousCity, selectedTransport) {
   mission.travelDistance = haversine(previousCity, mission.city);
   mission.travelStartDay = mission.startDay - selectedTransport.days;
   mission.travelFrom = previousCity;
+  mission.travelLocked = mission.travelDays > 0.1;
+  clearMissionAccess(mission);
   mission.scheduleBroken = false;
+}
+function applyAccessToMission(mission, previousCity, selectedTransport) {
+  mission.accessMode = selectedTransport.mode;
+  mission.accessCancellable = !!selectedTransport.cancellable;
+  mission.accessLabel = selectedTransport.label;
+  mission.accessIcon = selectedTransport.icon;
+  mission.accessDays = selectedTransport.days;
+  mission.accessCost = selectedTransport.cost;
+  mission.accessBaseCost = selectedTransport.baseCost;
+  mission.accessStartDay = mission.travelStartDay - selectedTransport.days;
+  mission.accessFrom = previousCity;
+  mission.accessTo = mission.travelFrom;
+}
+function getMissionCancellationCost(mission) {
+  if (!mission) return 0;
+  let total = !mission.travelCancellable ? (mission.travelCost || 0) : 0;
+  if (mission.accessDays > 0.1 && !mission.accessCancellable) total += mission.accessCost || 0;
+  return total;
+}
+function getMissionTravelLegs(mission) {
+  const legs = [];
+  if (mission.accessDays > 0.1) {
+    legs.push({
+      mode: mission.accessMode,
+      label: `${mission.accessLabel} vers ${(mission.accessTo || mission.travelFrom || mission.city).name}`,
+      icon: mission.accessIcon,
+      cost: mission.accessCost || 0,
+      cancellable: !!mission.accessCancellable,
+      startDay: mission.accessStartDay,
+      endDay: mission.travelStartDay,
+    });
+  }
+  if (mission.travelDays < 0.1) {
+    legs.push({
+      mode: 'none',
+      label: 'Sur place',
+      icon: '·',
+      cost: 0,
+      cancellable: true,
+      startDay: mission.startDay,
+      endDay: mission.startDay,
+    });
+  } else {
+    legs.push({
+      mode: mission.travelMode,
+      label: mission.travelLabel || (TRANSPORT[mission.travelMode] ? TRANSPORT[mission.travelMode].name : 'Trajet'),
+      icon: mission.travelIcon || (TRANSPORT[mission.travelMode] ? TRANSPORT[mission.travelMode].icon : '·'),
+      cost: mission.travelCost || 0,
+      cancellable: !!mission.travelCancellable,
+      startDay: mission.travelStartDay,
+      endDay: mission.startDay,
+    });
+  }
+  return legs;
+}
+function getTravelLegDays(leg) {
+  if (!leg) return 0;
+  return Math.max(0, (leg.endDay || 0) - (leg.startDay || 0));
+}
+function formatTravelLegText(leg) {
+  if (!leg || leg.mode === 'none' || getTravelLegDays(leg) < 0.1) return 'Sur place';
+  return `${leg.icon} ${leg.label} · ${fmtDays(getTravelLegDays(leg))} · ${fmtDayRange(leg.startDay, leg.endDay)}${leg.cancellable ? ' · annulable' : ''}`;
+}
+function getMissionTravelSegmentForWeek(mission, week) {
+  if (mission.accessDays > 0.1 && weekOverlapsRange(week, mission.accessStartDay, mission.travelStartDay)) {
+    return {
+      kind: 'access',
+      cancellable: !!mission.accessCancellable,
+      label: `${mission.accessLabel || (TRANSPORT[mission.accessMode] ? TRANSPORT[mission.accessMode].name : 'Trajet')} vers ${(mission.accessTo || mission.travelFrom || mission.city).name}`,
+      icon: mission.accessIcon || (TRANSPORT[mission.accessMode] ? TRANSPORT[mission.accessMode].icon : '·'),
+      startDay: mission.accessStartDay,
+      endDay: mission.travelStartDay,
+    };
+  }
+  if (mission.travelDays > 0.1 && weekOverlapsRange(week, mission.travelStartDay, mission.startDay)) {
+    return {
+      kind: 'travel',
+      cancellable: !!mission.travelCancellable,
+      label: mission.travelLabel || (TRANSPORT[mission.travelMode] ? TRANSPORT[mission.travelMode].name : 'Trajet'),
+      icon: mission.travelIcon || (TRANSPORT[mission.travelMode] ? TRANSPORT[mission.travelMode].icon : '·'),
+      startDay: mission.travelStartDay,
+      endDay: mission.startDay,
+    };
+  }
+  return null;
+}
+function canFutureAgendaFitFrom(originCity, availableDay, excludedMissionIds = new Set()) {
+  let previousCity = originCity;
+  let dayCursor = availableDay;
+  for (const mission of getFutureAgenda()) {
+    if (excludedMissionIds.has(mission.id)) continue;
+    syncMissionShape(mission);
+    if (!previousCity) previousCity = STATE.startCity || mission.travelFrom || mission.city;
+    if (!previousCity) return false;
+    if (mission.travelLocked && mission.travelDays > 0.1 && mission.travelFrom) {
+      if (dayCursor > mission.travelStartDay + 0.001) return false;
+      if (!sameCity(previousCity, mission.travelFrom)) {
+        const accessOptions = getTransportOptions(
+          haversine(previousCity, mission.travelFrom),
+          mission.travelStartDay - dayCursor,
+          previousCity.continent,
+          mission.travelFrom.continent
+        );
+        if (!accessOptions.length) return false;
+      }
+      previousCity = mission.city;
+      dayCursor = mission.endDay;
+      continue;
+    }
+    const options = getTransportOptions(
+      haversine(previousCity, mission.city),
+      mission.startDay - dayCursor,
+      previousCity.continent,
+      mission.city.continent
+    );
+    if (!options.length) return false;
+    previousCity = mission.city;
+    dayCursor = mission.endDay;
+  }
+  return true;
+}
+function getParentsDepartureWeek() {
+  if (!STATE.atParents) return null;
+  const upcoming = getUpcomingAgenda();
+  if (!upcoming.length) return null;
+  const nextDepartureDay = Math.min(...upcoming.map(mission => getMissionDepartureDay(mission)));
+  return Math.floor(nextDepartureDay / 7);
+}
+function isShelteredAtParentsThisWeek() {
+  if (!STATE.atParents) return false;
+  const departureWeek = getParentsDepartureWeek();
+  return departureWeek == null || STATE.week < departureWeek;
+}
+function buildHomeReturnOffer() {
+  const homeCity = STATE.startCity;
+  const currentCity = deriveCurrentCityFromState();
+  if (!homeCity || !currentCity) return null;
+  const currentDay = weekToDay(STATE.week);
+  const distance = haversine(currentCity, homeCity);
+  const nextMission = getFutureAgenda()[0] || null;
+  const options = getTransportOptions(distance, 3650, currentCity.continent, homeCity.continent);
+  const card = {
+    kind: 'home',
+    id: `home-${STATE.week}`,
+    city: homeCity,
+    srcCity: currentCity,
+    distance,
+    startWeek: STATE.week,
+    endWeek: STATE.week,
+    startDay: currentDay,
+    endDay: currentDay,
+    inboundOptions: options,
+    outboundOptions: [],
+    nextMissionId: nextMission ? nextMission.id : null,
+    nextMissionTitle: nextMission ? missionLabel(nextMission) : '',
+    outboundPlanType: 'none',
+    outboundTargetCity: nextMission ? nextMission.city : null,
+    outboundTargetDay: nextMission ? nextMission.startDay : null,
+    outboundPlannerText: '',
+    selectedInboundMode: options[0] ? options[0].mode : null,
+    selectedInboundCancellable: false,
+    selectedOutboundMode: null,
+    selectedOutboundCancellable: false,
+    feasible: true,
+    feasibilityIssues: [],
+  };
+  refreshPendingHomeSelections(card);
+  return card;
+}
+function refreshPendingHomeSelections(card) {
+  if (!card || card.kind !== 'home') return;
+  card.selectedInbound = getSelectedTransport(card.inboundOptions, card.selectedInboundMode, false);
+  card.selectedOutbound = null;
+  card.travelMode = card.selectedInbound ? card.selectedInbound.mode : null;
+  card.travelLabel = card.selectedInbound ? card.selectedInbound.label : 'Pas de trajet';
+  card.travelIcon = card.selectedInbound ? card.selectedInbound.icon : '✖';
+  card.travelCost = card.selectedInbound ? card.selectedInbound.cost : 0;
+  card.travelDays = card.selectedInbound ? card.selectedInbound.days : 0;
+  card.travelStartDay = weekToDay(STATE.week);
+  card.arrivalDay = card.travelStartDay + card.travelDays;
+  card.arrivalWeek = Math.floor(card.arrivalDay / 7);
+  card.startDay = card.arrivalDay;
+  card.endDay = card.arrivalDay;
+  const issues = [];
+  if (!card.selectedInbound) issues.push('Aucune option réaliste pour rentrer chez tes parents.');
+
+  const nextMission = card.nextMissionId
+    ? STATE.agenda.find(mission => mission.id === card.nextMissionId)
+    : null;
+  let outboundOptions = [];
+  let outboundPlanType = 'none';
+  let outboundTargetCity = nextMission ? nextMission.city : null;
+  let outboundTargetDay = nextMission ? nextMission.startDay : null;
+  let outboundPlannerText = '';
+  let outboundBlockedReason = '';
+
+  if (nextMission && card.selectedInbound) {
+    const canCatchBookedTravel = nextMission.travelLocked && nextMission.travelDays > 0.1 && nextMission.travelFrom;
+    if (canCatchBookedTravel) {
+      outboundPlanType = 'catch-booked';
+      outboundTargetCity = nextMission.travelFrom;
+      outboundTargetDay = nextMission.travelStartDay;
+      outboundPlannerText = `Rejoins ${nextMission.travelFrom.name} pour prendre ensuite ${nextMission.travelIcon} ${nextMission.travelLabel} déjà réservé vers ${nextMission.city.name}.`;
+      outboundOptions = getTransportOptions(
+        haversine(card.city, nextMission.travelFrom),
+        nextMission.travelStartDay - card.arrivalDay,
+        card.city.continent,
+        nextMission.travelFrom.continent
+      );
+      if (!outboundOptions.length) {
+        outboundPlanType = 'replace-booked';
+        outboundTargetCity = nextMission.city;
+        outboundTargetDay = nextMission.startDay;
+        outboundPlannerText = `Remplace le trajet déjà réservé pour ${missionLabel(nextMission)}.`;
+      }
+    }
+    if (!outboundOptions.length) {
+      outboundOptions = getTransportOptions(
+        haversine(card.city, nextMission.city),
+        nextMission.startDay - card.arrivalDay,
+        card.city.continent,
+        nextMission.city.continent
+      );
+    }
+    if (!outboundOptions.length) {
+      outboundBlockedReason = outboundPlanType === 'catch-booked'
+        ? `Le retour empiète sur ${missionLabel(nextMission)} : impossible de rejoindre ${nextMission.travelFrom.name} à temps.`
+        : `Le retour empiète sur ${missionLabel(nextMission)} : impossible de repartir ensuite à temps.`;
+      issues.push(outboundBlockedReason);
+    } else if (outboundPlanType !== 'catch-booked') {
+      outboundPlanType = 'replace-booked';
+      outboundTargetCity = nextMission.city;
+      outboundTargetDay = nextMission.startDay;
+      outboundPlannerText = `Remplace le trajet déjà réservé pour ${missionLabel(nextMission)}.`;
+    }
+  }
+
+  card.outboundOptions = outboundOptions;
+  card.outboundPlanType = outboundPlanType;
+  card.outboundTargetCity = outboundTargetCity;
+  card.outboundTargetDay = outboundTargetDay;
+  card.outboundPlannerText = outboundPlannerText;
+  card.outboundBlockedReason = outboundBlockedReason;
+
+  if (
+    nextMission
+    && outboundOptions.length
+    && (!card.selectedOutboundMode || !outboundOptions.some(option => option.mode === card.selectedOutboundMode))
+  ) {
+    card.selectedOutboundMode = (outboundPlanType === 'replace-booked'
+      ? (outboundOptions.find(option => option.mode === nextMission.travelMode) || outboundOptions[0])
+      : outboundOptions[0]).mode;
+    card.selectedOutboundCancellable = outboundPlanType === 'replace-booked' ? !!nextMission.travelCancellable : false;
+  }
+  card.selectedOutbound = nextMission
+    ? getSelectedTransport(card.outboundOptions, card.selectedOutboundMode, card.selectedOutboundCancellable)
+    : null;
+
+  card.nextMissionRefundCost = nextMission && card.selectedOutbound && card.outboundPlanType === 'replace-booked'
+    ? getMissionCancellationCost(nextMission)
+    : 0;
+  card.nextMissionCancellationRefundCost = nextMission && !card.selectedOutbound
+    ? getMissionCancellationCost(nextMission)
+    : 0;
+  card.refundCost = card.nextMissionRefundCost;
+
+  if (card.selectedOutbound) {
+    card.nextTravelStartDay = outboundPlanType === 'catch-booked'
+      ? nextMission.travelStartDay - card.selectedOutbound.days
+      : nextMission.startDay - card.selectedOutbound.days;
+    card.nextTravelEndDay = outboundPlanType === 'catch-booked'
+      ? nextMission.travelStartDay
+      : nextMission.startDay;
+    card.nextTravelCost = card.selectedOutbound.cost;
+    card.nextTravelLabel = outboundPlanType === 'catch-booked'
+      ? `${card.selectedOutbound.label} vers ${nextMission.travelFrom.name}`
+      : card.selectedOutbound.label;
+  } else {
+    card.nextTravelStartDay = null;
+    card.nextTravelEndDay = null;
+    card.nextTravelCost = null;
+    card.nextTravelLabel = '';
+  }
+
+  const canFitAfterCancellingNext = nextMission
+    ? canFutureAgendaFitFrom(card.city, card.arrivalDay, new Set([nextMission.id]))
+    : false;
+  card.canAcceptByCancellingNextMission = !!nextMission
+    && !!card.selectedInbound
+    && !card.selectedOutbound
+    && nextMission.startWeek > STATE.week
+    && canFitAfterCancellingNext
+    && issues.length === 1
+    && issues[0] === outboundBlockedReason;
+  card.blockingNextMissionId = card.canAcceptByCancellingNextMission ? nextMission.id : null;
+  card.netEstimate = -(card.travelCost + card.refundCost);
+  card.feasibilityIssues = issues;
+  card.feasible = issues.length === 0;
+}
+function resolveTravelLegDeparture(leg) {
+  let actualCost = leg.cost || 0;
+  let costNote = '';
+  const hadSocialStar = hasPerk('socialStar');
+
+  if (leg.mode === 'plane') {
+    if (!STATE.tookPlane) {
+      STATE.tookPlane = true;
+      removeEcolo();
+    }
+    if (hadSocialStar) {
+      const loss = Math.max(0, STATE.balance - actualCost) * 0.30;
+      STATE.balance -= loss;
+      log(`💢 Badbuzz ! L'avion fait hurler tes abonnés. −${fmtMoney(loss)}`);
+    }
+    blockSocialStar();
+  } else if (hasPerk('socialStar') && ['train', 'ferry', 'boatstop', 'bus'].includes(leg.mode) && Math.random() < SOCIAL_STAR_FREE_CHANCE) {
+    actualCost = 0;
+    costNote = ' (offert par collab)';
+  }
+
+  if (PEKIN_EXPRESS_MODES.includes(leg.mode)) {
+    STATE.transportModesDone.add(leg.mode);
+  }
+
+  return { actualCost, costNote };
 }
 function recomputeAgenda(logChanges) {
   let guard = 0;
@@ -1861,6 +2292,40 @@ function recomputeAgenda(logChanges) {
       }
 
       if (!previousCity) previousCity = STATE.startCity;
+      if (mission.travelLocked && mission.travelDays > 0.1 && mission.travelFrom) {
+        if (availableDay > mission.travelStartDay + 0.001) {
+          mission.scheduleBroken = true;
+          brokenIds.push(mission.id);
+          continue;
+        }
+        if (!sameCity(previousCity, mission.travelFrom)) {
+          const accessOptions = getTransportOptions(
+            haversine(previousCity, mission.travelFrom),
+            mission.travelStartDay - availableDay,
+            previousCity.continent,
+            mission.travelFrom.continent
+          );
+          if (!accessOptions.length) {
+            mission.scheduleBroken = true;
+            brokenIds.push(mission.id);
+            continue;
+          }
+          const beforeAccessMode = mission.accessMode;
+          const selectedAccess = getSelectedTransport(accessOptions, mission.accessMode, mission.accessCancellable)
+            || getSelectedTransport(accessOptions, accessOptions[0].mode, mission.accessCancellable);
+          applyAccessToMission(mission, previousCity, selectedAccess);
+          if (logChanges && beforeAccessMode && selectedAccess.mode !== beforeAccessMode) {
+            log(`↺ Trajet d'approche réajusté pour ${mission.city.name} : ${selectedAccess.label}.`);
+          }
+        } else {
+          clearMissionAccess(mission);
+        }
+        previousCity = mission.city;
+        availableDay = mission.endDay;
+        continue;
+      }
+
+      clearMissionAccess(mission);
       const distance = haversine(previousCity, mission.city);
       const options = getTransportOptions(distance, mission.startDay - availableDay, previousCity.continent, mission.city.continent);
       if (!options.length) {
@@ -1936,6 +2401,8 @@ function normalizeLoadedState(snap) {
   if (STATE.activePerk === 'socialStar' && STATE.socialStarBlocked) {
     STATE.activePerk = null;
   }
+  STATE.offerFilter = STATE.offerFilter === 'nearby' ? 'nearby' : 'anywhere';
+  STATE.atParents = !!STATE.atParents;
   recomputeAgenda(false);
   refreshPendingMissionFromAgenda();
 
@@ -1984,6 +2451,21 @@ function returnToMenu() {
   syncMusic(true);
   render();
 }
+function setOfferFilter(mode) {
+  if (!OFFER_FILTERS[mode]) return;
+  STATE.offerFilter = mode;
+  render();
+}
+function offerReturnHome() {
+  if (STATE.phase !== 'playing' || STATE.pendingCard || getActiveMission() || STATE.atParents) return;
+  const card = buildHomeReturnOffer();
+  if (!card) return;
+  STATE.pendingCard = card;
+  STATE.pendingCardMinimized = false;
+  STATE.pendingCardTab = 'presentation';
+  log(`Retour chez les parents proposé : ${STATE.startCity.name}.`);
+  render();
+}
 function updateMenuName(value) {
   STATE.characterName = value;
   syncMusic(true);
@@ -2024,14 +2506,7 @@ function generateRawMission() {
   const type = weighted(types, types.map(key => weights[key]));
 
   const currentCity = deriveCurrentCityFromState();
-  const pLocal = hasPerk('socialStar') ? 0.30 : P_LOCAL_CARD;
-  let city;
-  if (currentCity && Math.random() < pLocal) {
-    const sameContinent = CITIES.filter(candidate => candidate.continent === currentCity.continent && candidate.name !== currentCity.name);
-    city = sameContinent.length ? rng(sameContinent) : rng(CITIES);
-  } else {
-    city = rng(CITIES);
-  }
+  const city = pickOpportunityCity(currentCity);
 
   const bucket = weighted(['short', 'medium', 'long', 'tiny'], [0.60, 0.25, 0.10, 0.05]);
   let durationDays;
@@ -2125,15 +2600,47 @@ function buildMissionOffer(baseMission) {
 
   let outboundOptions = [];
   let outboundBlockedReason = '';
+  let outboundPlanType = 'none';
+  let outboundTargetCity = nextMission ? nextMission.city : null;
+  let outboundTargetDay = nextMission ? nextMission.startDay : null;
+  let outboundPlannerText = '';
   if (nextMission) {
-    outboundOptions = getTransportOptions(
-      haversine(baseMission.city, nextMission.city),
-      nextMission.startDay - baseMission.endDay,
-      baseMission.city.continent,
-      nextMission.city.continent
-    );
+    const canCatchBookedTravel = nextMission.travelLocked && nextMission.travelDays > 0.1 && nextMission.travelFrom;
+    if (canCatchBookedTravel) {
+      outboundPlanType = 'catch-booked';
+      outboundTargetCity = nextMission.travelFrom;
+      outboundTargetDay = nextMission.travelStartDay;
+      outboundPlannerText = `Rejoins ${nextMission.travelFrom.name} pour prendre ensuite ${nextMission.travelIcon} ${nextMission.travelLabel} déjà réservé vers ${nextMission.city.name}.`;
+      outboundOptions = getTransportOptions(
+        haversine(baseMission.city, nextMission.travelFrom),
+        nextMission.travelStartDay - baseMission.endDay,
+        baseMission.city.continent,
+        nextMission.travelFrom.continent
+      );
+      if (!outboundOptions.length) {
+        outboundPlanType = 'replace-booked';
+        outboundTargetCity = nextMission.city;
+        outboundTargetDay = nextMission.startDay;
+        outboundPlannerText = `Remplace le trajet déjà réservé pour ${missionLabel(nextMission)}.`;
+      }
+    }
     if (!outboundOptions.length) {
-      outboundBlockedReason = `Impossible de rejoindre ensuite ${nextMission.city.name} à temps.`;
+      outboundOptions = getTransportOptions(
+        haversine(baseMission.city, nextMission.city),
+        nextMission.startDay - baseMission.endDay,
+        baseMission.city.continent,
+        nextMission.city.continent
+      );
+    }
+    if (!outboundOptions.length) {
+      outboundBlockedReason = outboundPlanType === 'catch-booked'
+        ? `Impossible de rejoindre ${nextMission.travelFrom.name} pour prendre ensuite ${missionLabel(nextMission)} à temps.`
+        : `Impossible de rejoindre ensuite ${nextMission.city.name} à temps.`;
+    } else if (outboundPlanType !== 'catch-booked') {
+      outboundPlanType = 'replace-booked';
+      outboundTargetCity = nextMission.city;
+      outboundTargetDay = nextMission.startDay;
+      outboundPlannerText = `Remplace le trajet déjà réservé pour ${missionLabel(nextMission)}.`;
     }
   }
 
@@ -2147,12 +2654,18 @@ function buildMissionOffer(baseMission) {
     outboundOptions,
     nextMissionId: nextMission ? nextMission.id : null,
     nextMissionTitle: nextMission ? missionLabel(nextMission) : '',
+    outboundPlanType,
+    outboundTargetCity,
+    outboundTargetDay,
+    outboundPlannerText,
     selectedInboundMode: inboundOptions[0] ? inboundOptions[0].mode : null,
     selectedInboundCancellable: false,
     selectedOutboundMode: nextMission && outboundOptions.length
-      ? ((outboundOptions.find(option => option.mode === nextMission.travelMode) || outboundOptions[0]).mode)
+      ? ((outboundPlanType === 'replace-booked'
+          ? (outboundOptions.find(option => option.mode === nextMission.travelMode) || outboundOptions[0])
+          : outboundOptions[0]).mode)
       : null,
-    selectedOutboundCancellable: nextMission ? !!nextMission.travelCancellable : false,
+    selectedOutboundCancellable: nextMission && outboundPlanType === 'replace-booked' ? !!nextMission.travelCancellable : false,
     overlapMissionId: overlapMission ? overlapMission.id : null,
     overlapMissionTitle: overlapMission
       ? missionLabel(overlapMission) + (overlappingMissions.length > 1 ? ` (+${overlappingMissions.length - 1})` : '')
@@ -2214,6 +2727,35 @@ function refreshPendingMissionFromAgenda() {
   refreshPendingMissionSelections(refreshed);
   STATE.pendingCard = refreshed;
 }
+function refreshPendingHomeFromAgenda() {
+  const card = STATE.pendingCard;
+  if (!card || card.kind !== 'home') return;
+  const preserved = {
+    selectedInboundMode: card.selectedInboundMode,
+    selectedOutboundMode: card.selectedOutboundMode,
+    selectedOutboundCancellable: card.selectedOutboundCancellable,
+    nextMissionId: card.nextMissionId,
+  };
+  const refreshed = buildHomeReturnOffer();
+  if (!refreshed) {
+    STATE.pendingCard = null;
+    return;
+  }
+  if (preserved.selectedInboundMode && refreshed.inboundOptions.some(option => option.mode === preserved.selectedInboundMode)) {
+    refreshed.selectedInboundMode = preserved.selectedInboundMode;
+  }
+  if (
+    refreshed.nextMissionId
+    && refreshed.nextMissionId === preserved.nextMissionId
+    && preserved.selectedOutboundMode
+    && refreshed.outboundOptions.some(option => option.mode === preserved.selectedOutboundMode)
+  ) {
+    refreshed.selectedOutboundMode = preserved.selectedOutboundMode;
+    refreshed.selectedOutboundCancellable = !!preserved.selectedOutboundCancellable;
+  }
+  refreshPendingHomeSelections(refreshed);
+  STATE.pendingCard = refreshed;
+}
 function generateChanceOffer() {
   if (STATE.activePerk) return null;
   const pool = Object.keys(PERK_DEFS).filter(key => key !== 'socialStar' || !STATE.socialStarBlocked);
@@ -2251,19 +2793,22 @@ function refreshPendingMissionSelections(card) {
     .filter(Boolean);
   if (overlapMissions.length) issues.push(`Chevauchement avec ${card.overlapMissionTitle}.`);
   if (!card.selectedInbound) issues.push('Aucun trajet possible pour arriver à temps.');
-  const outboundIssue = card.outboundBlockedReason || 'Aucun trajet possible vers la mission suivante.';
+  const outboundIssue = card.outboundBlockedReason || (
+    card.outboundPlanType === 'catch-booked'
+      ? 'Aucun trajet possible pour rejoindre le départ déjà réservé.'
+      : 'Aucun trajet possible vers la mission suivante.'
+  );
   if (card.nextMissionId && !card.selectedOutbound) issues.push(outboundIssue);
   card.overlapRefundCost = overlapMissions
-    .filter(mission => !mission.travelCancellable)
-    .reduce((sum, mission) => sum + (mission.travelCost || 0), 0);
+    .reduce((sum, mission) => sum + getMissionCancellationCost(mission), 0);
   const nextMission = card.nextMissionId
     ? STATE.agenda.find(mission => mission.id === card.nextMissionId)
     : null;
-  card.nextMissionCancellationRefundCost = nextMission && !card.selectedOutbound && !nextMission.travelCancellable
-    ? (nextMission.travelCost || 0)
+  card.nextMissionCancellationRefundCost = nextMission && !card.selectedOutbound
+    ? getMissionCancellationCost(nextMission)
     : 0;
-  card.nextMissionRefundCost = nextMission && card.selectedOutbound && !nextMission.travelCancellable
-    ? (nextMission.travelCost || 0)
+  card.nextMissionRefundCost = nextMission && card.selectedOutbound && card.outboundPlanType === 'replace-booked'
+    ? getMissionCancellationCost(nextMission)
     : 0;
   card.refundCost = card.overlapRefundCost + card.nextMissionRefundCost;
   card.netEstimate = card.payTotal - card.travelCost - card.refundCost - (WEEKLY_FOOD * card.durationWeeks);
@@ -2281,29 +2826,42 @@ function refreshPendingMissionSelections(card) {
   card.blockingNextMissionId = card.canAcceptByCancellingNextMission ? nextMission.id : null;
   card.overlapCancellationPenalty = overlapMissions.some(mission => mission.startWeek - STATE.week < SAFE_CANCEL_WEEKS);
   if (card.selectedOutbound) {
-    card.nextTravelStartDay = nextMission ? nextMission.startDay - card.selectedOutbound.days : null;
+    card.nextTravelStartDay = nextMission
+      ? (card.outboundPlanType === 'catch-booked' ? nextMission.travelStartDay - card.selectedOutbound.days : nextMission.startDay - card.selectedOutbound.days)
+      : null;
+    card.nextTravelEndDay = nextMission
+      ? (card.outboundPlanType === 'catch-booked' ? nextMission.travelStartDay : nextMission.startDay)
+      : null;
     card.nextTravelCost = card.selectedOutbound.cost;
+    card.nextTravelLabel = card.outboundPlanType === 'catch-booked' && nextMission
+      ? `${card.selectedOutbound.label} vers ${nextMission.travelFrom.name}`
+      : card.selectedOutbound.label;
   } else {
     card.nextTravelStartDay = null;
+    card.nextTravelEndDay = null;
     card.nextTravelCost = null;
+    card.nextTravelLabel = '';
   }
 }
 function selectPendingTransport(which, mode) {
   const card = STATE.pendingCard;
-  if (!card || card.kind !== 'mission') return;
+  if (!card || (card.kind !== 'mission' && card.kind !== 'home')) return;
   if (which === 'inbound') card.selectedInboundMode = mode;
   if (which === 'outbound') card.selectedOutboundMode = mode;
-  refreshPendingMissionSelections(card);
+  if (card.kind === 'home') refreshPendingHomeSelections(card);
+  else refreshPendingMissionSelections(card);
   render();
 }
 function togglePendingCancellable(which) {
   const card = STATE.pendingCard;
-  if (!card || card.kind !== 'mission') return;
+  if (!card || (card.kind !== 'mission' && card.kind !== 'home')) return;
+  if (card.kind === 'home' && which === 'inbound') return;
   const mode = which === 'inbound' ? card.selectedInboundMode : card.selectedOutboundMode;
   if (isAutoCancellableMode(mode)) return;
   if (which === 'inbound') card.selectedInboundCancellable = !card.selectedInboundCancellable;
   if (which === 'outbound') card.selectedOutboundCancellable = !card.selectedOutboundCancellable;
-  refreshPendingMissionSelections(card);
+  if (card.kind === 'home') refreshPendingHomeSelections(card);
+  else refreshPendingMissionSelections(card);
   render();
 }
 function getCardOverlapMissions(card) {
@@ -2314,7 +2872,7 @@ function getCardOverlapMissions(card) {
 function applyMissionCancellation(mission, { reflow = true } = {}) {
   if (!mission || mission.startWeek <= STATE.week) return false;
   const isLateCancel = mission.startWeek - STATE.week < SAFE_CANCEL_WEEKS;
-  const lostTicketCost = !mission.travelCancellable ? (mission.travelCost || 0) : 0;
+  const lostTicketCost = getMissionCancellationCost(mission);
   STATE.agenda = STATE.agenda.filter(entry => entry.id !== mission.id);
   if (lostTicketCost > 0) {
     STATE.balance -= lostTicketCost;
@@ -2358,12 +2916,20 @@ function commitPendingMission(card) {
   if (card.nextMissionId && card.selectedOutbound) {
     const nextMission = STATE.agenda.find(entry => entry.id === card.nextMissionId);
     if (nextMission) {
-      if (!nextMission.travelCancellable && (nextMission.travelCost || 0) > 0) {
-        STATE.balance -= nextMission.travelCost;
-        log(`↺ Trajet remplacé pour ${missionLabel(nextMission)} : billet précédent perdu (−${fmtMoney(nextMission.travelCost)}).`);
+      if (card.outboundPlanType === 'catch-booked') {
+        applyAccessToMission(nextMission, mission.city, card.selectedOutbound);
+      } else {
+        const replacedTravelCost = getMissionCancellationCost(nextMission);
+        if (replacedTravelCost > 0) {
+          STATE.balance -= replacedTravelCost;
+          log(`↺ Trajet remplacé pour ${missionLabel(nextMission)} : billet précédent perdu (−${fmtMoney(replacedTravelCost)}).`);
+        }
+        clearMissionAccess(nextMission);
+        nextMission.travelLocked = false;
+        nextMission.travelFrom = null;
+        nextMission.travelMode = card.selectedOutbound.mode;
+        nextMission.travelCancellable = card.selectedOutbound.cancellable;
       }
-      nextMission.travelMode = card.selectedOutbound.mode;
-      nextMission.travelCancellable = card.selectedOutbound.cancellable;
     }
   }
   STATE.acceptedCount++;
@@ -2378,6 +2944,81 @@ function commitPendingMission(card) {
     log('✗ DÉFAITE : solde épuisé.');
   }
 }
+function acceptHomeCard() {
+  const card = STATE.pendingCard;
+  if (!card || card.kind !== 'home' || !card.selectedInbound) return;
+  const nextMission = card.nextMissionId
+    ? STATE.agenda.find(mission => mission.id === card.nextMissionId)
+    : null;
+  const leg = {
+    mode: card.selectedInbound.mode,
+    label: card.selectedInbound.label,
+    icon: card.selectedInbound.icon,
+    cost: card.selectedInbound.cost,
+    startDay: card.travelStartDay,
+    endDay: card.arrivalDay,
+  };
+  const { actualCost, costNote } = resolveTravelLegDeparture(leg);
+  STATE.balance -= actualCost;
+  STATE.currentCity = STATE.startCity;
+  STATE.atParents = true;
+
+  if (nextMission && card.selectedOutbound) {
+    if (card.outboundPlanType === 'catch-booked') {
+      if (card.selectedOutbound.days > 0.1 && !sameCity(STATE.startCity, nextMission.travelFrom)) {
+        applyAccessToMission(nextMission, STATE.startCity, card.selectedOutbound);
+      } else {
+        clearMissionAccess(nextMission);
+      }
+    } else {
+      const replacedTravelCost = getMissionCancellationCost(nextMission);
+      if (replacedTravelCost > 0) {
+        STATE.balance -= replacedTravelCost;
+        log(`↺ Trajet remplacé pour ${missionLabel(nextMission)} : billet précédent perdu (−${fmtMoney(replacedTravelCost)}).`);
+      }
+      clearMissionAccess(nextMission);
+      nextMission.travelLocked = false;
+      nextMission.travelFrom = null;
+      nextMission.travelMode = card.selectedOutbound.mode;
+      nextMission.travelCancellable = card.selectedOutbound.cancellable;
+    }
+  }
+
+  STATE.pendingCard = null;
+  STATE.pendingCardMinimized = false;
+  STATE.pendingCardTab = 'presentation';
+  recomputeAgenda(false);
+  log(`↩ Retour chez les parents à ${STATE.startCity.name} : ${card.travelIcon} ${card.travelLabel} ${fmtMoney(-actualCost)}${costNote}.`);
+  if (STATE.balance < 0) {
+    STATE.phase = 'over';
+    STATE.endReason = 'defeat';
+    log('✗ DÉFAITE : solde épuisé.');
+  }
+}
+function acceptHomeCardByCancellingNextMission() {
+  const card = STATE.pendingCard;
+  if (!card || card.kind !== 'home' || !card.canAcceptByCancellingNextMission || !card.selectedInbound) return;
+  const nextMission = card.blockingNextMissionId
+    ? STATE.agenda.find(mission => mission.id === card.blockingNextMissionId)
+    : null;
+  if (!nextMission) return;
+  const lateWarning = nextMission.startWeek - STATE.week < SAFE_CANCEL_WEEKS
+    ? ' Une annulation tardive appliquera le malus de réputation pendant 6 mois.'
+    : '';
+  const refundWarning = card.nextMissionCancellationRefundCost > 0
+    ? ` Le trajet déjà réservé sera perdu (−${fmtMoney(card.nextMissionCancellationRefundCost)}).`
+    : '';
+  const okay = window.confirm(`Rentrer chez tes parents en annulant ${missionLabel(nextMission)} ?${refundWarning}${lateWarning}`);
+  if (!okay) return;
+  applyMissionCancellation(nextMission, { reflow: true });
+  refreshPendingHomeFromAgenda();
+  if (!STATE.pendingCard || STATE.pendingCard.kind !== 'home' || !STATE.pendingCard.feasible || !STATE.pendingCard.selectedInbound) {
+    render();
+    return;
+  }
+  acceptHomeCard();
+  render();
+}
 function acceptCard() {
   const card = STATE.pendingCard;
   if (!card) return;
@@ -2388,6 +3029,12 @@ function acceptCard() {
     STATE.pendingCardMinimized = false;
     STATE.pendingCardTab = 'presentation';
     log(`★ Carte Chance acceptée : ${PERK_DEFS[card.perkKey].name}.`);
+    render();
+    return;
+  }
+  if (card.kind === 'home') {
+    if (!card.feasible || !card.selectedInbound) return;
+    acceptHomeCard();
     render();
     return;
   }
@@ -2459,6 +3106,7 @@ function acceptCardByCancellingNextMission() {
 }
 function refuseCard() {
   if (STATE.pendingCard && STATE.pendingCard.kind === 'chance') discardPendingCard('Carte Chance refusée.');
+  else if (STATE.pendingCard && STATE.pendingCard.kind === 'home') discardPendingCard('Retour chez les parents annulé.');
   else discardPendingCard('Opportunité refusée.');
   render();
 }
@@ -2473,6 +3121,7 @@ function cancelMission(id) {
 
   applyMissionCancellation(mission, { reflow: true });
   refreshPendingMissionFromAgenda();
+  refreshPendingHomeFromAgenda();
   render();
 }
 function removeEcolo() {
@@ -2533,10 +3182,16 @@ function nextTurn() {
   if (STATE.pendingCard && STATE.pendingCardMinimized) {
     const logText = STATE.pendingCard.kind === 'chance'
       ? 'Carte Chance laissée passer en prenant le tour suivant.'
-      : 'Opportunité laissée passer en prenant le tour suivant.';
+      : (STATE.pendingCard.kind === 'home'
+        ? 'Retour chez les parents laissé passer en prenant le tour suivant.'
+        : 'Opportunité laissée passer en prenant le tour suivant.');
     discardPendingCard(logText);
   }
   STATE.week++;
+  if (STATE.atParents) {
+    const departureWeek = getParentsDepartureWeek();
+    if (departureWeek != null && STATE.week >= departureWeek) STATE.atParents = false;
+  }
 
   const ending = STATE.agenda.filter(mission => mission.endWeek === STATE.week);
   for (const mission of ending) {
@@ -2555,33 +3210,15 @@ function nextTurn() {
   const starting = STATE.agenda.filter(mission => mission.startWeek === STATE.week);
   for (const mission of starting) {
     STATE.balance += mission.payTotal;
-    let actualCost = mission.travelCost;
-    let costNote = '';
-    const hadSocialStar = hasPerk('socialStar');
-
-    if (mission.travelMode === 'plane') {
-      if (!STATE.tookPlane) {
-        STATE.tookPlane = true;
-        removeEcolo();
-      }
-      if (hadSocialStar) {
-        const loss = Math.max(0, STATE.balance - actualCost) * 0.30;
-        STATE.balance -= loss;
-        log(`💢 Badbuzz ! L'avion fait hurler tes abonnés. −${fmtMoney(loss)}`);
-      }
-      blockSocialStar();
-    } else if (hasPerk('socialStar') && ['train', 'ferry', 'boatstop', 'bus'].includes(mission.travelMode) && Math.random() < SOCIAL_STAR_FREE_CHANCE) {
-      actualCost = 0;
-      costNote = ' (offert par collab)';
+    const travelLegs = getMissionTravelLegs(mission).filter(leg => leg.mode !== 'none' && getTravelLegDays(leg) > 0.1);
+    const legSummaries = [];
+    for (const leg of travelLegs) {
+      const { actualCost, costNote } = resolveTravelLegDeparture(leg);
+      STATE.balance -= actualCost;
+      legSummaries.push(`${leg.icon} ${leg.label} · ${fmtDays(getTravelLegDays(leg))} · ${fmtMoney(-actualCost)}${costNote}`);
     }
-
-    if (PEKIN_EXPRESS_MODES.includes(mission.travelMode)) {
-      STATE.transportModesDone.add(mission.travelMode);
-    }
-    STATE.balance -= actualCost;
     STATE.currentCity = mission.city;
-
-    log(`→ Départ pour ${mission.city.name} : +${fmtMoney(mission.payTotal)} · ${mission.travelIcon} ${mission.travelLabel} ${fmtMoney(-actualCost)}${costNote}`);
+    log(`→ Départ pour ${mission.city.name} : +${fmtMoney(mission.payTotal)} · ${legSummaries.length ? legSummaries.join(' puis ') : 'Sur place'}`);
   }
 
   if (hasPerk('digitalNomad') && STATE.week % 4 === 0 && STATE.week !== STATE.nomadLastIncomeWeek) {
@@ -2605,7 +3242,7 @@ function nextTurn() {
     }
   }
 
-  STATE.balance -= WEEKLY_FOOD;
+  if (!isShelteredAtParentsThisWeek()) STATE.balance -= WEEKLY_FOOD;
   checkAchievements();
 
   if (STATE.balance < 0) {
@@ -2728,6 +3365,40 @@ function renderPerkPanel() {
     </div>
   `;
 }
+function renderOfferFilterPanel() {
+  const currentCity = deriveCurrentCityFromState();
+  const nearbyLabel = currentCity ? `Autour de ${currentCity.name}` : 'Autour de toi';
+  return `
+    <div class="offer-filter-panel">
+      <div class="offer-filter-buttons">
+        ${Object.entries(OFFER_FILTERS).map(([key, meta]) => `
+          <button class="offer-filter-button ${STATE.offerFilter === key ? 'active' : ''}" onclick="setOfferFilter('${key}')">
+            <div class="offer-filter-label">${meta.label}</div>
+            <div class="offer-filter-desc">${key === 'nearby' ? `${meta.desc} ${nearbyLabel}.` : meta.desc}</div>
+          </button>
+        `).join('')}
+      </div>
+      <div class="offer-filter-note">Le filtre d’annonces sera pris en compte au prochain clic sur <strong>Tour suivant →</strong>.</div>
+    </div>
+  `;
+}
+function renderReturnHomePanel() {
+  const activeMission = getActiveMission();
+  const disabled = STATE.atParents || !!STATE.pendingCard || !!activeMission;
+  const text = STATE.atParents
+    ? `Tu es déjà chez tes parents à ${STATE.startCity ? STATE.startCity.name : 'la maison'}. Aucune charge hebdomadaire tant que tu n’es pas reparti.`
+    : (STATE.pendingCard
+      ? 'Traite d’abord la carte en cours avant de proposer ce retour.'
+      : (activeMission
+        ? 'Impossible pendant une mission en cours.'
+        : `Rentre dans ta ville de départ${STATE.startCity ? ` : ${STATE.startCity.name}` : ''}. Tu paies le trajet, puis plus aucune charge sur place.`));
+  return `
+    <div class="offer-filter-panel">
+      <button class="primary" onclick="offerReturnHome()" ${disabled ? 'disabled' : ''}>Retour chez les parents</button>
+      <div class="offer-filter-note">${text}</div>
+    </div>
+  `;
+}
 function renderAgenda() {
   if (!STATE.agenda.length) {
     return '<div class="agenda-empty">Aucune mission planifiée. Accepte une opportunité pour remplir ton carnet.</div>';
@@ -2735,14 +3406,13 @@ function renderAgenda() {
   return getSortedAgenda().map(mission => {
     const isActive = mission.startWeek <= STATE.week && mission.endWeek > STATE.week;
     const isFuture = mission.startWeek > STATE.week;
-    const travelClass = mission.travelCancellable ? 'cancellable' : '';
-    const travelLabel = mission.travelDays < 0.1
-      ? 'Sur place'
-      : `${mission.travelIcon} ${mission.travelLabel} · ${fmtDays(mission.travelDays)} · ${fmtDayRange(mission.travelStartDay, mission.startDay)}${mission.travelCancellable ? ' · annulable' : ''}`;
+    const travelLines = getMissionTravelLegs(mission).map(leg => `
+      <div class="agenda-transport ${leg.cancellable ? 'cancellable' : ''}">${formatTravelLegText(leg)}</div>
+    `).join('');
     const status = isActive ? 'En cours' : `Démarre S${mission.startWeek}`;
     return `
       <div class="agenda-mission ${isActive ? 'active' : ''}">
-        <div class="agenda-transport ${travelClass}">${travelLabel}</div>
+        ${travelLines}
         <div class="am-title">${missionTitle(mission)}</div>
         <div class="am-sub">${mission.housing}${mission.isRareHousing ? ' ✦' : ''} · ${mission.durationDays} jours · ${fmtMoney(mission.payTotal)}</div>
         <div class="am-bar">${status} · ${fmtDate(mission.startWeek)} → ${fmtDate(mission.endWeek)}</div>
@@ -2839,11 +3509,14 @@ function renderCalendarPane(card) {
   let rows = '';
   let lastMonth = -1;
   const booked = getSortedAgenda();
-  const candidate = card && card.kind === 'mission' ? card : null;
+  const candidate = card && (card.kind === 'mission' || card.kind === 'home') ? card : null;
   const candidateNextMission = candidate && candidate.nextMissionId
     ? booked.find(entry => entry.id === candidate.nextMissionId)
     : null;
-  const replacedTravelMissionId = candidate && candidate.selectedOutbound && candidateNextMission
+  const replacedTravelMissionId = candidate && candidate.selectedOutbound && candidateNextMission && candidate.outboundPlanType === 'replace-booked'
+    ? candidate.nextMissionId
+    : null;
+  const replacedAccessMissionId = candidate && candidate.selectedOutbound && candidateNextMission && candidate.outboundPlanType === 'catch-booked'
     ? candidate.nextMissionId
     : null;
   const focusWeek = candidate ? Math.min(endWeek - 1, getPendingCalendarFocusWeek(candidate)) : null;
@@ -2859,30 +3532,35 @@ function renderCalendarPane(card) {
     let cls = '';
     let label = '';
     const mission = booked.find(entry => weekOverlapsRange(week, entry.startDay, entry.endDay));
-    const travel = booked.find(entry =>
-      entry.id !== replacedTravelMissionId
-      && entry.travelDays > 0.1
-      && weekOverlapsRange(week, entry.travelStartDay, entry.startDay)
-    );
-    const candidateMission = candidate && weekOverlapsRange(week, candidate.startDay, candidate.endDay);
+    const travel = booked
+      .map(entry => {
+        if (entry.id === replacedTravelMissionId) return null;
+        const segment = getMissionTravelSegmentForWeek(entry, week);
+        if (!segment) return null;
+        if (entry.id === replacedAccessMissionId && segment.kind === 'access') return null;
+        return { mission: entry, segment };
+      })
+      .find(Boolean);
+    const candidateMission = candidate && candidate.kind === 'mission' && weekOverlapsRange(week, candidate.startDay, candidate.endDay);
     const candidateTravel = candidate && candidate.travelDays > 0.1 && weekOverlapsRange(week, candidate.travelStartDay, candidate.startDay);
     const candidateOutboundTravel = candidate && candidateNextMission && candidate.selectedOutbound
       && candidate.selectedOutbound.days > 0.1
       && candidate.nextTravelStartDay != null
-      && weekOverlapsRange(week, candidate.nextTravelStartDay, candidateNextMission.startDay);
+      && candidate.nextTravelEndDay != null
+      && weekOverlapsRange(week, candidate.nextTravelStartDay, candidate.nextTravelEndDay);
 
     if (mission && candidateMission) cls = 'both';
     else if (mission) cls = 'booked';
     else if (candidateMission) cls = 'candidate';
     else if (candidateOutboundTravel) cls = candidate.selectedOutbound.cancellable ? 'candidate-travel-cancellable' : 'candidate-travel';
     else if (candidateTravel) cls = candidate.selectedInbound && candidate.selectedInbound.cancellable ? 'candidate-travel-cancellable' : 'candidate-travel';
-    else if (travel) cls = travel.travelCancellable ? 'travel-cancellable' : 'travel';
+    else if (travel) cls = travel.segment.cancellable ? 'travel-cancellable' : 'travel';
 
     if (mission && week === mission.startWeek) label = mission.city.name;
-    else if (candidateOutboundTravel && Math.floor(candidate.nextTravelStartDay / 7) === week) label = candidate.selectedOutbound.label;
+    else if (candidateOutboundTravel && Math.floor(candidate.nextTravelStartDay / 7) === week) label = card.nextTravelLabel || candidate.selectedOutbound.label;
     else if (candidateMission && week === candidate.startWeek) label = candidate.city.name;
     else if (candidateTravel && Math.floor(candidate.travelStartDay / 7) === week) label = candidate.travelLabel;
-    else if (travel && Math.floor(travel.travelStartDay / 7) === week) label = travel.travelLabel;
+    else if (travel && Math.floor(travel.segment.startDay / 7) === week) label = travel.segment.label;
 
     rows += `
       <div class="calendar-row ${monthStart ? 'month-start' : ''}"${focusWeek === week ? ` data-focus-week="${week}"` : ''}>
@@ -2908,7 +3586,12 @@ function renderCalendarPane(card) {
 }
 function renderTransportPlanner(card, which, title, options, selectedMode, cancellable, extraText) {
   const selected = getSelectedTransport(options, selectedMode, cancellable);
-  const showCancellableToggle = selected && !isAutoCancellableMode(selected.mode);
+  const allowCancellableToggle = !(card.kind === 'home' && which === 'inbound');
+  const showCancellableToggle = allowCancellableToggle && selected && !isAutoCancellableMode(selected.mode);
+  const startDay = which === 'inbound' ? card.travelStartDay : card.nextTravelStartDay;
+  const endDay = which === 'inbound'
+    ? card.startDay
+    : (card.nextTravelEndDay ?? (STATE.agenda.find(mission => mission.id === card.nextMissionId)?.startDay || card.startDay));
   return `
     <div class="transport-panel">
       <div class="transport-title">${title}</div>
@@ -2927,18 +3610,22 @@ function renderTransportPlanner(card, which, title, options, selectedMode, cance
         </div>
         ${showCancellableToggle ? `<button class="toggle-chip ${cancellable ? 'on' : ''}" onclick="togglePendingCancellable('${which}')">
           Billet annulable (+${Math.round((CANCELLABLE_MULTIPLIER - 1) * 100)} %)
-        </button>` : '<div class="transport-mini">Annulable d\'office, sans surcoût.</div>'}
+        </button>` : (selected && isAutoCancellableMode(selected.mode) ? '<div class="transport-mini">Annulable d\'office, sans surcoût.</div>' : '')}
       ` : `<div class="transport-empty">Aucune option réaliste pour ce segment.</div>`}
-      ${selected ? `<div class="transport-mini">${selected.icon} ${selected.label} · ${fmtDayRange(card[which === 'inbound' ? 'travelStartDay' : 'nextTravelStartDay'], which === 'inbound' ? card.startDay : (STATE.agenda.find(mission => mission.id === card.nextMissionId)?.startDay || card.startDay))}</div>` : ''}
+      ${selected && startDay != null && endDay != null ? `<div class="transport-mini">${selected.icon} ${selected.label} · ${fmtDayRange(startDay, endDay)}</div>` : ''}
     </div>
   `;
 }
 function renderPendingCardStrip(card) {
   if (!card) return '';
-  const title = card.kind === 'chance' ? 'Carte en attente' : 'Opportunité en attente';
+  const title = card.kind === 'chance'
+    ? 'Carte en attente'
+    : (card.kind === 'home' ? 'Retour en attente' : 'Opportunité en attente');
   const label = card.kind === 'chance'
     ? `Carte Chance : ${PERK_DEFS[card.perkKey].name}`
-    : `${missionTitle(card)} · ${fmtMoney(card.payTotal)} · +${card.points} pts`;
+    : (card.kind === 'home'
+      ? `Retour chez les parents à ${card.city.name} · ${fmtMoney(-(card.travelCost || 0))}`
+      : `${missionTitle(card)} · ${fmtMoney(card.payTotal)} · +${card.points} pts`);
   const note = 'Tu peux la rouvrir, la refuser, ou passer la semaine et la perdre.';
   return `
     <div class="paper pending-strip">
@@ -2954,8 +3641,99 @@ function renderPendingCardStrip(card) {
     </div>
   `;
 }
+function renderHomePresentation(card) {
+  return `
+    <div class="listing-panel">
+      <div class="listing-description">"Tu rentres dans ta ville de départ. Là-bas, aucune charge hebdomadaire tant que tu n'es pas reparti."</div>
+      <div class="listing-grid">
+        <div class="listing-spec">
+          <div class="listing-spec-label">Ville de retour</div>
+          <div class="listing-spec-value">${card.city.name}</div>
+        </div>
+        <div class="listing-spec">
+          <div class="listing-spec-label">Depuis</div>
+          <div class="listing-spec-value">${card.srcCity.name}</div>
+        </div>
+        <div class="listing-spec">
+          <div class="listing-spec-label">Coût hebdo sur place</div>
+          <div class="listing-spec-value">0 €</div>
+        </div>
+        <div class="listing-spec">
+          <div class="listing-spec-label">Agenda ensuite</div>
+          <div class="listing-spec-value">${card.nextMissionId ? 'Repart au prochain départ' : 'Aucun départ prévu'}</div>
+        </div>
+      </div>
+    </div>
+  `;
+}
+function renderHomePlanning(card, nextMission) {
+  const outboundValue = nextMission
+    ? (card.selectedOutbound ? `${card.selectedOutbound.icon} ${card.selectedOutbound.label}` : 'Bloqué')
+    : 'Libre';
+  const outboundSub = nextMission
+    ? (card.selectedOutbound
+      ? (card.outboundPlanType === 'catch-booked'
+        ? `Vers ${card.outboundTargetCity.name} · puis ${nextMission.travelIcon} ${nextMission.travelLabel} vers ${nextMission.city.name}`
+        : `Vers ${nextMission.city.name} · ${fmtMoney(card.selectedOutbound.cost)}`)
+      : card.outboundBlockedReason)
+    : 'Aucune destination réservée après le retour';
+  return `
+    <div class="planner-view">
+      <div class="planner-summary">
+        <div class="planner-stat-card">
+          <div class="planner-stat-label">Retour</div>
+          <div class="planner-stat-value">${card.selectedInbound ? `${card.selectedInbound.icon} ${card.selectedInbound.label}` : 'Impossible'}</div>
+          <div class="planner-stat-sub">${card.selectedInbound ? `${fmtDays(card.travelDays)} · ${fmtMoney(card.travelCost)}` : 'Aucune option réaliste'}</div>
+        </div>
+        <div class="planner-stat-card">
+          <div class="planner-stat-label">Chez les parents</div>
+          <div class="planner-stat-value">0 € / semaine</div>
+          <div class="planner-stat-sub">Jusqu’au prochain trajet de départ</div>
+        </div>
+        <div class="planner-stat-card">
+          <div class="planner-stat-label">${nextMission ? 'Après le retour' : 'Agenda'}</div>
+          <div class="planner-stat-value">${outboundValue}</div>
+          <div class="planner-stat-sub">${outboundSub}</div>
+        </div>
+      </div>
+
+      ${renderTransportPlanner(
+        card,
+        'inbound',
+        `Trajet vers ${card.city.name}`,
+        card.inboundOptions,
+        card.selectedInboundMode,
+        false,
+        `Depuis ${card.srcCity.name} · ${Math.round(card.distance)} km`
+      )}
+
+      ${nextMission ? renderTransportPlanner(
+        card,
+        'outbound',
+        card.outboundPlanType === 'catch-booked'
+          ? `Puis rejoindre ${card.outboundTargetCity.name}`
+          : `Puis vers ${nextMission.city.name}`,
+        card.outboundOptions,
+        card.selectedOutboundMode,
+        card.selectedOutboundCancellable,
+        card.outboundPlannerText || `Prépare le départ après le retour chez les parents.`
+      ) : ''}
+
+      <div class="travel-info">
+        ${card.selectedInbound ? `${card.travelIcon} <strong>${card.travelLabel}</strong> · ${fmtDays(card.travelDays)} · ${fmtMoney(card.travelCost)}` : '✖ <strong>Retour impossible pour l’instant</strong>'}<br>
+        ${card.selectedInbound ? `<span class="planner-note">Arrivée estimée : <strong>${fmtDayRange(card.travelStartDay, card.arrivalDay)}</strong></span>` : ''}
+        ${card.selectedOutbound && nextMission ? `<br><span class="planner-note">Prochain départ : <strong>${fmtMoney(card.selectedOutbound.cost)}</strong> ${card.outboundPlanType === 'catch-booked'
+          ? `pour rejoindre ${card.outboundTargetCity.name}, puis ${nextMission.travelIcon} ${nextMission.travelLabel} vers ${nextMission.city.name}`
+          : `pour rejoindre ${nextMission.city.name}`}</span>` : ''}
+        ${card.refundCost > 0 ? `<br><span class="planner-note">Coût des trajets remplacés : <strong style="color:#a83232;">−${fmtMoney(card.refundCost)}</strong></span>` : ''}
+        <br><span class="planner-note">Le statut chez les parents s’arrête dès qu’un trajet repart de chez eux vers la prochaine destination.</span>
+        ${card.feasibilityIssues.length ? `<div class="travel-warnings">${card.feasibilityIssues.map(issue => `<div>⚠ ${issue}</div>`).join('')}</div>` : ''}
+      </div>
+    </div>
+  `;
+}
 function getPendingCardCancellationData(card) {
-  if (!card || card.kind !== 'mission') return null;
+  if (!card || (card.kind !== 'mission' && card.kind !== 'home')) return null;
   const overlapMissions = getCardOverlapMissions(card);
   if (overlapMissions.length) {
     return {
@@ -2971,7 +3749,9 @@ function getPendingCardCancellationData(card) {
   if (nextMission) {
     return {
       missions: [nextMission],
-      reason: `Cette mission bloque le trajet après l’opportunité. En l’annulant, la route se libère.`,
+      reason: card.kind === 'home'
+        ? `Cette mission tombe pendant le retour ou bloque le redépart depuis chez tes parents. En l’annulant, le plan redevient viable.`
+        : `Cette mission bloque le trajet après l’opportunité. En l’annulant, la route se libère.`,
     };
   }
   return null;
@@ -2990,7 +3770,7 @@ function getPendingCardActiveTab(card) {
 }
 function setPendingCardTab(tab) {
   const card = STATE.pendingCard;
-  if (!card || card.kind !== 'mission') return;
+  if (!card || (card.kind !== 'mission' && card.kind !== 'home')) return;
   const keys = getPendingCardTabs(card).map(item => item.key);
   STATE.pendingCardTab = keys.includes(tab) ? tab : 'presentation';
   render();
@@ -3050,7 +3830,11 @@ function renderOpportunityPlanning(card, nextMission) {
     ? (card.selectedOutbound ? `${card.selectedOutbound.icon} ${card.selectedOutbound.label}` : 'Bloqué')
     : 'Libre';
   const nextSub = nextMission
-    ? (card.selectedOutbound ? `Vers ${nextMission.city.name} · ${fmtMoney(card.selectedOutbound.cost)}` : card.outboundBlockedReason)
+    ? (card.selectedOutbound
+      ? (card.outboundPlanType === 'catch-booked'
+        ? `Vers ${card.outboundTargetCity.name} · puis ${nextMission.travelIcon} ${nextMission.travelLabel} vers ${nextMission.city.name}`
+        : `Vers ${nextMission.city.name} · ${fmtMoney(card.selectedOutbound.cost)}`)
+      : card.outboundBlockedReason)
     : 'Aucun sitting suivant réservé';
   return `
     <div class="planner-view">
@@ -3085,17 +3869,21 @@ function renderOpportunityPlanning(card, nextMission) {
       ${nextMission ? renderTransportPlanner(
         card,
         'outbound',
-        `Puis vers ${nextMission.city.name}`,
+        card.outboundPlanType === 'catch-booked'
+          ? `Trajet pour rejoindre ${card.outboundTargetCity.name}`
+          : `Puis vers ${nextMission.city.name}`,
         card.outboundOptions,
         card.selectedOutboundMode,
         card.selectedOutboundCancellable,
-        `Remplace le trajet déjà réservé pour ${missionLabel(nextMission)}`
+        card.outboundPlannerText || `Remplace le trajet déjà réservé pour ${missionLabel(nextMission)}`
       ) : ''}
 
       <div class="travel-info">
         ${card.selectedInbound ? `${card.travelIcon} <strong>${card.travelLabel}</strong> · ${fmtDays(card.travelDays)} · ${fmtMoney(card.travelCost)}` : '✖ <strong>Trajet d’arrivée impossible</strong>'}<br>
         <span class="planner-note">Fenêtre de trajet : <strong>${fmtDayRange(card.travelStartDay, card.startDay)}</strong></span>
-        ${card.selectedOutbound ? `<br><span class="planner-note">Suite réservée : <strong>${fmtMoney(card.selectedOutbound.cost)}</strong> pour rejoindre ${nextMission.city.name}</span>` : ''}
+        ${card.selectedOutbound && nextMission ? `<br><span class="planner-note">Suite réservée : <strong>${fmtMoney(card.selectedOutbound.cost)}</strong> ${card.outboundPlanType === 'catch-booked'
+          ? `pour rejoindre ${card.outboundTargetCity.name}, puis ${nextMission.travelIcon} ${nextMission.travelLabel} vers ${nextMission.city.name}`
+          : `pour rejoindre ${nextMission.city.name}`}</span>` : ''}
         ${card.refundCost > 0 ? `<br><span class="planner-note">Coût des trajets remplacés : <strong style="color:#a83232;">−${fmtMoney(card.refundCost)}</strong></span>` : ''}
         ${card.feasibilityIssues.length ? `<div class="travel-warnings">${card.feasibilityIssues.map(issue => `<div>⚠ ${issue}</div>`).join('')}</div>` : ''}
       </div>
@@ -3111,17 +3899,17 @@ function renderOpportunityCancellation(card) {
       <div class="cancel-reason">${data.reason}</div>
       <div class="cancel-stack">
         ${data.missions.map(mission => {
-          const lostTicketCost = !mission.travelCancellable ? (mission.travelCost || 0) : 0;
-          return `
-            <div class="cancel-note">
-              <div class="cancel-note-title">${missionTitle(mission)}</div>
-              <div class="cancel-note-date">${fmtDate(mission.startWeek)}</div>
+        const lostTicketCost = getMissionCancellationCost(mission);
+        return `
+          <div class="cancel-note">
+            <div class="cancel-note-title">${missionTitle(mission)}</div>
+            <div class="cancel-note-date">${fmtDate(mission.startWeek)}</div>
               <div class="cancel-note-metrics">
                 <div>Paiement prévu : <strong>${fmtMoney(mission.payTotal)}</strong></div>
                 <div>Satisfaction : <strong>+${mission.points} pts</strong></div>
                 ${lostTicketCost > 0
                   ? `<div class="cancel-note-cost">Coût du trajet : <strong>−${fmtMoney(lostTicketCost)}</strong></div>`
-                  : `<div>${isAutoCancellableMode(mission.travelMode) ? 'Trajet' : 'Billet'} : <strong>annulable sans frais</strong></div>`}
+                  : `<div>Trajet : <strong>annulable sans frais</strong></div>`}
               </div>
             </div>
           `;
@@ -3131,6 +3919,34 @@ function renderOpportunityCancellation(card) {
   `;
 }
 function getPendingCardPrimaryAction(card) {
+  if (card.kind === 'home') {
+    if (card.canAcceptByCancellingNextMission) {
+      return {
+        label: 'Rentrer en annulant',
+        onclick: 'acceptHomeCardByCancellingNextMission()',
+        disabled: false,
+        note: card.nextMissionCancellationRefundCost > 0
+          ? `L’annulation coûtera ${fmtMoney(card.nextMissionCancellationRefundCost)} de trajet déjà réservé.`
+          : 'Le sitting bloquant peut être annulé sans coût de trajet.',
+      };
+    }
+    if (card.feasible) {
+      return {
+        label: 'Rentrer',
+        onclick: 'acceptCard()',
+        disabled: false,
+        note: card.refundCost > 0
+          ? `Le retour remplace des trajets déjà réservés pour ${fmtMoney(card.refundCost)}.`
+          : `Coût immédiat du retour : ${fmtMoney(card.travelCost)}.`,
+      };
+    }
+    return {
+      label: 'Rentrer',
+      onclick: 'acceptCard()',
+      disabled: true,
+      note: 'Ce retour n’est pas faisable avec le planning actuel.',
+    };
+  }
   if (card.canAcceptByCancellingOverlap) {
     return {
       label: 'Accepter en annulant',
@@ -3187,6 +4003,51 @@ function renderPendingCardModal() {
             <button onclick="minimizePendingCard()">Réfléchir</button>
             <button class="danger" onclick="refuseCard()">Refuser</button>
             <button class="primary" onclick="acceptCard()">Accepter</button>
+          </div>
+        </div>
+      </div>
+    `;
+  }
+  if (card.kind === 'home') {
+    const nextMission = card.nextMissionId ? STATE.agenda.find(mission => mission.id === card.nextMissionId) : null;
+    const activeTab = getPendingCardActiveTab(card);
+    const primaryAction = getPendingCardPrimaryAction(card);
+    const tabs = getPendingCardTabs(card);
+    const tabPanel = activeTab === 'planning'
+      ? renderHomePlanning(card, nextMission)
+      : (activeTab === 'cancellation' ? renderOpportunityCancellation(card) : renderHomePresentation(card));
+    return `
+      <div class="modal-overlay" id="card-modal">
+        <div class="opportunity-modal">
+          <div class="opportunity-shell">
+            <div class="opportunity-topline">
+              <div class="opportunity-title-line">
+                <strong>Retour chez les parents</strong>, <span class="opportunity-city">${card.city.name}</span>, <strong class="opportunity-continent">${card.city.continent}</strong>
+              </div>
+            </div>
+            <div class="opportunity-tabs">
+              ${tabs.map(tab => `
+                <button class="opportunity-tab ${activeTab === tab.key ? 'active' : ''}" onclick="setPendingCardTab('${tab.key}')">${tab.label}</button>
+              `).join('')}
+            </div>
+            <div class="opportunity-body">
+              <div class="opportunity-main">
+                <div class="opportunity-panel-wrap">
+                  <div class="opportunity-panel">${tabPanel}</div>
+                </div>
+              </div>
+              <div class="opportunity-side">
+                ${renderCalendarPane(card)}
+              </div>
+            </div>
+          </div>
+          <div class="opportunity-footer">
+            <div class="opportunity-footer-note">${primaryAction.note}</div>
+            <div class="opportunity-footer-main">
+              <button onclick="minimizePendingCard()">Réfléchir</button>
+              <button class="danger" onclick="refuseCard()">Refuser</button>
+              <button class="primary" onclick="${primaryAction.onclick}" ${primaryAction.disabled ? 'disabled' : ''}>${primaryAction.label}</button>
+            </div>
           </div>
         </div>
       </div>
@@ -3351,12 +4212,20 @@ function renderGame() {
           ${renderAgenda()}
         </div>
         <div class="paper">
-          <h3>Carte Chance</h3>
-          ${renderPerkPanel()}
+          <h3>Annonces</h3>
+          ${renderOfferFilterPanel()}
         </div>
         <div class="paper">
           <h3>Succès</h3>
           ${renderAchievements()}
+        </div>
+        <div class="paper">
+          <h3>Carte Chance</h3>
+          ${renderPerkPanel()}
+        </div>
+        <div class="paper">
+          <h3>Retour chez les parents</h3>
+          ${renderReturnHomePanel()}
         </div>
       </div>
     </div>
@@ -3390,6 +4259,7 @@ window.toggleHelp = toggleHelp;
 window.cancelMission = cancelMission;
 window.acceptCardByCancellingOverlap = acceptCardByCancellingOverlap;
 window.acceptCardByCancellingNextMission = acceptCardByCancellingNextMission;
+window.acceptHomeCardByCancellingNextMission = acceptHomeCardByCancellingNextMission;
 window.minimizePendingCard = minimizePendingCard;
 window.reopenPendingCard = reopenPendingCard;
 window.setPendingCardTab = setPendingCardTab;
@@ -3397,6 +4267,8 @@ window.selectPendingTransport = selectPendingTransport;
 window.togglePendingCancellable = togglePendingCancellable;
 window.updateMenuName = updateMenuName;
 window.chooseAvatar = chooseAvatar;
+window.setOfferFilter = setOfferFilter;
+window.offerReturnHome = offerReturnHome;
 window.generateOffer = generateOffer;
 window.buildMissionOffer = buildMissionOffer;
 window.STATE = STATE;

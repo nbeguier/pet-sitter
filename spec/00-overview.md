@@ -1,193 +1,433 @@
-# Pet Sitter — Spécifications du jeu
+# Pet Sitter — Vue d’ensemble du jeu
 
-> Jeu navigateur en React. Le joueur incarne un·e pet-sitter (et plus rarement house/bird/cat-sitter) qui voyage de mission en mission. Le but : enchaîner les opportunités, gérer son argent, et accumuler des points de succès — sans jamais finir à découvert.
+> Ce document décrit le **jeu tel qu’il existe aujourd’hui** dans `game/pet-sitter.html`.  
+> L’ancienne vision “React + Zustand” n’est plus la référence produit. La source de vérité actuelle est le jeu standalone HTML/CSS/JS.
 
 ## 1. Pitch
 
-Le joueur pioche au tour par tour des cartes **Opportunité**. La grande majorité concerne du **Dog sitting**, mais on tombe parfois sur des cartes plus originales : **Cat sitting**, **House sitting**, **Bird sitting**, etc.
+`Pet Sitter` est un jeu solo navigateur, au tour par tour, dans lequel on incarne un·e sitter itinérant·e.  
+On enchaîne des missions de `Dog sitting`, `Cat sitting`, `Bird sitting` ou `House sitting`, on planifie ses déplacements à l’avance, on essaie de ne jamais finir à découvert, et on vise `100 points` de satisfaction/succès.
 
-Chaque carte propose un contrat avec un lieu, un type de logement, un paiement, une durée et une date de début. Le joueur peut accepter ou refuser — refuser, c'est parier qu'une meilleure opportunité arrivera bientôt.
+Le ton est volontairement léger, un peu carnet de voyage / petites annonces, mais le cœur du jeu est un **jeu de planning** :
 
-## 2. Boucle de jeu
+- accepter une mission rentable tout de suite ou attendre mieux ;
+- garder assez de cash pour survivre ;
+- choisir des transports lents et peu chers ou rapides et coûteux ;
+- réorganiser un agenda déjà réservé sans tout faire exploser.
 
-À chaque tour (= 1 semaine) :
+## 2. Réalité du projet aujourd’hui
 
-1. Le temps avance d'une semaine.
-2. Avec une probabilité **P_opportunité = 45%**, une carte Opportunité est piochée et présentée.
-3. Si une carte est proposée, le joueur choisit : **accepter** ou **refuser** (refuser = la carte disparaît).
-4. Les coûts récurrents (vie courante) et ponctuels (déplacements) sont prélevés.
-5. Si une mission acceptée **démarre** ce tour : paiement total versé et coût de transport débité.
-6. Si une mission acceptée **se termine** ce tour : points de satisfaction crédités.
-7. Les succès éventuellement débloqués déclenchent des points.
-8. Condition de défaite vérifiée : si le solde passe sous 0, fin de partie.
-9. Condition de victoire vérifiée : si points ≥ 100, fin de partie.
+- Le jeu jouable est dans `game/pet-sitter.html`.
+- Il n’y a **pas** de build front, pas de TypeScript, pas de React.
+- Le jeu est un gros fichier unique qui contient :
+  - le CSS ;
+  - les données ;
+  - le moteur ;
+  - le rendu ;
+  - les handlers UI.
+- Les assets externes utilisés aujourd’hui sont :
+  - `game/world_map_with_nations.svg`
+  - `game/music/launch.mp3`
+  - `game/music/ingame.mp3`
 
-**Note** : pendant qu'une mission est en cours, les tours continuent normalement et le joueur peut piocher / accepter d'**autres** cartes futures — tant qu'aucun chevauchement temporel n'existe entre deux sittings.
+## 3. Boucle de jeu
 
-## 3. Cartes Opportunité
+Chaque tour représente **1 semaine**.
 
-### 3.1. Type de mission (avec probabilités indicatives)
+Ordre logique actuel :
 
-- **Dog sitting** — très fréquent (~60%) — bien payé, mais satisfaction faible.
-- **Cat sitting** — peu fréquent (~18%) — moins bien payé, mais satisfaction plus élevée.
-- **House sitting** (= garder un logement **sans animal**) — rare (~12%). 5 réussis → succès **Ermite**.
-- **Bird sitting** — très rare (~5%).
-- *(types additionnels possibles plus tard : plant sitting, fish sitting, exotic sitting…)*
+1. Si une carte est ouverte, le joueur doit soit la traiter, soit la réduire avec `Réfléchir`.
+2. Si une carte réduite reste en attente et qu’on clique `Tour suivant`, elle est perdue.
+3. La semaine avance de 1.
+4. Les missions qui se terminent donnent leurs points de satisfaction et alimentent les compteurs de succès.
+5. Les missions qui démarrent :
+   - versent leur paiement total immédiatement ;
+   - débitent leurs coûts de transport au démarrage ;
+   - déplacent la position courante.
+6. Les revenus / événements de perk éventuels se résolvent.
+7. Le coût de vie hebdomadaire est prélevé, sauf si le joueur est `chez les parents`.
+8. Si le solde passe sous `0`, la partie est perdue.
+9. Si les points atteignent `100`, la partie est gagnée.
+10. Avec `45 %` de chance de base, une nouvelle carte apparaît.
 
-### 3.2. Champs d'une carte
+## 4. Types de cartes
 
-- **Lieu** : ville + pays + continent.
-- **Type de logement** : appartement, maison, villa, château, péniche, cabane, etc.
-- **Paiement** : montant total (calculé depuis le tarif journalier × durée).
-- **Durée** : exprimée en jours ou en mois.
-- **Date de début** : peut être proche ou très éloignée de la date courante.
-- **Points de satisfaction** : valeur fixe créditée à la fin de la mission.
-- **Mention "potes invités"** (optionnelle) : drapeau pour le succès Kiffeur.
+Le jeu manipule aujourd’hui **3 familles** de cartes.
 
-### 3.3. Anatomie visuelle d'une carte (UI)
+### 4.1. Carte Opportunité
 
-Chaque carte Opportunité affichée à l'écran ressemble à une petite annonce, dans le style atlas / carnet de voyage :
+C’est la carte principale du jeu.
 
-1. **Image du logement** en haut (illustration ou photo retouchée sépia).
-2. **Bloc caractéristiques** structuré :
-   - Type de mission (Dog / Cat / Bird / House sitting) + animal·aux concerné·s
-   - Lieu (ville, pays, continent)
-   - Type de logement
-   - Date de début + durée
-   - Paiement total
-   - Points de satisfaction
-   - Mention "potes invités" si applicable
-3. **Zone de texte d'ambiance** (2 à 3 phrases) : description rédigée de l'annonce, ton "leboncoin" / petite annonce — purement décorative, pour donner du caractère. Exemples :
-   > "Cherche personne de confiance pour s'occuper de Maurice, golden retriever de 8 ans très calme. Le logement donne sur le canal, plantes à arroser deux fois par semaine. Possibilité d'inviter des amis."
+Elle décrit une mission avec :
 
-   > "Petite maison perchée dans la vallée, à garder pendant mon voyage. Pas d'animaux, juste les volets à ouvrir et le courrier à relever. Endroit idéal pour les amateurs de silence."
+- type de mission ;
+- ville / continent ;
+- type de logement ;
+- date de début ;
+- durée ;
+- paiement total ;
+- points de satisfaction ;
+- texte d’annonce ;
+- parfois la mention `Potes invités`.
 
-4. **Boutons** : `Accepter` / `Refuser`.
+Le joueur peut :
 
-Ces 2-3 phrases sont **générées à partir de templates** (avec variables : nom de l'animal, type de logement, lieu, mentions diverses) pour éviter d'avoir à rédiger 150 textes uniques. Quelques dizaines de templates suffisent à produire de la variété perçue.
+- `Accepter`
+- `Refuser`
+- `Réfléchir`
+- parfois `Accepter en annulant`
 
-## 4. Économie
+La popup d’opportunité est structurée en onglets :
 
-- **Solde** : argent disponible du joueur.
-- **Solde de départ** : équivalent à **3 mois de coûts de vie** (= 1500€ avec un coût de vie de 500€/mois).
-- **Revenus** : paiements des missions acceptées et terminées.
-- **Coûts de vie (nourriture)** : **500 €/mois fixes**, prélevés en mission **comme** hors mission. La nourriture est toujours à la charge du joueur.
-- **Logement** : gratuit pendant un sitting (le joueur loge dans le logement de la mission). Hors sitting, pas de coût de logement (le joueur est censé bouger / dormir où il peut, c'est abstrait).
-- **Coûts de déplacement** : selon la distance × le mode de transport choisi (voir §8).
-- **Défaite** : solde < 0.
+- `Présentation`
+- `Planification`
+- `⚠ Mission à annuler` quand nécessaire
 
-## 5. Points & Succès
+Un mini-calendrier reste visible à droite pendant toute la consultation.
 
-Les points ne se confondent pas avec l'argent. On en gagne via :
+### 4.2. Carte Chance
 
-- **Satisfaction de la mission** : chaque carte indique un nombre de points fixe gagnés en fin de mission.
-- **Succès débloqués** : voir §15 ci-dessous.
+Avec `2 %` de chance, un tirage d’opportunité devient une carte `Chance`.
 
-## 6. Temps & tours
+Règles :
 
-- **Unité d'un tour : 1 semaine.**
-- Calendrier interne : date courante du jeu, qui avance d'une semaine à chaque tour.
-- Les missions ont une date de début future ; le joueur peut **réserver des missions à l'avance**.
+- une seule carte Chance active à la fois ;
+- on peut la refuser ;
+- elle dure toute la partie tant qu’elle n’est pas retirée par sa propre logique.
 
-## 7. Agenda / planning
+Perks actuels :
 
-- Le joueur dispose d'un **agenda visuel** (calendrier).
-- Il peut empiler plusieurs missions futures tant qu'elles **ne se chevauchent pas dans le temps** (et qu'il a le temps de voyager entre les deux — voir §8).
-- Les missions acceptées sont visibles dans l'agenda avec leurs dates et lieux.
+- `Un ami qui s’y connaît`
+  - affiche une lecture qualitative de la rémunération (`Arnaque`, `Moyen`, `Bon deal`, `Excellent`)
+- `Digital Nomad`
+  - revenu freelance aléatoire environ mensuel
+  - risque de coup URSSAF en fin d’été / rentrée
+- `Star des réseaux`
+  - `+20 points` de chance d’opportunité
+  - cartes plus lointaines
+  - `50 %` de chance que `train`, `ferry`, `boatstop` ou `bus` soient offerts
+  - est perdue au premier avion
+  - devient définitivement indisponible pour le reste de la partie après un avion
 
-## 8. Carte du monde & déplacements
+### 4.3. Retour chez les parents
 
-- **Carte interactive 2D** du monde réel, esthétique d'**atlas / carnet de voyage vintage** (papier vieilli, typo sérif).
-- Les villes sont des points cliquables.
-- Le joueur a une position courante ; les déplacements tracent une ligne sur la carte.
-- **Distance** : à vol d'oiseau entre les deux points.
-- **Modes de transport au choix** :
-  - Avion : rapide, cher.
-  - Train : intermédiaire.
-  - Bus / voiture : lent, économique.
-  - Auto-stop / lent : très long, presque gratuit.
-- **Règle clé** : le **coût d'un transport est proportionnel à sa rapidité**. Avoir beaucoup de temps entre deux missions permet de voyager presque gratuitement. À l'inverse, si on a accepté deux missions trop rapprochées (ex: 3 jours d'écart) sur des continents éloignés, on est **forcé de prendre l'avion**, donc de payer cher.
-- L'agenda doit donc être planifié en pensant au temps de transit nécessaire.
+Le bloc latéral `Retour chez les parents` permet de déclencher une carte spéciale.
 
-## 9. Conditions de fin de partie
+Règles :
 
-- **Victoire** : atteindre **100 points** (seuil ajustable selon équilibrage).
-- **Défaite** : solde d'argent < 0.
-- À voir : possibilité de continuer après victoire pour un high-score.
+- disponible seulement si :
+  - aucune mission n’est en cours ;
+  - aucune autre carte n’est déjà ouverte ;
+  - le joueur n’est pas déjà chez ses parents ;
+- la destination est toujours la **ville de départ** ;
+- il faut payer le trajet pour y aller ;
+- une fois sur place :
+  - les charges hebdomadaires deviennent `0 €` ;
+  - cet état dure jusqu’au prochain trajet qui repart de la ville de départ vers une mission future ;
+- la carte reprend la même UX qu’une opportunité :
+  - `Présentation`
+  - `Planification`
+  - `Mission à annuler` si besoin
+  - calendrier à droite
 
-## 10. Système de points
+Le retour maison peut :
 
-Les points proviennent de plusieurs sources :
+- recalculer le trajet du sitting suivant ;
+- remplacer le trajet déjà réservé du sitting suivant ;
+- nécessiter l’annulation d’un sitting qui tombe pendant le retour ou qui bloque le redépart.
 
-- **Satisfaction de la mission** : chaque carte Opportunité indique un **nombre de points fixe** gagné à la fin de la mission (en plus du paiement). C'est la "satisfaction" du sitting.
-- **Succès géographiques** : ex. visiter tous les continents → bonus de points.
-- **Autres succès** : à définir (séries, types de missions rares, etc.).
+## 5. Génération des missions
 
-## 11. Génération & présentation des cartes
+### 5.1. Types de mission
 
-- **Pool biaisé géographiquement** : à chaque tirage, **60 % de chances** que la carte tombe dans le **continent courant du joueur** (cartes "locales"), **40 % de chances** qu'elle vienne de n'importe où dans le monde (cartes "lointaines"). Cela donne une activité régulière à proximité tout en gardant le frisson des grandes opportunités.
-- **Une seule carte par tour** : le joueur voit l'opportunité, et choisit **accepter** ou **refuser**. Une carte refusée disparaît définitivement.
-- La probabilité **P_opportunité = 45 %** d'avoir une carte au tour : certains tours, rien ne sort.
+Pool actuel :
 
-## 12. Direction artistique
+- `Dog sitting` : `60 %`
+- `Cat sitting` : `18 %`
+- `House sitting` : `17 %`
+- `Bird sitting` : `5 %`
 
-- **Style atlas / carnet de voyage vintage** : papier vieilli, encre sépia, typographie sérif (genre Playfair, Cormorant), traits dessinés à la plume.
-- Les cartes Opportunité reprennent ce style mais sont structurées comme des **petites annonces** (voir §3.3) : photo du logement, caractéristiques, texte d'ambiance.
-- Les icônes (chien, chat, oiseau, château, appartement…) en pictogrammes au trait.
+### 5.2. Lieux
 
-## 13. Démarrage de partie
+Le jeu utilise aujourd’hui `32 villes` réparties sur `6 continents` :
 
-- **Choix d'un personnage** : purement cosmétique (avatar, prénom). Aucun effet sur les stats / l'économie.
-- **Position de départ** : ville **aléatoire** parmi un set défini.
-- **Solde de départ** : équivalent à 3 mois de coûts de vie.
+- `Europe`
+- `Africa`
+- `Asia`
+- `N.America`
+- `S.America`
+- `Oceania`
 
-## 14. Sauvegarde
+### 5.3. Biais géographique
 
-- **Mode solo uniquement** (multijoueur potentiellement plus tard).
-- **Auto-save dans le `localStorage`** : la partie en cours est persistée en continu, on reprend où on en était au prochain lancement.
+En mode normal :
 
-## 15. Succès & système d'Expertise
+- `60 %` de chances qu’une carte soit “locale” au continent courant ;
+- `40 %` qu’elle soit mondiale.
 
-### 15.1. Succès géographiques
+Le panneau `Annonces` permet aussi un filtre manuel :
 
-- **Globe-trotter** : avoir gardé sur **chaque continent**. Modèle retenu : **6 continents sans Antarctique** : Europe, Afrique, Asie, **Amérique du Nord**, **Amérique du Sud**, Océanie.
+- `N’importe où`
+- `À proximité`
 
-### 15.2. Bestiaire
+Le mode `À proximité` restreint le tirage à un petit pool de villes proches de la position actuelle.  
+Le choix est pris en compte au prochain clic sur `Tour suivant`.
 
-- **Bestiaire complet** : avoir gardé chaque type d'animal au moins une fois (chien, chat, oiseau, et tous les types ajoutés).
+### 5.4. Horizon de départ
 
-### 15.3. Système d'Expert (mécanique transverse)
+Répartition actuelle des dates de début :
 
-Quand le joueur a réussi **5 sittings du même type**, il débloque une **carte Expert** correspondante :
+- `40 %` : urgence, départ dans `1 à 2 semaines`
+- `10 %` : départ dans `3 à 22 semaines`
+- `40 %` : départ dans `23 à 39 semaines`
+- `10 %` : départ dans `40 à 52 semaines`
 
-- 5 dog sittings → **Expert Chien**
-- 5 cat sittings → **Expert Chat**
-- 5 House sittings → **Ermite** (un House sitting est par définition un sitting **sans animal**).
+### 5.5. Durée
 
-Note : pas d'Expert Oiseau (Bird sitting reste dans le pool de base, sans biais possible).
+Répartition actuelle :
 
-**Effet d'une carte Expert** : tant que le joueur la possède, le **pool de tirage est biaisé en faveur de ce type de carte** (la proba qu'**une fois** une carte est tirée, elle soit de ce type augmente). Cela **ne change pas** la probabilité globale `P_opportunité = 45%` — juste la composition du pool. Plusieurs Expert cumulables.
+- majorité entre `7` et `21 jours`
+- une part moyenne entre `22` et `60 jours`
+- une petite part longue jusqu’à `90 jours`
+- une très petite part ultra courte (`5 à 6 jours`)
 
-Chaque carte Expert débloquée donne aussi un **bonus de points**.
+### 5.6. Variantes de mission
 
-### 15.4. Succès "Kiffeur"
+- logement rare : `25 %`
+  - donne `+2 pts`
+- `Potes invités` : `30 %`
+  - donne `+1 pt` immédiat sur la carte
+  - alimente le succès `Kiffeur`
+- bonus de rémunération continent lointain : `+20 %`
 
-Certaines cartes Opportunité portent la mention **"potes invités"**. Aucun impact économique ou ludique : c'est purement un drapeau narratif. Après **5 sittings réussis avec cette mention**, le succès **Kiffeur** est débloqué (bonus de points + carte Kiffeur affichée).
+## 6. Agenda et planification
 
-### 15.5. UI des succès
+Le jeu repose sur un agenda de missions futures.
 
-- Un **panneau "Mes cartes"** liste les cartes Expert obtenues (Chien, Chat, Oiseau, Ermite, Kiffeur, Globe-trotter, etc.).
-- Visuel : style carte d'identité / blason.
+Règles générales :
 
-## 16. Aide
+- on peut réserver plusieurs missions à l’avance ;
+- les missions ne peuvent pas se chevaucher si on veut les garder toutes ;
+- le temps de transport est une vraie contrainte ;
+- une mission peut être acceptée même si elle force à en annuler une autre.
 
-- **Pas de tutoriel interactif**. Au premier lancement, on entre directement dans la partie.
-- Un bouton **"Aide"** (icône `?`) ouvre une **page d'aide dédiée** récapitulant : la boucle de tour, l'agenda, la carte, les coûts, les succès, les conditions de victoire/défaite.
+### 6.1. Deux couches de trajet
 
-## 17. Décisions ouvertes restantes
+Le modèle actuel distingue :
 
-- Échelle économique exacte (€/mois de vie, paiements types, tarifs de transport au km × mode)
-- Distribution des points de satisfaction par carte (range typique pour atteindre 100 pts)
-- Valeur en points des succès débloqués (Globe-trotter, Bestiaire, Experts, Kiffeur)
-- Liste précise des types de logement et types d'animaux (pour les data files)
-- Liste de villes (combien ? quelles villes ?)
+- le **trajet principal** d’une mission ;
+- éventuellement un **trajet d’approche** pour rejoindre un départ déjà réservé.
+
+Exemple :
+
+- un ferry vers Rio déjà booké au départ de Vienne ;
+- une mission intermédiaire acceptée à Athènes ;
+- le jeu peut proposer un trajet `Athènes -> Vienne` pour attraper le ferry déjà réservé.
+
+### 6.2. Remplacement vs rattrapage
+
+Quand une nouvelle carte s’insère avant une mission future, le moteur peut :
+
+- **rattraper un trajet réservé**
+  - on garde le trajet principal déjà booké ;
+  - on ajoute un trajet d’approche vers sa ville de départ
+- **remplacer un trajet réservé**
+  - l’ancien trajet est jeté ;
+  - un nouveau segment est choisi
+
+### 6.3. Billets annulables
+
+Certains transports peuvent être pris en version `annulable`.
+
+Règles :
+
+- surcoût de `+15 %`
+- permet de remplacer / annuler le trajet sans perdre son coût
+
+Exceptions :
+
+- `Auto-stop`
+- `Bateau-stop`
+- `Sur place`
+
+Ces modes sont annulables d’office, sans surcoût.
+
+### 6.4. Annulation d’une mission future
+
+Le joueur peut annuler une mission déjà bookée.
+
+- si elle commence dans plus de `8 semaines` :
+  - aucune pénalité de réputation
+- si elle commence dans moins de `8 semaines` :
+  - malus de réputation pendant `26 semaines`
+  - `-10 %` de chance d’opportunité pendant cette durée
+
+Dans tous les cas :
+
+- si des trajets non annulables étaient déjà réservés, leur coût est perdu
+
+## 7. Transports
+
+### 7.1. Modes disponibles
+
+Trajets terrestres :
+
+- `Auto-stop`
+- `Bus`
+- `Train`
+
+Trajets trans-océaniques :
+
+- `Bateau-stop`
+- `Avion`
+- `Ferry`
+
+### 7.2. Coût et vitesse actuels
+
+| Mode | Coût/km | Vitesse |
+|---|---:|---:|
+| Auto-stop | 0,005 € | 60 km/j |
+| Bateau-stop | 0,01 € | 80 km/j |
+| Avion | 0,03 € | 22 000 km/j |
+| Bus | 0,05 € | 200 km/j |
+| Train | 0,08 € | 400 km/j |
+| Ferry | 0,09 € | 200 km/j |
+
+Important :
+
+- le train et le ferry sont volontairement les plus chers ;
+- l’avion est plus cher que le bus sur certains segments, mais moins que train/ferry ;
+- l’auto-stop et le bateau-stop sont les vraies options low-cost.
+
+### 7.3. Affichage
+
+Le temps de transport apparaît :
+
+- dans la carte d’opportunité ;
+- dans l’agenda ;
+- dans le calendrier latéral ;
+- en gris hachuré quand le segment est annulable.
+
+## 8. Économie
+
+### 8.1. Valeurs globales
+
+- solde initial : `2000 €`
+- coût de vie : `500 €/mois`
+- équivalent hebdo prélevé : `500 * 12 / 52`, soit environ `115,38 €`
+- victoire : `100 pts`
+
+### 8.2. Paiement des missions
+
+Le paiement est versé **au démarrage** de la mission.  
+Les points, eux, sont gagnés **à la fin**.
+
+Tarifs journaliers actuels :
+
+- Dog : `35-55 €/jour`
+- Cat : `25-40 €/jour`
+- Bird : `30-50 €/jour`
+- House : `20-35 €/jour`
+
+### 8.3. Défaite
+
+La partie s’arrête dès que le solde passe sous `0`.
+
+## 9. Succès
+
+Succès actuels :
+
+- `Globe-trotter` : 6 continents, `+30`
+- `Bestiaire` : les 3 types d’animaux (`chien`, `chat`, `oiseau`), `+20`
+- `Agent Immobilier` : tous les types de logement, `+20`
+- `Pékin Express` : tous les transports sauf avion, `+20`
+- `Kiffeur` : 5 missions avec `Potes invités`, `+20`
+- `Écolo` : actif dès le départ, `+25`, perdu au premier avion
+- `Expert Chien` : 5 dog sittings, `+7`
+- `Ermite` : 5 house sittings, `+7`
+
+Effets spéciaux associés :
+
+- `Expert Chien`
+  - double le poids des `Dog sitting`
+- `Ermite`
+  - double le poids des `House sitting`
+- `Écolo`
+  - retiré dès qu’un avion est pris
+
+Affichage :
+
+- panneau de succès sous forme de cartes ;
+- progression visuelle par icônes grisées plutôt que par simples compteurs.
+
+## 10. Interface actuelle
+
+## 10.1. Menu
+
+- saisie du prénom
+- choix d’avatar
+- lancement de la partie
+- reprise de sauvegarde si présente
+- musique `launch.mp3`
+
+## 10.2. Écran de jeu
+
+Colonne centrale :
+
+- carte du monde
+- journal
+
+Colonne droite :
+
+- `Agenda`
+- `Annonces`
+- `Succès`
+- `Carte Chance`
+- `Retour chez les parents`
+
+## 10.3. Opportunités
+
+Une opportunité ouverte masque le jeu dans une grande modale.
+
+Le joueur peut :
+
+- consulter les onglets
+- changer les transports
+- réduire la popup avec `Réfléchir`
+- rouvrir la carte plus tard via le bandeau d’attente
+
+## 10.4. Fin de partie
+
+La modale de fin affiche :
+
+- victoire ou défaite
+- stats globales
+- carte du voyage façon carnet / polarsteps
+- succès obtenus
+- pourcentage de progression des succès manquants
+
+## 11. Sauvegarde, audio, aide
+
+- auto-save continu dans `localStorage`
+- musique d’intro au menu
+- musique de boucle en partie
+- écran d’aide intégré
+
+## 12. Ce qu’un autre dev doit garder en tête
+
+Les zones les plus sensibles du jeu sont :
+
+- la génération d’offre ;
+- le recalcul d’agenda ;
+- la gestion des trajets réservés / remplacés / rattrapés ;
+- les états spéciaux `pendingCard`, `atParents`, `activePerk` ;
+- le calendrier latéral, qui sert d’explication visuelle du moteur.
+
+Quand on modifie une règle de transport ou de planning, il faut toujours vérifier :
+
+- la carte d’opportunité ;
+- l’agenda ;
+- le calendrier ;
+- le coût réellement débité au démarrage ;
+- les cas d’annulation ;
+- les cas `Retour chez les parents`.

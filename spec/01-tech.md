@@ -1,41 +1,274 @@
-# Stack technique
+# Stack et architecture actuelles
 
-## Choix recommandé
+## 1. Réalité technique
 
-- **Vite + React 18 + TypeScript** — setup standard 2025, build rapide, typage utile pour les cartes et l'état du jeu.
-- **Gestion d'état** : **Zustand** (léger, simple, parfait pour une seule store globale du jeu). Alternative envisageable : `useReducer` + Context si on veut zéro dépendance.
-- **Routing** : non nécessaire (mono-écran avec panneaux).
-- **Carte interactive 2D** : **react-simple-maps** (basé sur D3, projection mondiale, supporte le style vintage via CSS / SVG filters). Alternative : **Leaflet** + tuiles custom si on veut du zoom continent fluide.
-- **Persistence** : `localStorage` direct, ou middleware `zustand/persist` pour serialization auto.
-- **Style** : **Tailwind CSS** + une palette sépia / papier vieilli + une font sérif (Cormorant, Playfair Display via Google Fonts).
-- **Icônes** : `lucide-react` pour les icônes système, **SVG custom** au trait pour les pictos thématiques (chien, chat, château…).
-- **Lint / format** : ESLint + Prettier.
-- **Tests** : Vitest pour la logique de jeu (tirage, économie, succès) — la logique métier doit être testable pure (séparée de React).
+Le projet n’est pas une app React.  
+La version active est un **jeu standalone en HTML/CSS/JavaScript vanilla**.
 
-## Architecture
+Source principale :
+
+- `game/pet-sitter.html`
+
+Assets :
+
+- `game/world_map_with_nations.svg`
+- `game/music/launch.mp3`
+- `game/music/ingame.mp3`
+
+Autres fichiers utiles :
+
+- `spec/00-overview.md`
+- `spec/02-balance.md`
+- `spec/sim/current_balance_sim.js`
+
+`game/index.html` existe, mais n’est pas la vraie entrée du jeu aujourd’hui.
+
+## 2. Organisation du repo
 
 ```
-src/
-  app/                # Composants racine, layout, providers
-  components/         # Composants UI réutilisables (Card, MapView, AgendaPanel...)
-  features/
-    cards/            # Génération et logique des cartes Opportunité
-    economy/          # Calcul coûts vie, déplacements, paiements
-    achievements/     # Détection et déblocage des succès
-    map/              # Carte interactive et déplacements
-    agenda/           # Planning des missions
-  game/               # Cœur de la logique de jeu (pur, sans React)
-    engine.ts         # Boucle de tour, état, transitions
-    types.ts          # Types : Card, Mission, GameState, Achievement
-    rng.ts            # Génération aléatoire seedée (pour reproductibilité tests)
-  store/              # Zustand store + persist
-  data/               # JSON statiques : villes, types de logements, types d'animaux
-  styles/             # Tailwind config, fonts
-  assets/             # Pictogrammes SVG, textures papier
+game/
+  pet-sitter.html            # jeu complet : UI + données + moteur
+  world_map_with_nations.svg # fond de carte
+  music/
+    launch.mp3
+    ingame.mp3
+
+spec/
+  00-overview.md
+  01-tech.md
+  02-balance.md
+  sim/
+    current_balance_sim.js   # simulateur actuel
+    balance_sim.py           # legacy / archive
+    balance_tweaks.py        # legacy / archive
 ```
 
-## Principes
+## 3. Architecture interne de `pet-sitter.html`
 
-- **Logique métier découplée de React** : tout le calcul du tour (`advanceTurn(state) -> newState`) vit dans `game/`. Les composants n'appellent que des actions du store.
-- **RNG seedé** : permet le rejeu déterministe (utile pour debug et tests).
-- **Données séparées** : la liste des villes, types d'animaux, types de logements vit dans `data/*.json` pour que l'équilibrage soit modifiable sans toucher au code.
+Même si tout est dans un seul fichier, le code est structuré par grandes zones :
+
+1. `CSS`
+   - DA complète du jeu
+   - styles de modales, panneaux, calendrier, map, etc.
+2. `Markup statique`
+   - bouton `?`
+   - conteneur `#app`
+   - overlay d’aide
+3. `Constantes et données`
+   - balance
+   - transports
+   - villes
+   - templates d’annonces
+   - logements
+   - perks
+   - succès
+4. `Helpers`
+   - formatage
+   - hasard pondéré
+   - distance
+   - calculs de dates / semaines
+5. `État global`
+   - `STATE`
+   - `buildDefaultState()`
+   - persistence `localStorage`
+6. `Moteur planning / transport`
+   - model de mission
+   - recalcul d’agenda
+   - segments de trajet
+   - annulations
+7. `Génération de cartes`
+   - opportunités
+   - cartes Chance
+   - retour chez les parents
+8. `Actions`
+   - accepter / refuser
+   - annuler mission
+   - tour suivant
+   - retour menu
+9. `Render`
+   - sidebar
+   - agenda
+   - map
+   - modales
+   - calendrier
+
+## 4. Modèle d’état principal
+
+Le store est un simple objet global `STATE`.
+
+Champs importants :
+
+- `phase`
+  - `menu`
+  - `playing`
+  - `over`
+- `week`
+- `balance`
+- `points`
+- `startCity`
+- `currentCity`
+- `agenda`
+- `completed`
+- `pendingCard`
+- `pendingCardMinimized`
+- `pendingCardTab`
+- `activePerk`
+- `socialStarBlocked`
+- `offerFilter`
+- `atParents`
+- `reputationPenaltyUntil`
+- sets de progression :
+  - `achievements`
+  - `animalsDone`
+  - `housingsDone`
+  - `continentsDone`
+  - `transportModesDone`
+
+## 5. Modèle de mission
+
+Une mission future peut embarquer deux couches de trajet :
+
+- `travel*`
+  - trajet principal
+- `access*`
+  - trajet d’approche vers un départ déjà réservé
+
+Champs structurants :
+
+- `travelMode`
+- `travelCancellable`
+- `travelDays`
+- `travelCost`
+- `travelStartDay`
+- `travelFrom`
+- `travelLocked`
+- `accessMode`
+- `accessCancellable`
+- `accessDays`
+- `accessCost`
+- `accessStartDay`
+- `accessFrom`
+- `accessTo`
+
+C’est le cœur des cas compliqués du jeu.
+
+## 6. Invariants métier importants
+
+Quand on touche au planning, il faut préserver ces règles :
+
+### 6.1. Une mission peut avoir un trajet déjà “figé”
+
+Si un trajet a déjà été réservé, une nouvelle carte peut soit :
+
+- le conserver et ajouter un trajet d’approche ;
+- le remplacer ;
+- rendre la mission infaisable ;
+- imposer une annulation.
+
+### 6.2. Le rendu doit refléter la vraie logique
+
+À chaque changement de transport, il faut que :
+
+- l’agenda ;
+- le mini-calendrier ;
+- le calcul du net estimé ;
+- le coût débité au démarrage
+
+restent cohérents entre eux.
+
+### 6.3. `Retour chez les parents` est un état à part
+
+Ce n’est pas juste un changement de ville.
+
+Il impacte :
+
+- le coût de vie hebdo ;
+- le prochain trajet ;
+- les cas d’annulation ;
+- le calendrier ;
+- la sortie de cet état, qui arrive au moment du prochain départ.
+
+## 7. Fonctions sensibles à connaître
+
+Pour un dev qui reprend le projet, les zones à lire en premier sont :
+
+- `generateRawMission()`
+- `buildMissionOffer()`
+- `refreshPendingMissionSelections()`
+- `refreshPendingHomeSelections()`
+- `recomputeAgenda()`
+- `nextTurn()`
+- `applyMissionCancellation()`
+- `renderCalendarPane()`
+- `renderOpportunityPlanning()`
+- `renderPendingCardModal()`
+
+## 8. Exécution locale
+
+Le jeu peut être ouvert directement dans un navigateur, mais un petit serveur statique est plus confortable.
+
+Exemples :
+
+```bash
+cd /Users/nicolas/perso/Lucile
+python3 -m http.server 8000
+```
+
+Puis ouvrir :
+
+- `http://localhost:8000/game/pet-sitter.html`
+
+## 9. Vérifications rapides utiles
+
+### 9.1. Sanity check syntaxe
+
+```bash
+node -e "const fs=require('fs');const html=fs.readFileSync('game/pet-sitter.html','utf8');const m=html.match(/<script>([\\s\\S]*)<\\/script>/); new Function(m[1]); console.log('syntax ok');"
+```
+
+### 9.2. Simulation d’équilibrage
+
+Le simulateur actuel exécute le vrai moteur JS du jeu :
+
+```bash
+node spec/sim/current_balance_sim.js --n 500 --json
+```
+
+Notes :
+
+- c’est le simulateur de référence aujourd’hui ;
+- les scripts Python dans `spec/sim/` sont des restes d’une ancienne phase et ne doivent plus être considérés comme source de vérité.
+
+## 10. Conseils de reprise
+
+### 10.1. Avant de toucher au moteur
+
+Toujours identifier si le changement impacte :
+
+- mission simple ;
+- mission avec trajet remplacé ;
+- mission avec trajet rattrapé (`catch-booked`) ;
+- mission annulée ;
+- retour chez les parents.
+
+### 10.2. Après un changement
+
+Toujours vérifier manuellement :
+
+- une opportunité simple ;
+- une opportunité qui chevauche ;
+- un trajet annulable ;
+- un trajet non annulable ;
+- un cas “retour maison” ;
+- un cas “sitting suivant recalculé”.
+
+### 10.3. Si un refactor est envisagé plus tard
+
+La meilleure extraction future serait probablement :
+
+- `data.js`
+- `engine.js`
+- `render.js`
+- `sim/`
+
+Mais aujourd’hui il vaut mieux **garder la cohérence du moteur** que lancer un gros refactor structurel.

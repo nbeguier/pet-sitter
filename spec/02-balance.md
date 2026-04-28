@@ -288,28 +288,37 @@ node spec/sim/current_balance_sim.js --n 200 --json
 
 ### 9.2. Résultat
 
-Résultats obtenus avec le bot `balanced_bot` :
+Résultats obtenus avec le bot `ecolo_collection_bot` :
+
+Ce bot n’est plus un simple bot de survie pure :
+
+- il utilise `Retour chez les parents` ;
+- il bascule sur `À proximité` quand l’économie se tend ;
+- il valorise aussi explicitement `Écolo`, `Bestiaire` et `Kiffeur`, ainsi que la progression partielle des succès.
 
 | Indicateur | Valeur |
 |---|---:|
-| `winRate` | `0 %` |
-| `defeatRate` | `100 %` |
-| `timeoutRate` | `0 %` |
-| `defeatRateFirst4Months` | `73 %` |
-| `medianWeekDefeat` | `11 semaines` |
-| `medianBalanceYear1Carry` | `-83,46 €` |
-| `medianBalanceWeek52Survivors` | `1778,93 €` |
-| `week52SurvivorRate` | `5,5 %` |
+| `winRate` | `4,5 %` |
+| `defeatRate` | `65,5 %` |
+| `timeoutRate` | `30 %` |
+| `defeatRateFirst4Months` | `0 %` |
+| `medianWeekDefeat` | `125 semaines` |
+| `defeatsAfter52Count` | `112` |
+| `medianPointsAtDefeatAfter52` | `44 pts` |
+| `medianBalanceYear1Carry` | `1298,08 €` |
+| `medianBalanceWeek52Survivors` | `1431,41 €` |
+| `week52SurvivorRate` | `90,5 %` |
+| `avgHomeUses` | `5,99` |
+| `nearbyWeekRate` | `68,5 %` |
 
 ### 9.3. Lecture
 
 En l’état :
 
-- le jeu est devenu très punitif dès le début ;
-- le bot de référence ne gagne plus du tout sur ce batch ;
-- la défaite arrive médianement vers la semaine `11`, donc très tôt ;
-- `73 %` des runs meurent dans les 4 premiers mois ;
-- les rares survivants à `S52` redeviennent souvent viables, mais ils sont très peu nombreux.
+- le bot gagne un peu plus souvent et ses victoires sont désormais très souvent corrélées à `Écolo`, `Bestiaire`, et parfois `Kiffeur` ;
+- malgré ça, il continue à mourir souvent, et quand il échoue tard il tombe médianement à seulement `44 pts` ;
+- la mécanique “maison” reste un levier énorme d’équilibrage ;
+- l’économie n’est plus le seul sujet : la capacité à convertir la survie en gros paquets de points devient centrale.
 
 ### 9.4. Limite importante
 
@@ -318,9 +327,14 @@ Le simulateur actuel :
 - joue les opportunités ;
 - gère les annulations proposées ;
 - gère les cartes Chance ;
+- bascule vers le filtre `À proximité` quand la trésorerie se tend ;
+- exploite activement `Retour chez les parents` quand cela améliore la survie projetée.
 
-mais il **n’exploite pas activement** le bouton manuel `Retour chez les parents`.  
-Les chiffres ci-dessus décrivent donc surtout le baseline “sans optimisation manuelle maison”.
+Sa limite principale a changé :
+
+- il valorise désormais fortement `Écolo`, `Bestiaire` et `Kiffeur`, mais reste encore trop prudent dans certaines branches ;
+- il sait mieux convertir certaines opportunités en progression de collection ;
+- malgré ça, il ne joue pas encore comme un humain opportuniste qui accepterait parfois un risque calculé pour verrouiller un très gros succès.
 
 ## 10. Leviers d’équilibrage principaux
 

@@ -1,0 +1,1456 @@
+<!DOCTYPE html>
+<html lang="fr">
+<head>
+<meta charset="UTF-8">
+<title>Pet Sitter — Le jeu</title>
+<style>
+:root { color-scheme: light; }
+
+* { box-sizing: border-box; margin: 0; padding: 0; }
+
+body {
+  font-family: 'Cormorant Garamond', Georgia, 'Times New Roman', serif;
+  background: #ead9b8;
+  background-image:
+    radial-gradient(circle at 10% 10%, rgba(120, 80, 30, 0.08) 0, transparent 40%),
+    radial-gradient(circle at 90% 80%, rgba(120, 80, 30, 0.10) 0, transparent 50%),
+    radial-gradient(circle at 50% 50%, rgba(150, 100, 40, 0.05) 0, transparent 70%);
+  color: #2b1f10;
+  min-height: 100vh;
+  padding: 16px;
+  font-size: 16px;
+}
+
+h1, h2, h3 { font-weight: 600; letter-spacing: 0.02em; }
+h1 { font-size: 32px; margin-bottom: 8px; }
+h2 { font-size: 22px; margin-bottom: 8px; border-bottom: 1px solid #8b6f47; padding-bottom: 4px; }
+h3 { font-size: 16px; text-transform: uppercase; letter-spacing: 0.1em; margin-bottom: 6px; color: #6e5532; }
+
+button {
+  font-family: inherit;
+  font-size: 16px;
+  padding: 8px 18px;
+  background: #f5e6c8;
+  border: 1.5px solid #6e5532;
+  color: #2b1f10;
+  cursor: pointer;
+  border-radius: 2px;
+  letter-spacing: 0.05em;
+  transition: all 0.15s;
+}
+button:hover { background: #6e5532; color: #f5e6c8; }
+button.primary { background: #2b1f10; color: #f5e6c8; }
+button.primary:hover { background: #4a3520; }
+button.danger { border-color: #a83232; color: #a83232; }
+button.danger:hover { background: #a83232; color: #f5e6c8; }
+button:disabled { opacity: 0.4; cursor: not-allowed; }
+
+input[type=text] {
+  font-family: inherit;
+  font-size: 18px;
+  padding: 6px 10px;
+  background: rgba(245, 230, 200, 0.6);
+  border: none;
+  border-bottom: 1.5px solid #6e5532;
+  color: #2b1f10;
+  outline: none;
+  width: 240px;
+}
+
+.paper {
+  background: #f5e6c8;
+  border: 1px solid #8b6f47;
+  border-radius: 3px;
+  padding: 14px;
+  box-shadow: 0 2px 8px rgba(43, 31, 16, 0.12);
+}
+
+.center { display: flex; align-items: center; justify-content: center; }
+.col { display: flex; flex-direction: column; gap: 12px; }
+.row { display: flex; gap: 12px; align-items: center; }
+
+/* MENU */
+#menu {
+  max-width: 720px;
+  margin: 80px auto;
+  text-align: center;
+}
+#menu h1 { font-size: 56px; font-weight: 500; }
+#menu .subtitle { font-style: italic; color: #6e5532; margin-bottom: 32px; font-size: 20px; }
+#menu .avatar-row { display: flex; gap: 14px; justify-content: center; margin: 24px 0; }
+#menu .avatar {
+  font-size: 48px;
+  width: 80px; height: 80px;
+  border: 1.5px solid #8b6f47;
+  border-radius: 50%;
+  display: flex;
+  align-items: center;
+  justify-content: center;
+  cursor: pointer;
+  background: #f5e6c8;
+  transition: transform 0.15s, border-color 0.15s;
+}
+#menu .avatar.selected { border-color: #2b1f10; border-width: 3px; transform: scale(1.1); }
+#menu .avatar:hover { transform: scale(1.05); }
+
+/* GAME LAYOUT */
+#game { display: grid; grid-template-columns: 1fr 320px; gap: 16px; max-width: 1400px; margin: 0 auto; }
+#header-bar {
+  grid-column: 1 / 3;
+  display: flex;
+  justify-content: space-between;
+  padding: 12px 18px;
+  align-items: center;
+}
+.stat { display: flex; flex-direction: column; gap: 2px; }
+.stat .label { font-size: 11px; text-transform: uppercase; letter-spacing: 0.1em; color: #6e5532; }
+.stat .value { font-size: 22px; font-weight: 600; }
+.stat .value.danger { color: #a83232; }
+.stat .value.success { color: #2d6e3e; }
+
+#main-area { display: flex; flex-direction: column; gap: 12px; }
+#side-area { display: flex; flex-direction: column; gap: 12px; }
+
+/* MAP */
+#map-container { padding: 0; overflow: hidden; }
+#map-svg {
+  display: block;
+  width: 100%;
+  height: auto;
+  background:
+    repeating-linear-gradient(0deg, transparent 0, transparent 39px, rgba(110,85,50,0.07) 39px, rgba(110,85,50,0.07) 40px),
+    repeating-linear-gradient(90deg, transparent 0, transparent 39px, rgba(110,85,50,0.07) 39px, rgba(110,85,50,0.07) 40px),
+    #ead9b8;
+}
+.continent-fill { fill: #d8c595; stroke: #8b6f47; stroke-width: 0.5; }
+.continent-label { fill: #6e5532; font-size: 11px; font-style: italic; text-anchor: middle; text-transform: uppercase; letter-spacing: 0.15em; pointer-events: none; }
+.city-dot { fill: #6e5532; stroke: #f5e6c8; stroke-width: 1; }
+.city-dot.current { fill: #a83232; stroke-width: 2; r: 6; }
+.city-dot.agenda { fill: #2d6e3e; r: 5; }
+.city-label { fill: #2b1f10; font-size: 9px; pointer-events: none; }
+.travel-line { stroke: #a83232; stroke-width: 1.2; stroke-dasharray: 3 3; fill: none; opacity: 0.7; }
+
+/* CARD */
+.card {
+  background: #faf0d4;
+  border: 2px solid #6e5532;
+  padding: 0;
+  border-radius: 4px;
+  position: relative;
+  overflow: hidden;
+}
+.card-image {
+  height: 140px;
+  background: linear-gradient(135deg, #d8c595 0%, #c4b078 100%);
+  border-bottom: 1.5px solid #6e5532;
+  display: flex;
+  align-items: center;
+  justify-content: center;
+  font-size: 64px;
+  color: #6e5532;
+  position: relative;
+}
+.card-image .stamp {
+  position: absolute;
+  top: 8px;
+  right: 8px;
+  background: rgba(168, 50, 50, 0.85);
+  color: #f5e6c8;
+  font-size: 11px;
+  text-transform: uppercase;
+  letter-spacing: 0.15em;
+  padding: 4px 10px;
+  border-radius: 2px;
+  transform: rotate(4deg);
+  border: 1px dashed #f5e6c8;
+}
+.card-body { padding: 14px 16px; }
+.card-title { font-size: 22px; font-weight: 600; margin-bottom: 6px; }
+.card-loc { font-size: 14px; font-style: italic; color: #6e5532; margin-bottom: 10px; }
+.card-attrs {
+  display: grid;
+  grid-template-columns: 1fr 1fr;
+  gap: 6px 14px;
+  margin: 10px 0;
+  font-size: 14px;
+}
+.card-attrs .attr-label { font-size: 11px; text-transform: uppercase; color: #6e5532; letter-spacing: 0.1em; }
+.card-attrs .attr-value { font-weight: 600; }
+.card-blurb {
+  font-size: 14px;
+  font-style: italic;
+  color: #4a3520;
+  border-top: 1px solid #d4b896;
+  border-bottom: 1px solid #d4b896;
+  padding: 10px 0;
+  margin: 10px 0;
+  line-height: 1.4;
+}
+.card-actions { display: flex; gap: 8px; justify-content: flex-end; margin-top: 10px; }
+.travel-info {
+  font-size: 13px;
+  background: rgba(168, 50, 50, 0.08);
+  padding: 6px 10px;
+  border-left: 3px solid #a83232;
+  margin: 10px 0;
+}
+
+/* AGENDA */
+.agenda-empty { font-style: italic; color: #6e5532; padding: 14px 0; text-align: center; }
+.agenda-mission {
+  border-top: 1px solid #d4b896;
+  padding: 10px 0;
+}
+.agenda-mission:first-child { border-top: none; }
+.agenda-mission .am-title { font-weight: 600; font-size: 15px; }
+.agenda-mission .am-sub { font-size: 12px; color: #6e5532; margin-top: 2px; }
+.agenda-mission .am-bar { font-size: 11px; color: #6e5532; margin-top: 4px; }
+.agenda-mission.active { background: rgba(45, 110, 62, 0.08); padding-left: 8px; border-left: 3px solid #2d6e3e; }
+
+/* ACHIEVEMENTS */
+.ach-grid { display: grid; grid-template-columns: 1fr 1fr; gap: 6px; }
+.ach {
+  background: rgba(110,85,50,0.08);
+  border: 1px dashed #8b6f47;
+  padding: 6px 8px;
+  border-radius: 2px;
+  font-size: 12px;
+  display: flex;
+  align-items: center;
+  gap: 6px;
+}
+.ach.locked { opacity: 0.5; }
+.ach.unlocked { background: rgba(45, 110, 62, 0.18); border: 1.5px solid #2d6e3e; opacity: 1; }
+.ach .ach-icon { font-size: 18px; }
+.ach .ach-name { font-weight: 600; }
+.ach .ach-prog { font-size: 10px; color: #6e5532; }
+
+/* LOG */
+#log-panel { max-height: 200px; overflow-y: auto; font-size: 13px; }
+.log-entry { padding: 4px 0; border-top: 1px dotted #d4b896; }
+.log-entry:first-child { border-top: none; }
+.log-entry .week-tag { font-weight: 600; color: #6e5532; margin-right: 6px; }
+
+/* MODAL */
+.modal-overlay {
+  position: fixed; inset: 0;
+  background: rgba(43, 31, 16, 0.65);
+  display: flex; align-items: center; justify-content: center;
+  z-index: 100;
+  padding: 20px;
+}
+.modal-twocol {
+  display: flex;
+  gap: 16px;
+  align-items: stretch;
+  max-width: 820px;
+  width: 100%;
+}
+.modal-twocol > .card { flex: 1 1 480px; }
+
+/* Calendrier popup */
+.calendar-pane {
+  flex: 0 0 280px;
+  background: #f5e6c8;
+  border: 2px solid #6e5532;
+  border-radius: 4px;
+  padding: 12px 14px;
+  max-height: 520px;
+  overflow-y: auto;
+}
+.calendar-pane h3 { margin-bottom: 8px; }
+.calendar-row {
+  display: flex;
+  align-items: center;
+  font-size: 12px;
+  height: 22px;
+  border-bottom: 1px dotted #d4b896;
+}
+.calendar-row:last-child { border-bottom: none; }
+.calendar-row.month-start { border-top: 1.5px solid #8b6f47; }
+.cal-week-tag {
+  width: 30px;
+  font-weight: 600;
+  color: #6e5532;
+  font-size: 10px;
+  flex-shrink: 0;
+}
+.cal-date {
+  width: 70px;
+  font-size: 10px;
+  color: #6e5532;
+  font-style: italic;
+  flex-shrink: 0;
+}
+.cal-bar {
+  flex: 1;
+  height: 16px;
+  border: 1px solid #d4b896;
+  position: relative;
+  overflow: hidden;
+  background: #fff;
+}
+.cal-bar.booked {
+  background: #2d6e3e;
+  border-color: #1f4e2c;
+}
+.cal-bar.candidate {
+  background-image: repeating-linear-gradient(
+    -45deg,
+    #4a8bc2 0, #4a8bc2 4px,
+    #b6dbf2 4px, #b6dbf2 8px
+  );
+  border-color: #2c6896;
+}
+.cal-bar.both {
+  background: #2d6e3e;
+  background-image: repeating-linear-gradient(
+    -45deg,
+    transparent 0, transparent 4px,
+    rgba(74, 139, 194, 0.85) 4px, rgba(74, 139, 194, 0.85) 8px
+  );
+  border-color: #1f4e2c;
+}
+.cal-label {
+  font-size: 9px;
+  color: #fff;
+  font-weight: 600;
+  position: absolute;
+  left: 4px;
+  top: 50%;
+  transform: translateY(-50%);
+  white-space: nowrap;
+  text-shadow: 0 1px 2px rgba(0,0,0,0.5);
+}
+.cal-legend {
+  font-size: 11px;
+  margin-top: 8px;
+  display: flex;
+  flex-direction: column;
+  gap: 4px;
+  padding-top: 8px;
+  border-top: 1px solid #d4b896;
+}
+.cal-legend-item { display: flex; align-items: center; gap: 6px; }
+.cal-swatch { width: 14px; height: 12px; border: 1px solid #6e5532; }
+.cal-swatch.booked { background: #2d6e3e; }
+.cal-swatch.candidate {
+  background-image: repeating-linear-gradient(-45deg, #4a8bc2 0, #4a8bc2 3px, #b6dbf2 3px, #b6dbf2 6px);
+}
+.cal-swatch.free { background: #fff; }
+
+/* Perks panel */
+.perk-row {
+  display: flex; align-items: flex-start; gap: 10px;
+  padding: 8px 0;
+  border-top: 1px dotted #d4b896;
+  cursor: pointer;
+  user-select: none;
+}
+.perk-row:first-child { border-top: none; }
+.perk-row:hover { background: rgba(110,85,50,0.04); }
+.perk-toggle {
+  width: 36px; height: 20px;
+  border: 1.5px solid #6e5532;
+  border-radius: 12px;
+  background: #f5e6c8;
+  position: relative;
+  flex-shrink: 0;
+  margin-top: 2px;
+  transition: background 0.15s;
+}
+.perk-toggle::after {
+  content: '';
+  position: absolute;
+  width: 14px; height: 14px;
+  border-radius: 50%;
+  background: #6e5532;
+  top: 1.5px; left: 2px;
+  transition: left 0.15s, background 0.15s;
+}
+.perk-row.on .perk-toggle { background: #2d6e3e; border-color: #1f4e2c; }
+.perk-row.on .perk-toggle::after { left: 18px; background: #f5e6c8; }
+.perk-info { flex: 1; }
+.perk-name { font-weight: 600; font-size: 13px; }
+.perk-desc { font-size: 11px; color: #6e5532; margin-top: 2px; line-height: 1.3; }
+
+/* Deal badge */
+.deal-badge {
+  display: flex; flex-wrap: wrap; align-items: center; gap: 6px;
+  padding: 6px 10px;
+  border: 1.5px dashed;
+  border-radius: 3px;
+  margin: 6px 0;
+  font-size: 12px;
+}
+.deal-icon { font-size: 14px; }
+.deal-label { font-weight: 700; text-transform: uppercase; letter-spacing: 0.05em; font-size: 11px; }
+.deal-pct { font-size: 11px; opacity: 0.8; }
+.deal-hint { font-size: 11px; font-style: italic; opacity: 0.85; flex-basis: 100%; }
+.modal {
+  background: #f5e6c8;
+  border: 2px solid #2b1f10;
+  border-radius: 4px;
+  padding: 24px;
+  max-width: 540px;
+  width: 100%;
+  text-align: center;
+  position: relative;
+}
+.modal h1 { font-size: 36px; }
+.modal .seal {
+  position: absolute;
+  top: -22px; left: 50%;
+  transform: translateX(-50%);
+  background: #a83232;
+  color: #f5e6c8;
+  width: 44px; height: 44px;
+  border-radius: 50%;
+  display: flex; align-items: center; justify-content: center;
+  font-size: 22px;
+  border: 2px solid #f5e6c8;
+}
+
+/* HELP */
+.help-button {
+  position: fixed;
+  top: 16px;
+  right: 16px;
+  width: 36px; height: 36px;
+  border-radius: 50%;
+  font-size: 18px;
+  font-weight: 600;
+  z-index: 50;
+}
+#help-overlay { z-index: 200; }
+#help-overlay .modal { max-width: 640px; text-align: left; }
+#help-overlay h2 { margin-top: 14px; }
+#help-overlay p { margin-bottom: 8px; line-height: 1.4; }
+#help-overlay ul { margin: 6px 0 8px 18px; }
+#help-overlay li { margin-bottom: 3px; }
+
+@media (max-width: 980px) {
+  #game { grid-template-columns: 1fr; }
+  #header-bar { grid-column: 1; flex-wrap: wrap; gap: 12px; }
+}
+</style>
+</head>
+<body>
+
+<button class="help-button" onclick="toggleHelp()">?</button>
+
+<div id="app"></div>
+
+<div id="help-overlay" style="display:none;" class="modal-overlay" onclick="if(event.target.id==='help-overlay')toggleHelp()">
+  <div class="modal">
+    <h1>Aide</h1>
+    <h2>But du jeu</h2>
+    <p>Atteindre <strong>100 points</strong> en enchaînant des sittings (chien, chat, oiseau, ou simple house sitting). Chaque mission rapporte de l'argent au démarrage et des points à la fin.</p>
+    <h2>Ne pas mourir</h2>
+    <p>Vous payez <strong>500 €/mois</strong> de nourriture, en mission ou non. Si votre solde passe sous zéro, partie perdue.</p>
+    <h2>Chaque tour = 1 semaine</h2>
+    <ul>
+      <li>45 % de chances qu'une carte Opportunité apparaisse.</li>
+      <li>Vous pouvez l'accepter ou la refuser. Une carte refusée disparaît.</li>
+      <li>Vous pouvez accepter plusieurs missions futures, tant que les dates ne se chevauchent pas et que le voyage tient dans le temps disponible.</li>
+    </ul>
+    <h2>Transport</h2>
+    <p>Avant chaque mission, le mode de transport le moins cher qui rentre dans le délai disponible est utilisé. Plus de temps = transport plus économique.</p>
+    <h2>Succès</h2>
+    <p>Visiter les 6 continents (+30), garder chien/chat/oiseau (+20), 5 missions « potes invités » (+20), 1 an sans avion = Écolo (+25), 5 sittings d'un même type pour devenir Expert (+7). Les Experts biaisent ensuite le pool de cartes en votre faveur.</p>
+    <h2>Bonus activables</h2>
+    <ul>
+      <li><strong>Un ami qui s'y connaît</strong> : juge la qualité du paiement de chaque carte (arnaque / moyen / bon deal).</li>
+      <li><strong>Digital Nomad</strong> : petits revenus freelance mensuels. Attention l'URSSAF en septembre.</li>
+      <li><strong>Star des réseaux</strong> : +20 % de chances d'opportunité, missions plus lointaines, train/bateau/bus payés par les collabs. Mais l'avion = badbuzz (−30 % du solde).</li>
+    </ul>
+    <div class="row" style="justify-content:center;margin-top:20px;">
+      <button onclick="toggleHelp()">Fermer</button>
+    </div>
+  </div>
+</div>
+
+<script>
+'use strict';
+
+// =================== CONSTANTES ===================
+const INITIAL_BALANCE = 1500;
+const WEEKLY_FOOD = 500 * 12 / 52;
+const P_OPPORTUNITY = 0.45;
+const P_LOCAL_CARD = 0.60;
+const VICTORY_POINTS = 100;
+const FAR_BONUS = 1.20;
+const P_RARE_HOUSING = 0.25;
+const P_POTES = 0.30;
+
+const POOL_BASE = { dog: 0.60, cat: 0.18, house: 0.17, bird: 0.05 };
+const PAY_RANGES = { dog: [35,55], cat: [25,40], bird: [30,50], house: [20,35] };
+const POINT_RANGES = { dog: [2,4], cat: [4,7], bird: [5,8], house: [3,5] };
+const ANIMAL_FOR_TYPE = { dog: 'chien', cat: 'chat', bird: 'oiseau', house: null };
+const TYPE_LABEL = { dog: 'Dog sitting', cat: 'Cat sitting', bird: 'Bird sitting', house: 'House sitting' };
+const TYPE_ICON = { dog: '🐕', cat: '🐈', bird: '🦜', house: '🏠' };
+
+const TRANSPORT = {
+  hitch:    { name: 'Auto-stop',  cost_km: 0.005, km_day:  60, trans_ocean: false, icon: '👍' },
+  boatstop: { name: 'Bateau-stop',cost_km: 0.01,  km_day:  80, trans_ocean: true,  icon: '⛵' },
+  bus:      { name: 'Bus',        cost_km: 0.04,  km_day: 200, trans_ocean: false, icon: '🚌' },
+  ferry:    { name: 'Ferry',      cost_km: 0.05,  km_day: 200, trans_ocean: true,  icon: '🚢' },
+  train:    { name: 'Train',      cost_km: 0.08,  km_day: 400, trans_ocean: false, icon: '🚆' },
+  plane:    { name: 'Avion',      cost_km: 0.15,  km_day: 800, trans_ocean: true,  icon: '✈️' },
+};
+// Modes terrestres triés par prix (cheapest first)
+const LAND_MODES = ['hitch','bus','train'];
+// Modes trans-océaniques triés par prix
+const SEA_MODES  = ['boatstop','ferry','plane'];
+
+const LAND_CONNECTED = new Set([
+  'Europe|Asia', 'Asia|Europe',
+  'Europe|Africa', 'Africa|Europe',
+  'Asia|Africa', 'Africa|Asia',
+  'N.America|S.America', 'S.America|N.America',
+]);
+
+const ACHIEVEMENT_POINTS = {
+  expert_chien: 7, expert_chat: 7, ermite: 7,
+  bestiaire: 20, globetrotter: 30, kiffeur: 20, ecolo: 25,
+};
+const ACHIEVEMENT_LABEL = {
+  expert_chien: 'Expert Chien', expert_chat: 'Expert Chat', ermite: 'Ermite',
+  bestiaire: 'Bestiaire', globetrotter: 'Globe-trotter', kiffeur: 'Kiffeur', ecolo: 'Écolo',
+};
+const ACHIEVEMENT_ICON = {
+  expert_chien: '🐕', expert_chat: '🐈', ermite: '🏚️',
+  bestiaire: '📚', globetrotter: '🌍', kiffeur: '🎉', ecolo: '🌱',
+};
+
+// =================== VILLES ===================
+const CITIES = [
+  // Europe
+  { name: "Paris",       continent: "Europe",    lat: 48.85, lng:   2.35 },
+  { name: "Berlin",      continent: "Europe",    lat: 52.52, lng:  13.40 },
+  { name: "Rome",        continent: "Europe",    lat: 41.90, lng:  12.50 },
+  { name: "Lisbonne",    continent: "Europe",    lat: 38.72, lng:  -9.14 },
+  { name: "Stockholm",   continent: "Europe",    lat: 59.33, lng:  18.07 },
+  { name: "Madrid",      continent: "Europe",    lat: 40.42, lng:  -3.70 },
+  { name: "Vienne",      continent: "Europe",    lat: 48.21, lng:  16.37 },
+  { name: "Athènes",     continent: "Europe",    lat: 37.98, lng:  23.73 },
+  // Africa
+  { name: "Le Caire",    continent: "Africa",    lat: 30.04, lng:  31.24 },
+  { name: "Le Cap",      continent: "Africa",    lat: -33.92, lng: 18.42 },
+  { name: "Marrakech",   continent: "Africa",    lat: 31.63, lng:  -8.00 },
+  { name: "Nairobi",     continent: "Africa",    lat: -1.29, lng:  36.82 },
+  { name: "Dakar",       continent: "Africa",    lat: 14.72, lng: -17.47 },
+  { name: "Lagos",       continent: "Africa",    lat:  6.46, lng:   3.39 },
+  // Asia
+  { name: "Tokyo",       continent: "Asia",      lat: 35.68, lng: 139.76 },
+  { name: "Bangkok",     continent: "Asia",      lat: 13.75, lng: 100.50 },
+  { name: "Mumbai",      continent: "Asia",      lat: 19.08, lng:  72.88 },
+  { name: "Pékin",       continent: "Asia",      lat: 39.90, lng: 116.41 },
+  { name: "Istanbul",    continent: "Asia",      lat: 41.00, lng:  28.98 },
+  { name: "Séoul",       continent: "Asia",      lat: 37.57, lng: 126.98 },
+  { name: "Singapour",   continent: "Asia",      lat:  1.35, lng: 103.82 },
+  // North America
+  { name: "New York",    continent: "N.America", lat: 40.71, lng: -74.00 },
+  { name: "Los Angeles", continent: "N.America", lat: 34.05, lng:-118.24 },
+  { name: "Mexico",      continent: "N.America", lat: 19.43, lng: -99.13 },
+  { name: "Toronto",     continent: "N.America", lat: 43.65, lng: -79.38 },
+  // South America
+  { name: "Buenos Aires",continent: "S.America", lat:-34.61, lng: -58.38 },
+  { name: "Rio",         continent: "S.America", lat:-22.91, lng: -43.17 },
+  { name: "Lima",        continent: "S.America", lat:-12.05, lng: -77.04 },
+  { name: "Bogota",      continent: "S.America", lat:  4.71, lng: -74.07 },
+  // Oceania
+  { name: "Sydney",      continent: "Oceania",   lat:-33.87, lng: 151.21 },
+  { name: "Auckland",    continent: "Oceania",   lat:-36.85, lng: 174.76 },
+  { name: "Melbourne",   continent: "Oceania",   lat:-37.81, lng: 144.96 },
+];
+
+// =================== DESCRIPTIONS / NAMES ===================
+const PET_NAMES = {
+  dog:  ['Maurice','Biscotte','Rocco','Vega','Pixel','Brioche','Sushi','Olaf','Newton','Tagada','Igor','Filou'],
+  cat:  ['Felix','Moustache','Princesse','Karl','Mochi','Choupi','Java','Pampa','Croissant','Otto','Néron'],
+  bird: ['Lulu','Sirocco','Plume','Brindille','Crouton','Mosquito','Tonnerre','Câline'],
+};
+const HOUSING_TYPES = {
+  common: ['appartement','studio','maison','loft','villa'],
+  rare:   ['château','péniche','cabane perchée','yourte','tiny house','van aménagé','voilier'],
+};
+const DOG_TRAITS = ['très calme','plein d\'énergie','un peu pataud','indépendant','très joueur','adorable'];
+const CAT_TRAITS = ['ronronneuse','curieuse','sauvage','très câline','un peu farouche'];
+const BIRD_TYPES = ['perroquet','canari','calopsitte','perruche'];
+const BLURB_EXTRAS = [
+  'Vue magnifique sur le quartier.',
+  'Plantes à arroser deux fois par semaine.',
+  'Quartier calme et résidentiel.',
+  'Voisin sympa au-dessus.',
+  'Logement avec terrasse fleurie.',
+  'Petit jardin attenant.',
+  'Belle lumière naturelle.',
+  'À deux pas des transports.',
+  'Quartier vivant et sympa.',
+  'Wifi nickel pour les soirs tranquilles.',
+];
+
+// Templates d'annonces (style petite annonce). On évite "Cherche personne de confiance" en boucle.
+const BLURB_TEMPLATES = {
+  dog: [
+    `{name}, {trait}, attend votre passage matin et soir.`,
+    `On part en voyage et on confie {name} à un sitter sympa.`,
+    `Notre adorable {name} cherche un peu de compagnie.`,
+    `{name} est {trait}. Promenades, gamelle et câlins au programme.`,
+    `Petit toutou {trait} qui s'appelle {name}, à garder pour quelques jours.`,
+    `{name} a besoin de quelqu'un pendant qu'on est absents. Très {trait}.`,
+    `On adore {name}, mais là on doit s'absenter. Vous voulez bien le sortir et le bichonner ?`,
+    `{name}, c'est notre boule d'amour. {trait_capital}. Personne pour veiller dessus ?`,
+    `Sitter recherché·e pour {name}. Habitué·e aux balades, peu exigeant·e côté ménage.`,
+  ],
+  cat: [
+    `{name}, chat·te {trait}, n'a besoin que de gamelles, litière, et un peu d'attention.`,
+    `Sitter recherché·e pour {name}, boule de poils {trait}.`,
+    `Notre {name} reste à la maison pendant qu'on s'évade. {trait_capital}, vit sa vie.`,
+    `{name} tient la maison toute seule. {trait_capital}. Passage matin et soir suffit.`,
+    `Petit·e félin·e {trait} répondant au nom de {name} cherche compagnon humain temporaire.`,
+    `{name} est très {trait}. On veut juste être sûr·e que tout va bien quand on rentrera.`,
+    `On part. {name} reste. Une présence amicale est tout ce qu'il/elle demande.`,
+    `À garder : {name}, {trait}, indépendant·e mais qui aime savoir que quelqu'un est là.`,
+  ],
+  bird: [
+    `{name}, {bird_type} très expressif, déteste la solitude. Sortie de cage quotidienne.`,
+    `On confie {name} ({bird_type}) à un·e amoureux·se des oiseaux.`,
+    `{name} est un·e {bird_type} qui aime piailler le matin. À sortir et nourrir chaque jour.`,
+    `Sitter recherché·e pour notre {bird_type} {name}, vif·ve et bavard·e.`,
+    `{name}, notre {bird_type}, a besoin d'un peu de présence. Adore les conversations.`,
+    `On aimerait que {name} ait de la compagnie. C'est un·e {bird_type} étonnamment câlin·e.`,
+  ],
+  house: [
+    `Logement à garder pendant un voyage pro. Pas d'animaux, juste les volets et le courrier.`,
+    `Présence rassurante demandée pour notre maison pendant qu'on est partis.`,
+    `Maison vide à surveiller. Idéal pour amateur de calme.`,
+    `On part. La maison reste. Volets à ouvrir, plantes à arroser, et c'est tout.`,
+    `Petite mission tranquille : faire vivre les lieux pendant notre absence.`,
+    `Notre logement vous attend. Quelques tâches simples, pas plus.`,
+    `Vous serez chez vous. Juste quelques plantes à chouchouter et le facteur à surveiller.`,
+  ],
+};
+
+function pickBlurb(type, vars) {
+  const template = rng(BLURB_TEMPLATES[type]);
+  let s = template;
+  for (const k of Object.keys(vars)) {
+    s = s.replaceAll('{' + k + '}', vars[k]);
+  }
+  // capitalize first letter at sentence start if needed
+  return s;
+}
+
+// =================== UTILS ===================
+function rng(arr) { return arr[Math.floor(Math.random() * arr.length)]; }
+function rint(min, max) { return Math.floor(Math.random() * (max - min + 1)) + min; }
+function rfloat(min, max) { return Math.random() * (max - min) + min; }
+function weighted(items, weights) {
+  let total = weights.reduce((a,b)=>a+b, 0);
+  let r = Math.random() * total;
+  for (let i = 0; i < items.length; i++) { r -= weights[i]; if (r <= 0) return items[i]; }
+  return items[items.length-1];
+}
+function haversine(a, b) {
+  const R = 6371;
+  const p1 = a.lat * Math.PI/180, p2 = b.lat * Math.PI/180;
+  const dp = (b.lat - a.lat) * Math.PI/180;
+  const dl = (b.lng - a.lng) * Math.PI/180;
+  const h = Math.sin(dp/2)**2 + Math.cos(p1)*Math.cos(p2)*Math.sin(dl/2)**2;
+  return 2 * R * Math.asin(Math.sqrt(h));
+}
+function needsPlane(c1, c2) {
+  if (c1 === c2) return false;
+  return !LAND_CONNECTED.has(`${c1}|${c2}`);
+}
+function bestTransport(distance_km, days_available, src_continent, dst_continent) {
+  if (distance_km < 1) return { mode: 'none', cost: 0, days: 0, label: 'Sur place', icon: '·' };
+  const must_cross_sea = needsPlane(src_continent, dst_continent);
+  // Si trans-océanique : seulement les modes qui passent l'océan (boat-stop, ferry, avion).
+  // Sinon : on peut prendre n'importe quel mode terrestre (qui sont tous moins chers que la mer).
+  const candidates = must_cross_sea ? SEA_MODES : LAND_MODES;
+  for (const m of candidates) {
+    const spec = TRANSPORT[m];
+    const d_needed = distance_km / spec.km_day;
+    if (d_needed <= days_available) {
+      return { mode: m, cost: distance_km * spec.cost_km, days: d_needed, label: spec.name, icon: spec.icon };
+    }
+  }
+  return null;
+}
+function fmtMoney(n) { return Math.round(n) + ' €'; }
+
+function dealQuality(card) {
+  // Estimation : moyenne du prix journalier × durée × bonus continent éloigné
+  const meanPerDay = (PAY_RANGES[card.type][0] + PAY_RANGES[card.type][1]) / 2;
+  const far = card.srcCity && card.srcCity.continent !== card.city.continent;
+  const expected = meanPerDay * card.durationDays * (far ? FAR_BONUS : 1.0);
+  const ratio = card.payTotal / expected;
+  let label, color, hint;
+  if (ratio < 0.85)        { label = 'Arnaque';     color = '#a83232'; hint = 'Mal payé pour ce que c\'est.'; }
+  else if (ratio < 1.05)   { label = 'Moyen';       color = '#8b6f47'; hint = 'Tarif standard.'; }
+  else if (ratio < 1.20)   { label = 'Bon deal';    color = '#2d6e3e'; hint = 'Au-dessus de la moyenne.'; }
+  else                     { label = 'Excellent !'; color = '#1f4e2c'; hint = 'Très bien payé pour ce type de mission.'; }
+  const pct = Math.round((ratio - 1) * 100);
+  const sign = pct >= 0 ? '+' : '';
+  return { label, color, hint, pct: `${sign}${pct}%` };
+}
+function fmtDate(week) {
+  // Date de jeu : on commence le 1er janvier d'une année arbitraire (2026)
+  const start = new Date(2026, 0, 1);
+  start.setDate(start.getDate() + week * 7);
+  const months = ['janv','fév','mars','avr','mai','juin','juil','août','sept','oct','nov','déc'];
+  return `${start.getDate()} ${months[start.getMonth()]} ${start.getFullYear()}`;
+}
+
+// =================== ÉTAT DE JEU ===================
+const STATE = {
+  phase: 'menu',
+  characterName: '',
+  characterIcon: '🧳',
+  week: 0,
+  balance: INITIAL_BALANCE,
+  points: 0,
+  startCity: null,
+  agenda: [],            // {id, type, city, startWeek, endWeek, durationDays, payTotal, travelCost, travelMode, points, animal, housing, isRareHousing, hasPotes, blurb, srcCity}
+  completed: [],
+  achievements: new Set(),
+  animalsDone: new Set(),
+  continentsDone: new Set(),
+  typeCount: { dog: 0, cat: 0, house: 0, bird: 0 },
+  potesCount: 0,
+  pendingCard: null,     // current opportunity awaiting decision
+  log: [],               // { week, text }
+  refusedCount: 0,
+  acceptedCount: 0,
+  endReason: null,       // 'victory' | 'defeat'
+  tookPlane: false,      // tracking pour succès Écolo
+  perks: { friendInsider: false, digitalNomad: false, socialStar: false },
+  nomadLastIncomeWeek: -1,
+  urssafYearMarked: -1,  // dernière année (en multiple de 52) où l'URSSAF a frappé
+};
+
+let _missionId = 1;
+
+// =================== JEU : LOGIQUE ===================
+function currentCityAt(targetWeek) {
+  // Cas 1 : aucune mission acceptée → on est encore à la ville de départ.
+  if (STATE.agenda.length === 0) {
+    return { city: STATE.startCity, availableFrom: STATE.week };
+  }
+  // Cas 2 : mission qui se termine LE PLUS TARD avant (ou pile à) targetWeek.
+  let prior = null;
+  for (const m of STATE.agenda) {
+    if (m.endWeek <= targetWeek) {
+      if (prior === null || m.endWeek > prior.endWeek) prior = m;
+    }
+  }
+  if (prior) return { city: prior.city, availableFrom: prior.endWeek };
+  // Cas 3 : aucune mission ne se termine avant targetWeek (chevauchement).
+  // Le joueur est nomade : la position de référence devient la mission engagée la plus tardive.
+  // La carte sera marquée infaisable par hasOverlap, mais l'affichage reste cohérent.
+  let latest = STATE.agenda[0];
+  for (const m of STATE.agenda) if (m.endWeek > latest.endWeek) latest = m;
+  return { city: latest.city, availableFrom: latest.endWeek };
+}
+
+function generateCard() {
+  // type avec biais expert
+  const weights = { ...POOL_BASE };
+  if (STATE.achievements.has('expert_chien')) weights.dog *= 2;
+  if (STATE.achievements.has('expert_chat')) weights.cat *= 2;
+  if (STATE.achievements.has('ermite')) weights.house *= 2;
+  const types = Object.keys(weights);
+  const type = weighted(types, types.map(t=>weights[t]));
+
+  // ville : par défaut 60% locale, 40% mondiale ; Star des réseaux : 30% locale (plus loin)
+  const here = currentCityAt(STATE.week);
+  const here_continent = here.city.continent;
+  const pLocal = STATE.perks.socialStar ? 0.30 : P_LOCAL_CARD;
+  let city;
+  if (Math.random() < pLocal) {
+    const sameContinent = CITIES.filter(c => c.continent === here_continent && c.name !== here.city.name);
+    city = sameContinent.length ? rng(sameContinent) : rng(CITIES);
+  } else {
+    city = rng(CITIES);
+  }
+
+  // durée
+  const bucket = weighted(['short','medium','long','tiny'], [0.60, 0.25, 0.10, 0.05]);
+  let duration;
+  if (bucket==='short')  duration = rint(7, 21);
+  else if (bucket==='medium') duration = rint(22, 60);
+  else if (bucket==='long')   duration = rint(61, 90);
+  else duration = rint(5, 6);
+
+  const [pay_lo, pay_hi] = PAY_RANGES[type];
+  const payPerDay = rfloat(pay_lo, pay_hi);
+  const [pts_lo, pts_hi] = POINT_RANGES[type];
+  let points = rint(pts_lo, pts_hi);
+
+  const isRareHousing = Math.random() < P_RARE_HOUSING;
+  if (isRareHousing) points += 2;
+  const housing = isRareHousing ? rng(HOUSING_TYPES.rare) : rng(HOUSING_TYPES.common);
+
+  const hasPotes = Math.random() < P_POTES;
+
+  const offsetBucket = weighted(['near','mid','far'], [0.5, 0.3, 0.2]);
+  let offset;
+  if (offsetBucket==='near') offset = rint(1, 4);
+  else if (offsetBucket==='mid') offset = rint(5, 8);
+  else offset = rint(9, 12);
+
+  const startWeek = STATE.week + offset;
+  const durationWeeks = Math.ceil(duration / 7);
+  const endWeek = startWeek + durationWeeks;
+
+  // animal
+  let petName = null, petType = null;
+  if (type === 'dog') { petName = rng(PET_NAMES.dog); petType = 'chien'; }
+  else if (type === 'cat') { petName = rng(PET_NAMES.cat); petType = 'chat'; }
+  else if (type === 'bird') { petName = rng(PET_NAMES.bird); petType = rng(BIRD_TYPES); }
+
+  // blurb (variations + extra ambiance + mention potes)
+  const traitDog = rng(DOG_TRAITS);
+  const traitCat = rng(CAT_TRAITS);
+  const blurbVars = {
+    name: petName || '',
+    trait: type === 'dog' ? traitDog : type === 'cat' ? traitCat : '',
+    trait_capital: (() => {
+      const t = type === 'dog' ? traitDog : type === 'cat' ? traitCat : '';
+      return t.charAt(0).toUpperCase() + t.slice(1);
+    })(),
+    bird_type: petType || '',
+  };
+  let blurb = pickBlurb(type, blurbVars) + ' ' + rng(BLURB_EXTRAS);
+  if (hasPotes) blurb += ' Vous pouvez inviter des amis sans souci.';
+
+  // calculer le voyage requis depuis la position juste avant startWeek
+  const at = currentCityAt(startWeek);
+  const days_available = Math.max(0, (startWeek - at.availableFrom) * 7);
+  const distance = haversine(at.city, city);
+  const travel = bestTransport(distance, days_available, at.city.continent, city.continent);
+
+  const far = at.city.continent !== city.continent;
+  const payTotal = payPerDay * duration * (far ? FAR_BONUS : 1.0);
+
+  const feasible = travel !== null && !hasOverlap(startWeek, endWeek);
+
+  return {
+    id: _missionId++,
+    type, city,
+    startWeek, endWeek, durationDays: duration, durationWeeks,
+    payPerDay, payTotal,
+    travelCost: travel ? travel.cost : null,
+    travelMode: travel ? travel.mode : null,
+    travelLabel: travel ? travel.label : 'Pas de transport possible',
+    travelIcon: travel ? travel.icon : '✖',
+    points,
+    petName, petType, animal: petType,
+    housing, isRareHousing,
+    hasPotes,
+    blurb,
+    srcCity: at.city,
+    distance,
+    feasible,
+  };
+}
+
+function hasOverlap(s, e) {
+  for (const m of STATE.agenda) {
+    if (!(e <= m.startWeek || s >= m.endWeek)) return true;
+  }
+  return false;
+}
+
+function acceptCard(card) {
+  STATE.agenda.push(card);
+  STATE.acceptedCount++;
+  STATE.pendingCard = null;
+  log(`Accepté : ${TYPE_LABEL[card.type]} à ${card.city.name} (${fmtDate(card.startWeek)})`);
+  render();
+}
+
+function refuseCard() {
+  STATE.refusedCount++;
+  STATE.pendingCard = null;
+  log(`Carte refusée.`);
+  render();
+}
+
+function log(text) {
+  STATE.log.unshift({ week: STATE.week, text });
+  if (STATE.log.length > 50) STATE.log.pop();
+}
+
+function nextTurn() {
+  if (STATE.pendingCard) return;
+  if (STATE.phase !== 'playing') return;
+  STATE.week++;
+
+  // résoudre fins de mission
+  const ending = STATE.agenda.filter(m => m.endWeek === STATE.week);
+  for (const m of ending) {
+    STATE.points += m.points;
+    STATE.completed.push(m);
+    STATE.typeCount[m.type]++;
+    if (m.animal) STATE.animalsDone.add(m.animal);
+    STATE.continentsDone.add(m.city.continent);
+    if (m.hasPotes) STATE.potesCount++;
+    log(`✓ Mission terminée à ${m.city.name} : +${m.points} pts`);
+
+    // succès
+    checkAchievements();
+  }
+  STATE.agenda = STATE.agenda.filter(m => m.endWeek > STATE.week);
+
+  // résoudre départs (paiement + transport)
+  const starting = STATE.agenda.filter(m => m.startWeek === STATE.week);
+  for (const m of starting) {
+    STATE.balance += m.payTotal;
+
+    // Coût de transport (potentiellement modifié par Star des réseaux)
+    let actualCost = m.travelCost;
+    let costNote = '';
+    if (STATE.perks.socialStar && ['train','ferry','boatstop','bus'].includes(m.travelMode)) {
+      actualCost = 0;
+      costNote = ' (offert par collab)';
+    }
+    STATE.balance -= actualCost;
+
+    if (m.travelMode === 'plane') {
+      STATE.tookPlane = true;
+      // Star des réseaux : badbuzz si avion → -30% du solde
+      if (STATE.perks.socialStar) {
+        const loss = Math.max(0, STATE.balance) * 0.30;
+        STATE.balance -= loss;
+        log(`💢 Badbuzz ! Tu prends l'avion, ta communauté hurle. −${fmtMoney(loss)}`);
+      }
+    }
+    log(`→ Départ pour ${m.city.name} : +${fmtMoney(m.payTotal)} payé · ${m.travelIcon} ${m.travelLabel} ${fmtMoney(-actualCost)}${costNote}`);
+  }
+
+  // Digital Nomad : revenu aléatoire mensuel
+  if (STATE.perks.digitalNomad && STATE.week % 4 === 0 && STATE.week !== STATE.nomadLastIncomeWeek) {
+    STATE.nomadLastIncomeWeek = STATE.week;
+    // 70% chance d'un petit revenu, sinon rien
+    if (Math.random() < 0.70) {
+      const income = rint(30, 220);
+      STATE.balance += income;
+      log(`💻 Digital Nomad : +${fmtMoney(income)} de freelance.`);
+    }
+  }
+  // Digital Nomad : URSSAF en septembre (autour de la semaine 35-40 de chaque année)
+  if (STATE.perks.digitalNomad) {
+    const yearIndex = Math.floor(STATE.week / 52);
+    const weekInYear = STATE.week % 52;
+    if (weekInYear >= 35 && weekInYear <= 40 && STATE.urssafYearMarked < yearIndex) {
+      // 60% de chances que l'URSSAF tombe cette année (et que ça tombe pile cette semaine)
+      if (Math.random() < 0.18) {  // ~60% étalé sur 6 semaines
+        STATE.urssafYearMarked = yearIndex;
+        const hit = rint(600, 1400);
+        STATE.balance -= hit;
+        log(`📬 URSSAF : appel de cotisations annuel. −${fmtMoney(hit)}`);
+      }
+    }
+  }
+
+  // nourriture hebdomadaire
+  STATE.balance -= WEEKLY_FOOD;
+
+  // Vérifier les succès qui peuvent se déclencher hors fin de mission (Écolo)
+  checkAchievements();
+
+  // défaite
+  if (STATE.balance < 0) {
+    STATE.phase = 'over';
+    STATE.endReason = 'defeat';
+    log(`✗ DÉFAITE : solde épuisé.`);
+    render();
+    return;
+  }
+  // victoire
+  if (STATE.points >= VICTORY_POINTS) {
+    STATE.phase = 'over';
+    STATE.endReason = 'victory';
+    log(`★ VICTOIRE en semaine ${STATE.week} !`);
+    render();
+    return;
+  }
+
+  // tirage carte (Star des réseaux : +opp et -local)
+  const pOpp = STATE.perks.socialStar ? 0.65 : P_OPPORTUNITY;
+  if (Math.random() < pOpp) {
+    STATE.pendingCard = generateCard();
+    log(`Une opportunité ! ${TYPE_LABEL[STATE.pendingCard.type]} à ${STATE.pendingCard.city.name}`);
+  }
+
+  render();
+}
+
+function checkAchievements() {
+  const A = STATE.achievements;
+  if (STATE.typeCount.dog >= 5 && !A.has('expert_chien')) {
+    A.add('expert_chien'); STATE.points += ACHIEVEMENT_POINTS.expert_chien;
+    log(`★ Succès : Expert Chien (+${ACHIEVEMENT_POINTS.expert_chien} pts)`);
+  }
+  if (STATE.typeCount.cat >= 5 && !A.has('expert_chat')) {
+    A.add('expert_chat'); STATE.points += ACHIEVEMENT_POINTS.expert_chat;
+    log(`★ Succès : Expert Chat (+${ACHIEVEMENT_POINTS.expert_chat} pts)`);
+  }
+  if (STATE.typeCount.house >= 5 && !A.has('ermite')) {
+    A.add('ermite'); STATE.points += ACHIEVEMENT_POINTS.ermite;
+    log(`★ Succès : Ermite (+${ACHIEVEMENT_POINTS.ermite} pts)`);
+  }
+  if (STATE.animalsDone.size >= 3 && !A.has('bestiaire')) {
+    A.add('bestiaire'); STATE.points += ACHIEVEMENT_POINTS.bestiaire;
+    log(`★ Succès : Bestiaire (+${ACHIEVEMENT_POINTS.bestiaire} pts)`);
+  }
+  if (STATE.continentsDone.size >= 6 && !A.has('globetrotter')) {
+    A.add('globetrotter'); STATE.points += ACHIEVEMENT_POINTS.globetrotter;
+    log(`★ Succès : Globe-trotter (+${ACHIEVEMENT_POINTS.globetrotter} pts)`);
+  }
+  if (STATE.potesCount >= 5 && !A.has('kiffeur')) {
+    A.add('kiffeur'); STATE.points += ACHIEVEMENT_POINTS.kiffeur;
+    log(`★ Succès : Kiffeur (+${ACHIEVEMENT_POINTS.kiffeur} pts)`);
+  }
+  // Écolo : 1 an (52 semaines) sans avoir pris l'avion
+  if (STATE.week >= 52 && !STATE.tookPlane && !A.has('ecolo')) {
+    A.add('ecolo'); STATE.points += ACHIEVEMENT_POINTS.ecolo;
+    log(`★ Succès : Écolo (+${ACHIEVEMENT_POINTS.ecolo} pts) — un an sans avion !`);
+  }
+}
+
+// =================== PERSIST ===================
+const SAVE_KEY = 'petsitter_save_v1';
+function saveGame() {
+  try {
+    const snap = { ...STATE,
+      achievements: [...STATE.achievements],
+      animalsDone: [...STATE.animalsDone],
+      continentsDone: [...STATE.continentsDone],
+    };
+    localStorage.setItem(SAVE_KEY, JSON.stringify(snap));
+  } catch(e) {}
+}
+function loadGame() {
+  try {
+    const raw = localStorage.getItem(SAVE_KEY);
+    if (!raw) return false;
+    const snap = JSON.parse(raw);
+    Object.assign(STATE, snap);
+    STATE.achievements = new Set(snap.achievements || []);
+    STATE.animalsDone = new Set(snap.animalsDone || []);
+    STATE.continentsDone = new Set(snap.continentsDone || []);
+    STATE.perks = Object.assign({ friendInsider: false, digitalNomad: false, socialStar: false }, snap.perks || {});
+    if (typeof STATE.nomadLastIncomeWeek !== 'number') STATE.nomadLastIncomeWeek = -1;
+    if (typeof STATE.urssafYearMarked !== 'number') STATE.urssafYearMarked = -1;
+    return true;
+  } catch(e) { return false; }
+}
+function resetGame() {
+  Object.assign(STATE, {
+    phase: 'menu', characterName: '', characterIcon: '🧳',
+    week: 0, balance: INITIAL_BALANCE, points: 0,
+    startCity: null, agenda: [], completed: [],
+    achievements: new Set(), animalsDone: new Set(), continentsDone: new Set(),
+    typeCount: { dog: 0, cat: 0, house: 0, bird: 0 }, potesCount: 0,
+    pendingCard: null, log: [], refusedCount: 0, acceptedCount: 0, endReason: null, tookPlane: false,
+    perks: { friendInsider: false, digitalNomad: false, socialStar: false },
+    nomadLastIncomeWeek: -1, urssafYearMarked: -1,
+  });
+  try { localStorage.removeItem(SAVE_KEY); } catch(e) {}
+}
+
+// =================== RENDU ===================
+const app = document.getElementById('app');
+
+function render() {
+  if (STATE.phase === 'menu') renderMenu();
+  else renderGame();
+  saveGame();
+}
+
+function renderMenu() {
+  app.innerHTML = `
+    <div id="menu" class="paper">
+      <h1>Pet Sitter</h1>
+      <div class="subtitle">Carnet de voyages d'un sitter au long cours</div>
+      <div class="col" style="gap:18px;align-items:center;">
+        <div>
+          <div style="font-size:13px;text-transform:uppercase;letter-spacing:0.1em;color:#6e5532;margin-bottom:8px;">Votre prénom</div>
+          <input type="text" id="name-input" placeholder="ex : Lucile" maxlength="20" />
+        </div>
+        <div>
+          <div style="font-size:13px;text-transform:uppercase;letter-spacing:0.1em;color:#6e5532;margin-bottom:8px;">Choisissez un avatar</div>
+          <div class="avatar-row" id="avatar-row">
+            ${['🧳','🎒','🧣','📷','🌿','🗺️'].map(ic =>
+              `<div class="avatar ${STATE.characterIcon===ic?'selected':''}" data-icon="${ic}">${ic}</div>`).join('')}
+          </div>
+        </div>
+        <button class="primary" style="font-size:18px;padding:12px 32px;margin-top:12px;" onclick="startGame()">Commencer la partie</button>
+        <div style="font-size:13px;color:#6e5532;margin-top:8px;">Ville de départ : tirée au sort · Solde initial : ${fmtMoney(INITIAL_BALANCE)}</div>
+        ${localStorage.getItem(SAVE_KEY) ? `<button onclick="continueGame()">Reprendre la partie sauvegardée</button>` : ''}
+      </div>
+    </div>
+  `;
+  document.getElementById('avatar-row').addEventListener('click', e => {
+    const t = e.target.closest('.avatar');
+    if (!t) return;
+    STATE.characterIcon = t.dataset.icon;
+    renderMenu();
+  });
+}
+
+function startGame() {
+  const name = (document.getElementById('name-input').value || 'Anonyme').trim();
+  STATE.characterName = name;
+  STATE.startCity = rng(CITIES);
+  STATE.phase = 'playing';
+  STATE.week = 0;
+  log(`Partie commencée à ${STATE.startCity.name}.`);
+  render();
+}
+
+function continueGame() {
+  if (loadGame() && STATE.phase !== 'menu') {
+    render();
+  } else {
+    resetGame(); render();
+  }
+}
+
+function renderGame() {
+  const here = currentCityAt(STATE.week);
+  const balanceClass = STATE.balance < 200 ? 'danger' : (STATE.balance > 2000 ? 'success' : '');
+  const pointsClass = STATE.points >= VICTORY_POINTS ? 'success' : '';
+
+  app.innerHTML = `
+    <div id="game">
+      <div id="header-bar" class="paper">
+        <div class="row">
+          <div style="font-size:32px">${STATE.characterIcon}</div>
+          <div>
+            <div style="font-weight:600;font-size:18px;">${STATE.characterName}</div>
+            <div style="font-size:13px;color:#6e5532;font-style:italic;">à ${here.city.name}, ${here.city.continent}</div>
+          </div>
+        </div>
+        <div class="stat"><div class="label">Semaine</div><div class="value">${STATE.week} <span style="font-size:13px;font-weight:400;color:#6e5532;font-style:italic">· ${fmtDate(STATE.week)}</span></div></div>
+        <div class="stat"><div class="label">Solde</div><div class="value ${balanceClass}">${fmtMoney(STATE.balance)}</div></div>
+        <div class="stat"><div class="label">Points</div><div class="value ${pointsClass}">${STATE.points} / ${VICTORY_POINTS}</div></div>
+        <button class="primary" onclick="nextTurn()" ${STATE.pendingCard?'disabled':''} ${STATE.phase!=='playing'?'disabled':''}>Tour suivant →</button>
+      </div>
+
+      <div id="main-area">
+        <div id="map-container" class="paper">${renderMap(here.city)}</div>
+        <div class="paper">
+          <h3>Journal</h3>
+          <div id="log-panel">
+            ${STATE.log.length === 0 ? '<div style="font-style:italic;color:#6e5532">Rien à signaler.</div>'
+              : STATE.log.map(e => `<div class="log-entry"><span class="week-tag">S${e.week}</span>${e.text}</div>`).join('')}
+          </div>
+        </div>
+      </div>
+
+      <div id="side-area">
+        <div class="paper">
+          <h3>Agenda (${STATE.agenda.length})</h3>
+          ${renderAgenda()}
+        </div>
+        <div class="paper">
+          <h3>Bonus</h3>
+          ${renderPerks()}
+        </div>
+        <div class="paper">
+          <h3>Succès</h3>
+          ${renderAchievements()}
+        </div>
+      </div>
+    </div>
+
+    ${STATE.pendingCard ? renderPendingCardModal() : ''}
+    ${STATE.phase === 'over' ? renderEndModal() : ''}
+  `;
+}
+
+function renderMap(currentCity) {
+  // Equirectangular projection 800x400
+  const W = 800, H = 400;
+  const proj = (lat, lng) => ({
+    x: (lng + 180) / 360 * W,
+    y: (90 - lat) / 180 * H,
+  });
+
+  // Continents simplifiés (paths approximatifs)
+  const continents = `
+    <path class="continent-fill" d="M 360,80 Q 380,60 420,72 L 470,90 L 460,140 L 400,160 L 360,150 Z"/> <!-- Europe -->
+    <path class="continent-fill" d="M 360,160 Q 380,180 420,190 L 470,200 L 480,290 L 430,320 Q 380,310 360,260 Z"/> <!-- Africa -->
+    <path class="continent-fill" d="M 460,80 Q 530,60 600,80 L 700,110 L 700,200 L 620,240 L 540,210 L 470,140 Z"/> <!-- Asia -->
+    <path class="continent-fill" d="M 110,90 Q 180,70 270,100 L 320,150 L 280,200 L 220,210 L 150,170 Z"/> <!-- N.America -->
+    <path class="continent-fill" d="M 240,210 Q 290,220 320,260 L 320,330 L 270,360 L 240,330 Z"/> <!-- S.America -->
+    <path class="continent-fill" d="M 620,260 Q 680,250 720,270 L 750,310 L 700,330 L 640,310 Z"/> <!-- Oceania -->
+  `;
+  const continentLabels = `
+    <text class="continent-label" x="395" y="118">Europe</text>
+    <text class="continent-label" x="415" y="240">Afrique</text>
+    <text class="continent-label" x="580" y="155">Asie</text>
+    <text class="continent-label" x="220" y="145">Am. Nord</text>
+    <text class="continent-label" x="285" y="295">Am. Sud</text>
+    <text class="continent-label" x="685" y="295">Océanie</text>
+  `;
+
+  // dots & lines
+  const agendaCities = STATE.agenda.map(m => m.city.name);
+  let lines = '';
+  // ligne current → première mission de l'agenda triée
+  const sortedAgenda = [...STATE.agenda].sort((a,b) => a.startWeek - b.startWeek);
+  let lastCity = currentCity;
+  for (const m of sortedAgenda) {
+    const a = proj(lastCity.lat, lastCity.lng);
+    const b = proj(m.city.lat, m.city.lng);
+    lines += `<line class="travel-line" x1="${a.x}" y1="${a.y}" x2="${b.x}" y2="${b.y}"/>`;
+    lastCity = m.city;
+  }
+
+  let dots = '';
+  for (const c of CITIES) {
+    const p = proj(c.lat, c.lng);
+    let cls = 'city-dot';
+    if (c.name === currentCity.name) cls += ' current';
+    else if (agendaCities.includes(c.name)) cls += ' agenda';
+    dots += `<circle class="${cls}" cx="${p.x}" cy="${p.y}" r="3.5"/>`;
+    if (c.name === currentCity.name || agendaCities.includes(c.name)) {
+      dots += `<text class="city-label" x="${p.x+6}" y="${p.y+3}">${c.name}</text>`;
+    }
+  }
+
+  return `
+    <svg id="map-svg" viewBox="0 0 ${W} ${H}" preserveAspectRatio="xMidYMid meet">
+      ${continents}
+      ${continentLabels}
+      ${lines}
+      ${dots}
+    </svg>
+  `;
+}
+
+function renderAgenda() {
+  if (STATE.agenda.length === 0) return '<div class="agenda-empty">Aucune mission planifiée. Acceptez une opportunité pour remplir votre agenda.</div>';
+  return [...STATE.agenda].sort((a,b)=>a.startWeek-b.startWeek).map(m => {
+    const isActive = m.startWeek <= STATE.week && m.endWeek > STATE.week;
+    const status = isActive ? 'En cours' : `Démarre S${m.startWeek}`;
+    return `
+      <div class="agenda-mission ${isActive ? 'active' : ''}">
+        <div class="am-title">${TYPE_ICON[m.type]} ${TYPE_LABEL[m.type]} à ${m.city.name}</div>
+        <div class="am-sub">${m.housing} · ${m.durationDays} jours · ${fmtMoney(m.payTotal)}</div>
+        <div class="am-bar">${status} · ${fmtDate(m.startWeek)} → ${fmtDate(m.endWeek)}</div>
+      </div>
+    `;
+  }).join('');
+}
+
+function renderAchievements() {
+  const all = ['globetrotter','bestiaire','kiffeur','ecolo','expert_chien','expert_chat','ermite'];
+  const ecoloProg = STATE.tookPlane
+    ? '✈ pris'
+    : (STATE.week >= 52 ? 'OK' : `${STATE.week}/52 sem`);
+  const progress = {
+    globetrotter: `${STATE.continentsDone.size}/6`,
+    bestiaire: `${STATE.animalsDone.size}/3`,
+    kiffeur: `${STATE.potesCount}/5`,
+    ecolo: ecoloProg,
+    expert_chien: `${STATE.typeCount.dog}/5`,
+    expert_chat: `${STATE.typeCount.cat}/5`,
+    ermite: `${STATE.typeCount.house}/5`,
+  };
+  return `<div class="ach-grid">${all.map(a => {
+    const unlocked = STATE.achievements.has(a);
+    return `<div class="ach ${unlocked?'unlocked':'locked'}">
+      <span class="ach-icon">${ACHIEVEMENT_ICON[a]}</span>
+      <div style="flex:1;line-height:1.2">
+        <div class="ach-name">${ACHIEVEMENT_LABEL[a]}</div>
+        <div class="ach-prog">${progress[a]} · +${ACHIEVEMENT_POINTS[a]}</div>
+      </div>
+    </div>`;
+  }).join('')}</div>`;
+}
+
+function renderPerks() {
+  const list = [
+    { key: 'friendInsider', name: 'Un ami qui s\'y connaît', desc: 'Affiche si une carte est un bon deal vs la moyenne du marché.' },
+    { key: 'digitalNomad',  name: 'Digital Nomad',          desc: 'Petit revenu freelance aléatoire chaque mois. Mais l\'URSSAF tape parfois en septembre…' },
+    { key: 'socialStar',    name: 'Star des réseaux',       desc: '+ d\'opportunités, plus mondiales. Train/bateau/bus offerts par tes collabs. Mais l\'avion = badbuzz (−30 % du solde).' },
+  ];
+  return list.map(p => {
+    const on = !!STATE.perks[p.key];
+    return `<div class="perk-row ${on?'on':''}" onclick="togglePerk('${p.key}')">
+      <div class="perk-toggle"></div>
+      <div class="perk-info">
+        <div class="perk-name">${p.name}</div>
+        <div class="perk-desc">${p.desc}</div>
+      </div>
+    </div>`;
+  }).join('');
+}
+
+function togglePerk(key) {
+  if (STATE.phase !== 'playing') return;
+  STATE.perks[key] = !STATE.perks[key];
+  log(`${STATE.perks[key]?'✓ Bonus activé':'Bonus désactivé'} : ${key}`);
+  render();
+}
+
+function renderCalendarPane(card) {
+  // 26 semaines à partir de la semaine courante
+  const startW = STATE.week;
+  const endW = startW + 26;
+  let rows = '';
+  let lastMonth = -1;
+  for (let w = startW; w < endW; w++) {
+    // Find any booked mission active this week
+    const mission = STATE.agenda.find(m => w >= m.startWeek && w < m.endWeek);
+    const isCandidate = card && w >= card.startWeek && w < card.endWeek;
+    const both = mission && isCandidate;
+    let cls = '';
+    if (both) cls = 'both';
+    else if (mission) cls = 'booked';
+    else if (isCandidate) cls = 'candidate';
+    let label = '';
+    if (mission && (w === mission.startWeek)) label = mission.city.name;
+    if (isCandidate && !mission && w === card.startWeek) label = card.city.name;
+    if (both && w === card.startWeek) label = '⚠ ' + card.city.name;
+
+    const date = new Date(2026, 0, 1);
+    date.setDate(date.getDate() + w * 7);
+    const months = ['janv','fév','mars','avr','mai','juin','juil','août','sept','oct','nov','déc'];
+    const dateLabel = `${date.getDate()} ${months[date.getMonth()]}`;
+    const monthStart = date.getMonth() !== lastMonth;
+    lastMonth = date.getMonth();
+
+    rows += `
+      <div class="calendar-row ${monthStart ? 'month-start' : ''}">
+        <div class="cal-week-tag">S${w}</div>
+        <div class="cal-date">${dateLabel}</div>
+        <div class="cal-bar ${cls}">${label ? `<span class="cal-label">${label}</span>` : ''}</div>
+      </div>`;
+  }
+  return `
+    <div class="calendar-pane">
+      <h3>Calendrier (6 mois)</h3>
+      ${rows}
+      <div class="cal-legend">
+        <div class="cal-legend-item"><span class="cal-swatch free"></span> Disponible</div>
+        <div class="cal-legend-item"><span class="cal-swatch booked"></span> Mission acceptée</div>
+        <div class="cal-legend-item"><span class="cal-swatch candidate"></span> Carte en cours</div>
+      </div>
+    </div>
+  `;
+}
+
+function renderPendingCardModal() {
+  const c = STATE.pendingCard;
+  const profit = c.feasible ? (c.payTotal - c.travelCost - WEEKLY_FOOD * c.durationWeeks) : null;
+  const subjectIcon = TYPE_ICON[c.type];
+  const stamp = c.type === 'house' ? 'House sitting' : (c.petType ? `${c.petType.charAt(0).toUpperCase()+c.petType.slice(1)}` : '');
+  return `
+    <div class="modal-overlay" id="card-modal">
+      <div class="modal-twocol">
+        <div class="card" style="background:#faf0d4;">
+          <div class="card-image">
+            ${subjectIcon}
+            <div class="stamp">${stamp}</div>
+          </div>
+          <div class="card-body">
+            <div class="card-title">${c.petName ? c.petName : 'Logement à garder'}</div>
+            <div class="card-loc">${c.city.name}, ${c.city.continent} · ${c.housing}${c.isRareHousing?' ✦':''}</div>
+            <div class="card-blurb">"${c.blurb}"</div>
+            <div class="card-attrs">
+              <div><div class="attr-label">Démarrage</div><div class="attr-value">${fmtDate(c.startWeek)}</div></div>
+              <div><div class="attr-label">Durée</div><div class="attr-value">${c.durationDays} jours</div></div>
+              <div><div class="attr-label">Paiement</div><div class="attr-value">${fmtMoney(c.payTotal)}</div></div>
+              <div><div class="attr-label">Satisfaction</div><div class="attr-value">+${c.points} pts</div></div>
+            </div>
+            ${STATE.perks.friendInsider ? (() => {
+              const dq = dealQuality(c);
+              return `<div class="deal-badge" style="border-color:${dq.color};color:${dq.color};">
+                <span class="deal-icon">🧐</span>
+                <span class="deal-label">${dq.label}</span>
+                <span class="deal-pct">(${dq.pct} vs moyenne)</span>
+                <span class="deal-hint">— ${dq.hint}</span>
+              </div>`;
+            })() : ''}
+            ${c.feasible ?
+              `<div class="travel-info">
+                Depuis ${c.srcCity.name} : ${c.travelIcon} <strong>${c.travelLabel}</strong> · ${Math.round(c.distance)} km · ${fmtMoney(c.travelCost)}<br>
+                <span style="font-size:12px;color:#6e5532;">Bénéfice net estimé : <strong style="color:${profit>=0?'#2d6e3e':'#a83232'}">${fmtMoney(profit)}</strong></span>
+               </div>`
+              : `<div class="travel-info" style="border-color:#6e5532;background:rgba(110,85,50,0.1);">⚠ Mission infaisable : ${hasOverlap(c.startWeek,c.endWeek)?'chevauchement avec votre agenda':'pas le temps de voyager jusque-là'}.</div>`
+            }
+            <div class="card-actions">
+              <button class="danger" onclick="refuseCard()">Refuser</button>
+              <button class="primary" onclick='acceptCard(STATE.pendingCard)' ${!c.feasible?'disabled':''}>Accepter</button>
+            </div>
+          </div>
+        </div>
+        ${renderCalendarPane(c)}
+      </div>
+    </div>
+  `;
+}
+
+function renderEndModal() {
+  const win = STATE.endReason === 'victory';
+  const months = (STATE.week / 4.33).toFixed(1);
+  return `
+    <div class="modal-overlay">
+      <div class="modal">
+        <div class="seal">${win?'★':'⚱'}</div>
+        <h1 style="margin-top:8px;color:${win?'#2d6e3e':'#a83232'};">${win?'Victoire !':'Défaite'}</h1>
+        <p style="margin:14px 0;font-size:18px;font-style:italic;color:#6e5532;">
+          ${win
+            ? `Vous avez accumulé ${STATE.points} points en ${STATE.week} semaines (${months} mois).`
+            : `Vous avez tenu ${STATE.week} semaines (${months} mois) avant que les caisses ne soient vides.`}
+        </p>
+        <div style="display:flex;justify-content:center;gap:14px;margin:18px 0;">
+          <div class="stat"><div class="label">Missions</div><div class="value">${STATE.completed.length}</div></div>
+          <div class="stat"><div class="label">Continents</div><div class="value">${STATE.continentsDone.size}/6</div></div>
+          <div class="stat"><div class="label">Succès</div><div class="value">${STATE.achievements.size}</div></div>
+          <div class="stat"><div class="label">Solde final</div><div class="value">${fmtMoney(STATE.balance)}</div></div>
+        </div>
+        <div class="row" style="justify-content:center;margin-top:14px;">
+          <button class="primary" onclick="resetGame();render();">Nouvelle partie</button>
+        </div>
+      </div>
+    </div>
+  `;
+}
+
+function toggleHelp() {
+  const h = document.getElementById('help-overlay');
+  h.style.display = h.style.display === 'none' ? 'flex' : 'none';
+}
+
+// =================== INIT ===================
+window.acceptCard = acceptCard;
+window.refuseCard = refuseCard;
+window.nextTurn = nextTurn;
+window.startGame = startGame;
+window.continueGame = continueGame;
+window.resetGame = resetGame;
+window.toggleHelp = toggleHelp;
+window.togglePerk = togglePerk;
+window.STATE = STATE;
+window.render = render;
+
+// Charger save si présente
+if (loadGame() && STATE.phase !== 'menu') {
+  render();
+} else {
+  resetGame();
+  render();
+}
+</script>
+</body>
+</html>

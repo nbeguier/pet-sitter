@@ -5,7 +5,6 @@
 <title>Pet Sitter — Le jeu</title>
 <style>
 :root { color-scheme: light; }
-
 * { box-sizing: border-box; margin: 0; padding: 0; }
 
 body {
@@ -15,10 +14,7 @@ body {
     radial-gradient(circle at 10% 10%, rgba(120, 80, 30, 0.08) 0, transparent 40%),
     radial-gradient(circle at 90% 80%, rgba(120, 80, 30, 0.10) 0, transparent 50%),
     radial-gradient(circle at 50% 50%, rgba(150, 100, 40, 0.05) 0, transparent 70%);
-  color: #2b1f10;
-  min-height: 100vh;
-  padding: 16px;
-  font-size: 16px;
+  color: #2b1f10; min-height: 100vh; padding: 16px; font-size: 16px;
 }
 
 h1, h2, h3 { font-weight: 600; letter-spacing: 0.02em; }
@@ -27,16 +23,9 @@ h2 { font-size: 22px; margin-bottom: 8px; border-bottom: 1px solid #8b6f47; padd
 h3 { font-size: 16px; text-transform: uppercase; letter-spacing: 0.1em; margin-bottom: 6px; color: #6e5532; }
 
 button {
-  font-family: inherit;
-  font-size: 16px;
-  padding: 8px 18px;
-  background: #f5e6c8;
-  border: 1.5px solid #6e5532;
-  color: #2b1f10;
-  cursor: pointer;
-  border-radius: 2px;
-  letter-spacing: 0.05em;
-  transition: all 0.15s;
+  font-family: inherit; font-size: 16px; padding: 8px 18px;
+  background: #f5e6c8; border: 1.5px solid #6e5532; color: #2b1f10;
+  cursor: pointer; border-radius: 2px; letter-spacing: 0.05em; transition: all 0.15s;
 }
 button:hover { background: #6e5532; color: #f5e6c8; }
 button.primary { background: #2b1f10; color: #f5e6c8; }
@@ -46,62 +35,36 @@ button.danger:hover { background: #a83232; color: #f5e6c8; }
 button:disabled { opacity: 0.4; cursor: not-allowed; }
 
 input[type=text] {
-  font-family: inherit;
-  font-size: 18px;
-  padding: 6px 10px;
-  background: rgba(245, 230, 200, 0.6);
-  border: none;
-  border-bottom: 1.5px solid #6e5532;
-  color: #2b1f10;
-  outline: none;
-  width: 240px;
+  font-family: inherit; font-size: 18px; padding: 6px 10px;
+  background: rgba(245, 230, 200, 0.6); border: none;
+  border-bottom: 1.5px solid #6e5532; color: #2b1f10; outline: none; width: 240px;
 }
 
 .paper {
-  background: #f5e6c8;
-  border: 1px solid #8b6f47;
-  border-radius: 3px;
-  padding: 14px;
+  background: #f5e6c8; border: 1px solid #8b6f47;
+  border-radius: 3px; padding: 14px;
   box-shadow: 0 2px 8px rgba(43, 31, 16, 0.12);
 }
 
-.center { display: flex; align-items: center; justify-content: center; }
 .col { display: flex; flex-direction: column; gap: 12px; }
 .row { display: flex; gap: 12px; align-items: center; }
 
-/* MENU */
-#menu {
-  max-width: 720px;
-  margin: 80px auto;
-  text-align: center;
-}
+#menu { max-width: 720px; margin: 80px auto; text-align: center; }
 #menu h1 { font-size: 56px; font-weight: 500; }
 #menu .subtitle { font-style: italic; color: #6e5532; margin-bottom: 32px; font-size: 20px; }
 #menu .avatar-row { display: flex; gap: 14px; justify-content: center; margin: 24px 0; }
 #menu .avatar {
-  font-size: 48px;
-  width: 80px; height: 80px;
-  border: 1.5px solid #8b6f47;
-  border-radius: 50%;
-  display: flex;
-  align-items: center;
-  justify-content: center;
-  cursor: pointer;
-  background: #f5e6c8;
+  font-size: 48px; width: 80px; height: 80px;
+  border: 1.5px solid #8b6f47; border-radius: 50%;
+  display: flex; align-items: center; justify-content: center;
+  cursor: pointer; background: #f5e6c8;
   transition: transform 0.15s, border-color 0.15s;
 }
 #menu .avatar.selected { border-color: #2b1f10; border-width: 3px; transform: scale(1.1); }
 #menu .avatar:hover { transform: scale(1.05); }
 
-/* GAME LAYOUT */
 #game { display: grid; grid-template-columns: 1fr 320px; gap: 16px; max-width: 1400px; margin: 0 auto; }
-#header-bar {
-  grid-column: 1 / 3;
-  display: flex;
-  justify-content: space-between;
-  padding: 12px 18px;
-  align-items: center;
-}
+#header-bar { grid-column: 1 / 3; display: flex; justify-content: space-between; padding: 12px 18px; align-items: center; flex-wrap: wrap; gap: 12px; }
 .stat { display: flex; flex-direction: column; gap: 2px; }
 .stat .label { font-size: 11px; text-transform: uppercase; letter-spacing: 0.1em; color: #6e5532; }
 .stat .value { font-size: 22px; font-weight: 600; }
@@ -111,113 +74,79 @@ input[type=text] {
 #main-area { display: flex; flex-direction: column; gap: 12px; }
 #side-area { display: flex; flex-direction: column; gap: 12px; }
 
-/* MAP */
 #map-container { padding: 0; overflow: hidden; }
 #map-svg {
-  display: block;
-  width: 100%;
-  height: auto;
+  display: block; width: 100%; height: auto;
   background:
-    repeating-linear-gradient(0deg, transparent 0, transparent 39px, rgba(110,85,50,0.07) 39px, rgba(110,85,50,0.07) 40px),
-    repeating-linear-gradient(90deg, transparent 0, transparent 39px, rgba(110,85,50,0.07) 39px, rgba(110,85,50,0.07) 40px),
+    repeating-linear-gradient(0deg, transparent 0, transparent 17px, rgba(110,85,50,0.06) 17px, rgba(110,85,50,0.06) 18px),
+    repeating-linear-gradient(90deg, transparent 0, transparent 17px, rgba(110,85,50,0.06) 17px, rgba(110,85,50,0.06) 18px),
     #ead9b8;
 }
-.continent-fill { fill: #d8c595; stroke: #8b6f47; stroke-width: 0.5; }
-.continent-label { fill: #6e5532; font-size: 11px; font-style: italic; text-anchor: middle; text-transform: uppercase; letter-spacing: 0.15em; pointer-events: none; }
-.city-dot { fill: #6e5532; stroke: #f5e6c8; stroke-width: 1; }
-.city-dot.current { fill: #a83232; stroke-width: 2; r: 6; }
-.city-dot.agenda { fill: #2d6e3e; r: 5; }
-.city-label { fill: #2b1f10; font-size: 9px; pointer-events: none; }
-.travel-line { stroke: #a83232; stroke-width: 1.2; stroke-dasharray: 3 3; fill: none; opacity: 0.7; }
+.continent-fill { fill: #d8c595; stroke: #8b6f47; stroke-width: 0.3; stroke-linejoin: round; }
+.continent-label { fill: #6e5532; font-size: 5.5px; font-style: italic; text-anchor: middle; text-transform: uppercase; letter-spacing: 0.15em; pointer-events: none; }
+.city-dot { fill: #6e5532; stroke: #f5e6c8; stroke-width: 0.4; }
+.city-dot.current { fill: #a83232; stroke-width: 0.8; }
+.city-dot.agenda { fill: #2d6e3e; }
+.city-label { fill: #2b1f10; font-size: 4px; pointer-events: none; }
+.travel-line { stroke: #a83232; stroke-width: 0.5; stroke-dasharray: 1.5 1.5; fill: none; opacity: 0.7; }
 
-/* CARD */
 .card {
-  background: #faf0d4;
-  border: 2px solid #6e5532;
-  padding: 0;
-  border-radius: 4px;
-  position: relative;
-  overflow: hidden;
+  background: #faf0d4; border: 2px solid #6e5532;
+  padding: 0; border-radius: 4px; position: relative; overflow: hidden;
 }
 .card-image {
-  height: 140px;
-  background: linear-gradient(135deg, #d8c595 0%, #c4b078 100%);
+  height: 140px; background: linear-gradient(135deg, #d8c595 0%, #c4b078 100%);
   border-bottom: 1.5px solid #6e5532;
-  display: flex;
-  align-items: center;
-  justify-content: center;
-  font-size: 64px;
-  color: #6e5532;
-  position: relative;
+  display: flex; align-items: center; justify-content: center;
+  font-size: 64px; color: #6e5532; position: relative;
 }
 .card-image .stamp {
-  position: absolute;
-  top: 8px;
-  right: 8px;
-  background: rgba(168, 50, 50, 0.85);
-  color: #f5e6c8;
-  font-size: 11px;
-  text-transform: uppercase;
-  letter-spacing: 0.15em;
-  padding: 4px 10px;
-  border-radius: 2px;
-  transform: rotate(4deg);
+  position: absolute; top: 8px; right: 8px;
+  background: rgba(168, 50, 50, 0.85); color: #f5e6c8;
+  font-size: 11px; text-transform: uppercase; letter-spacing: 0.15em;
+  padding: 4px 10px; border-radius: 2px; transform: rotate(4deg);
   border: 1px dashed #f5e6c8;
 }
 .card-body { padding: 14px 16px; }
 .card-title { font-size: 22px; font-weight: 600; margin-bottom: 6px; }
 .card-loc { font-size: 14px; font-style: italic; color: #6e5532; margin-bottom: 10px; }
-.card-attrs {
-  display: grid;
-  grid-template-columns: 1fr 1fr;
-  gap: 6px 14px;
-  margin: 10px 0;
-  font-size: 14px;
-}
+.card-attrs { display: grid; grid-template-columns: 1fr 1fr; gap: 6px 14px; margin: 10px 0; font-size: 14px; }
 .card-attrs .attr-label { font-size: 11px; text-transform: uppercase; color: #6e5532; letter-spacing: 0.1em; }
 .card-attrs .attr-value { font-weight: 600; }
 .card-blurb {
-  font-size: 14px;
-  font-style: italic;
-  color: #4a3520;
-  border-top: 1px solid #d4b896;
-  border-bottom: 1px solid #d4b896;
-  padding: 10px 0;
-  margin: 10px 0;
-  line-height: 1.4;
+  font-size: 14px; font-style: italic; color: #4a3520;
+  border-top: 1px solid #d4b896; border-bottom: 1px solid #d4b896;
+  padding: 10px 0; margin: 10px 0; line-height: 1.4;
 }
 .card-actions { display: flex; gap: 8px; justify-content: flex-end; margin-top: 10px; }
 .travel-info {
-  font-size: 13px;
-  background: rgba(168, 50, 50, 0.08);
-  padding: 6px 10px;
-  border-left: 3px solid #a83232;
-  margin: 10px 0;
+  font-size: 13px; background: rgba(168, 50, 50, 0.08);
+  padding: 6px 10px; border-left: 3px solid #a83232; margin: 10px 0;
 }
 
-/* AGENDA */
-.agenda-empty { font-style: italic; color: #6e5532; padding: 14px 0; text-align: center; }
-.agenda-mission {
-  border-top: 1px solid #d4b896;
-  padding: 10px 0;
+.deal-badge {
+  display: flex; flex-wrap: wrap; align-items: center; gap: 6px;
+  padding: 6px 10px; border: 1.5px dashed; border-radius: 3px;
+  margin: 6px 0; font-size: 12px;
 }
+.deal-icon { font-size: 14px; }
+.deal-label { font-weight: 700; text-transform: uppercase; letter-spacing: 0.05em; font-size: 11px; }
+.deal-pct { font-size: 11px; opacity: 0.8; }
+.deal-hint { font-size: 11px; font-style: italic; opacity: 0.85; flex-basis: 100%; }
+
+.agenda-empty { font-style: italic; color: #6e5532; padding: 14px 0; text-align: center; }
+.agenda-mission { border-top: 1px solid #d4b896; padding: 10px 0; }
 .agenda-mission:first-child { border-top: none; }
 .agenda-mission .am-title { font-weight: 600; font-size: 15px; }
 .agenda-mission .am-sub { font-size: 12px; color: #6e5532; margin-top: 2px; }
 .agenda-mission .am-bar { font-size: 11px; color: #6e5532; margin-top: 4px; }
 .agenda-mission.active { background: rgba(45, 110, 62, 0.08); padding-left: 8px; border-left: 3px solid #2d6e3e; }
 
-/* ACHIEVEMENTS */
 .ach-grid { display: grid; grid-template-columns: 1fr 1fr; gap: 6px; }
 .ach {
-  background: rgba(110,85,50,0.08);
-  border: 1px dashed #8b6f47;
-  padding: 6px 8px;
-  border-radius: 2px;
-  font-size: 12px;
-  display: flex;
-  align-items: center;
-  gap: 6px;
+  background: rgba(110,85,50,0.08); border: 1px dashed #8b6f47;
+  padding: 6px 8px; border-radius: 2px; font-size: 12px;
+  display: flex; align-items: center; gap: 6px;
 }
 .ach.locked { opacity: 0.5; }
 .ach.unlocked { background: rgba(45, 110, 62, 0.18); border: 1.5px solid #2d6e3e; opacity: 1; }
@@ -225,111 +154,50 @@ input[type=text] {
 .ach .ach-name { font-weight: 600; }
 .ach .ach-prog { font-size: 10px; color: #6e5532; }
 
-/* LOG */
 #log-panel { max-height: 200px; overflow-y: auto; font-size: 13px; }
 .log-entry { padding: 4px 0; border-top: 1px dotted #d4b896; }
 .log-entry:first-child { border-top: none; }
 .log-entry .week-tag { font-weight: 600; color: #6e5532; margin-right: 6px; }
 
-/* MODAL */
 .modal-overlay {
-  position: fixed; inset: 0;
-  background: rgba(43, 31, 16, 0.65);
+  position: fixed; inset: 0; background: rgba(43, 31, 16, 0.65);
   display: flex; align-items: center; justify-content: center;
-  z-index: 100;
-  padding: 20px;
+  z-index: 100; padding: 20px;
 }
-.modal-twocol {
-  display: flex;
-  gap: 16px;
-  align-items: stretch;
-  max-width: 820px;
-  width: 100%;
-}
+.modal-twocol { display: flex; gap: 16px; align-items: stretch; max-width: 820px; width: 100%; }
 .modal-twocol > .card { flex: 1 1 480px; }
 
-/* Calendrier popup */
 .calendar-pane {
-  flex: 0 0 280px;
-  background: #f5e6c8;
-  border: 2px solid #6e5532;
-  border-radius: 4px;
-  padding: 12px 14px;
-  max-height: 520px;
-  overflow-y: auto;
+  flex: 0 0 280px; background: #f5e6c8;
+  border: 2px solid #6e5532; border-radius: 4px;
+  padding: 12px 14px; max-height: 520px; overflow-y: auto;
 }
 .calendar-pane h3 { margin-bottom: 8px; }
-.calendar-row {
-  display: flex;
-  align-items: center;
-  font-size: 12px;
-  height: 22px;
-  border-bottom: 1px dotted #d4b896;
-}
+.calendar-row { display: flex; align-items: center; font-size: 12px; height: 22px; border-bottom: 1px dotted #d4b896; }
 .calendar-row:last-child { border-bottom: none; }
 .calendar-row.month-start { border-top: 1.5px solid #8b6f47; }
-.cal-week-tag {
-  width: 30px;
-  font-weight: 600;
-  color: #6e5532;
-  font-size: 10px;
-  flex-shrink: 0;
-}
-.cal-date {
-  width: 70px;
-  font-size: 10px;
-  color: #6e5532;
-  font-style: italic;
-  flex-shrink: 0;
-}
-.cal-bar {
-  flex: 1;
-  height: 16px;
-  border: 1px solid #d4b896;
-  position: relative;
-  overflow: hidden;
-  background: #fff;
-}
-.cal-bar.booked {
-  background: #2d6e3e;
-  border-color: #1f4e2c;
-}
+.cal-week-tag { width: 30px; font-weight: 600; color: #6e5532; font-size: 10px; flex-shrink: 0; }
+.cal-date { width: 70px; font-size: 10px; color: #6e5532; font-style: italic; flex-shrink: 0; }
+.cal-bar { flex: 1; height: 16px; border: 1px solid #d4b896; position: relative; overflow: hidden; background: #fff; }
+.cal-bar.booked { background: #2d6e3e; border-color: #1f4e2c; }
 .cal-bar.candidate {
-  background-image: repeating-linear-gradient(
-    -45deg,
-    #4a8bc2 0, #4a8bc2 4px,
-    #b6dbf2 4px, #b6dbf2 8px
-  );
+  background-image: repeating-linear-gradient(-45deg, #4a8bc2 0, #4a8bc2 4px, #b6dbf2 4px, #b6dbf2 8px);
   border-color: #2c6896;
 }
 .cal-bar.both {
   background: #2d6e3e;
-  background-image: repeating-linear-gradient(
-    -45deg,
-    transparent 0, transparent 4px,
-    rgba(74, 139, 194, 0.85) 4px, rgba(74, 139, 194, 0.85) 8px
-  );
+  background-image: repeating-linear-gradient(-45deg, transparent 0, transparent 4px, rgba(74, 139, 194, 0.85) 4px, rgba(74, 139, 194, 0.85) 8px);
   border-color: #1f4e2c;
 }
 .cal-label {
-  font-size: 9px;
-  color: #fff;
-  font-weight: 600;
-  position: absolute;
-  left: 4px;
-  top: 50%;
-  transform: translateY(-50%);
-  white-space: nowrap;
-  text-shadow: 0 1px 2px rgba(0,0,0,0.5);
+  font-size: 9px; color: #fff; font-weight: 600;
+  position: absolute; left: 4px; top: 50%; transform: translateY(-50%);
+  white-space: nowrap; text-shadow: 0 1px 2px rgba(0,0,0,0.5);
 }
 .cal-legend {
-  font-size: 11px;
-  margin-top: 8px;
-  display: flex;
-  flex-direction: column;
-  gap: 4px;
-  padding-top: 8px;
-  border-top: 1px solid #d4b896;
+  font-size: 11px; margin-top: 8px;
+  display: flex; flex-direction: column; gap: 4px;
+  padding-top: 8px; border-top: 1px solid #d4b896;
 }
 .cal-legend-item { display: flex; align-items: center; gap: 6px; }
 .cal-swatch { width: 14px; height: 12px; border: 1px solid #6e5532; }
@@ -339,33 +207,23 @@ input[type=text] {
 }
 .cal-swatch.free { background: #fff; }
 
-/* Perks panel */
 .perk-row {
   display: flex; align-items: flex-start; gap: 10px;
-  padding: 8px 0;
-  border-top: 1px dotted #d4b896;
-  cursor: pointer;
-  user-select: none;
+  padding: 8px 0; border-top: 1px dotted #d4b896;
+  cursor: pointer; user-select: none;
 }
 .perk-row:first-child { border-top: none; }
 .perk-row:hover { background: rgba(110,85,50,0.04); }
 .perk-toggle {
   width: 36px; height: 20px;
-  border: 1.5px solid #6e5532;
-  border-radius: 12px;
-  background: #f5e6c8;
-  position: relative;
-  flex-shrink: 0;
-  margin-top: 2px;
-  transition: background 0.15s;
+  border: 1.5px solid #6e5532; border-radius: 12px;
+  background: #f5e6c8; position: relative; flex-shrink: 0;
+  margin-top: 2px; transition: background 0.15s;
 }
 .perk-toggle::after {
-  content: '';
-  position: absolute;
-  width: 14px; height: 14px;
-  border-radius: 50%;
-  background: #6e5532;
-  top: 1.5px; left: 2px;
+  content: ''; position: absolute;
+  width: 14px; height: 14px; border-radius: 50%;
+  background: #6e5532; top: 1.5px; left: 2px;
   transition: left 0.15s, background 0.15s;
 }
 .perk-row.on .perk-toggle { background: #2d6e3e; border-color: #1f4e2c; }
@@ -374,53 +232,24 @@ input[type=text] {
 .perk-name { font-weight: 600; font-size: 13px; }
 .perk-desc { font-size: 11px; color: #6e5532; margin-top: 2px; line-height: 1.3; }
 
-/* Deal badge */
-.deal-badge {
-  display: flex; flex-wrap: wrap; align-items: center; gap: 6px;
-  padding: 6px 10px;
-  border: 1.5px dashed;
-  border-radius: 3px;
-  margin: 6px 0;
-  font-size: 12px;
-}
-.deal-icon { font-size: 14px; }
-.deal-label { font-weight: 700; text-transform: uppercase; letter-spacing: 0.05em; font-size: 11px; }
-.deal-pct { font-size: 11px; opacity: 0.8; }
-.deal-hint { font-size: 11px; font-style: italic; opacity: 0.85; flex-basis: 100%; }
 .modal {
-  background: #f5e6c8;
-  border: 2px solid #2b1f10;
-  border-radius: 4px;
-  padding: 24px;
-  max-width: 540px;
-  width: 100%;
-  text-align: center;
-  position: relative;
+  background: #f5e6c8; border: 2px solid #2b1f10;
+  border-radius: 4px; padding: 24px; max-width: 540px;
+  width: 100%; text-align: center; position: relative;
 }
 .modal h1 { font-size: 36px; }
 .modal .seal {
-  position: absolute;
-  top: -22px; left: 50%;
-  transform: translateX(-50%);
-  background: #a83232;
-  color: #f5e6c8;
-  width: 44px; height: 44px;
-  border-radius: 50%;
+  position: absolute; top: -22px; left: 50%; transform: translateX(-50%);
+  background: #a83232; color: #f5e6c8;
+  width: 44px; height: 44px; border-radius: 50%;
   display: flex; align-items: center; justify-content: center;
-  font-size: 22px;
-  border: 2px solid #f5e6c8;
+  font-size: 22px; border: 2px solid #f5e6c8;
 }
 
-/* HELP */
 .help-button {
-  position: fixed;
-  top: 16px;
-  right: 16px;
-  width: 36px; height: 36px;
-  border-radius: 50%;
-  font-size: 18px;
-  font-weight: 600;
-  z-index: 50;
+  position: fixed; top: 16px; right: 16px;
+  width: 36px; height: 36px; border-radius: 50%;
+  font-size: 18px; font-weight: 600; z-index: 50;
 }
 #help-overlay { z-index: 200; }
 #help-overlay .modal { max-width: 640px; text-align: left; }
@@ -429,9 +258,13 @@ input[type=text] {
 #help-overlay ul { margin: 6px 0 8px 18px; }
 #help-overlay li { margin-bottom: 3px; }
 
+@media (max-width: 1100px) {
+  .modal-twocol { flex-direction: column; max-width: 540px; }
+  .calendar-pane { max-height: 280px; }
+}
 @media (max-width: 980px) {
   #game { grid-template-columns: 1fr; }
-  #header-bar { grid-column: 1; flex-wrap: wrap; gap: 12px; }
+  #header-bar { grid-column: 1; }
 }
 </style>
 </head>
@@ -452,17 +285,17 @@ input[type=text] {
     <ul>
       <li>45 % de chances qu'une carte Opportunité apparaisse.</li>
       <li>Vous pouvez l'accepter ou la refuser. Une carte refusée disparaît.</li>
-      <li>Vous pouvez accepter plusieurs missions futures, tant que les dates ne se chevauchent pas et que le voyage tient dans le temps disponible.</li>
+      <li>Le calendrier à droite de chaque carte montre les semaines occupées (vert) et la période proposée (hachuré bleu).</li>
     </ul>
     <h2>Transport</h2>
-    <p>Avant chaque mission, le mode de transport le moins cher qui rentre dans le délai disponible est utilisé. Plus de temps = transport plus économique.</p>
+    <p>Modes : auto-stop, bateau-stop, bus, ferry, train, avion. Plus c'est rapide, plus c'est cher. Les océans se traversent en bateau-stop, ferry ou avion.</p>
     <h2>Succès</h2>
-    <p>Visiter les 6 continents (+30), garder chien/chat/oiseau (+20), 5 missions « potes invités » (+20), 1 an sans avion = Écolo (+25), 5 sittings d'un même type pour devenir Expert (+7). Les Experts biaisent ensuite le pool de cartes en votre faveur.</p>
+    <p>Globe-trotter (6 continents, +30), Bestiaire (chien/chat/oiseau, +20), Kiffeur (5 missions « potes invités », +20), Écolo (1 an sans avion, +25), Experts +7 par animal après 5 sittings, Ermite (5 House sittings, +7).</p>
     <h2>Bonus activables</h2>
     <ul>
-      <li><strong>Un ami qui s'y connaît</strong> : juge la qualité du paiement de chaque carte (arnaque / moyen / bon deal).</li>
+      <li><strong>Un ami qui s'y connaît</strong> : juge la qualité du paiement de chaque carte.</li>
       <li><strong>Digital Nomad</strong> : petits revenus freelance mensuels. Attention l'URSSAF en septembre.</li>
-      <li><strong>Star des réseaux</strong> : +20 % de chances d'opportunité, missions plus lointaines, train/bateau/bus payés par les collabs. Mais l'avion = badbuzz (−30 % du solde).</li>
+      <li><strong>Star des réseaux</strong> : +20 % d'opportunités, missions plus lointaines, train/bateau/bus payés par les collabs. Mais l'avion = badbuzz (−30 % du solde).</li>
     </ul>
     <div class="row" style="justify-content:center;margin-top:20px;">
       <button onclick="toggleHelp()">Fermer</button>
@@ -473,7 +306,6 @@ input[type=text] {
 <script>
 'use strict';
 
-// =================== CONSTANTES ===================
 const INITIAL_BALANCE = 1500;
 const WEEKLY_FOOD = 500 * 12 / 52;
 const P_OPPORTUNITY = 0.45;
@@ -486,7 +318,6 @@ const P_POTES = 0.30;
 const POOL_BASE = { dog: 0.60, cat: 0.18, house: 0.17, bird: 0.05 };
 const PAY_RANGES = { dog: [35,55], cat: [25,40], bird: [30,50], house: [20,35] };
 const POINT_RANGES = { dog: [2,4], cat: [4,7], bird: [5,8], house: [3,5] };
-const ANIMAL_FOR_TYPE = { dog: 'chien', cat: 'chat', bird: 'oiseau', house: null };
 const TYPE_LABEL = { dog: 'Dog sitting', cat: 'Cat sitting', bird: 'Bird sitting', house: 'House sitting' };
 const TYPE_ICON = { dog: '🐕', cat: '🐈', bird: '🦜', house: '🏠' };
 
@@ -498,9 +329,7 @@ const TRANSPORT = {
   train:    { name: 'Train',      cost_km: 0.08,  km_day: 400, trans_ocean: false, icon: '🚆' },
   plane:    { name: 'Avion',      cost_km: 0.15,  km_day: 800, trans_ocean: true,  icon: '✈️' },
 };
-// Modes terrestres triés par prix (cheapest first)
 const LAND_MODES = ['hitch','bus','train'];
-// Modes trans-océaniques triés par prix
 const SEA_MODES  = ['boatstop','ferry','plane'];
 
 const LAND_CONNECTED = new Set([
@@ -523,9 +352,7 @@ const ACHIEVEMENT_ICON = {
   bestiaire: '📚', globetrotter: '🌍', kiffeur: '🎉', ecolo: '🌱',
 };
 
-// =================== VILLES ===================
 const CITIES = [
-  // Europe
   { name: "Paris",       continent: "Europe",    lat: 48.85, lng:   2.35 },
   { name: "Berlin",      continent: "Europe",    lat: 52.52, lng:  13.40 },
   { name: "Rome",        continent: "Europe",    lat: 41.90, lng:  12.50 },
@@ -534,14 +361,12 @@ const CITIES = [
   { name: "Madrid",      continent: "Europe",    lat: 40.42, lng:  -3.70 },
   { name: "Vienne",      continent: "Europe",    lat: 48.21, lng:  16.37 },
   { name: "Athènes",     continent: "Europe",    lat: 37.98, lng:  23.73 },
-  // Africa
   { name: "Le Caire",    continent: "Africa",    lat: 30.04, lng:  31.24 },
   { name: "Le Cap",      continent: "Africa",    lat: -33.92, lng: 18.42 },
   { name: "Marrakech",   continent: "Africa",    lat: 31.63, lng:  -8.00 },
   { name: "Nairobi",     continent: "Africa",    lat: -1.29, lng:  36.82 },
   { name: "Dakar",       continent: "Africa",    lat: 14.72, lng: -17.47 },
   { name: "Lagos",       continent: "Africa",    lat:  6.46, lng:   3.39 },
-  // Asia
   { name: "Tokyo",       continent: "Asia",      lat: 35.68, lng: 139.76 },
   { name: "Bangkok",     continent: "Asia",      lat: 13.75, lng: 100.50 },
   { name: "Mumbai",      continent: "Asia",      lat: 19.08, lng:  72.88 },
@@ -549,21 +374,82 @@ const CITIES = [
   { name: "Istanbul",    continent: "Asia",      lat: 41.00, lng:  28.98 },
   { name: "Séoul",       continent: "Asia",      lat: 37.57, lng: 126.98 },
   { name: "Singapour",   continent: "Asia",      lat:  1.35, lng: 103.82 },
-  // North America
   { name: "New York",    continent: "N.America", lat: 40.71, lng: -74.00 },
   { name: "Los Angeles", continent: "N.America", lat: 34.05, lng:-118.24 },
   { name: "Mexico",      continent: "N.America", lat: 19.43, lng: -99.13 },
   { name: "Toronto",     continent: "N.America", lat: 43.65, lng: -79.38 },
-  // South America
   { name: "Buenos Aires",continent: "S.America", lat:-34.61, lng: -58.38 },
   { name: "Rio",         continent: "S.America", lat:-22.91, lng: -43.17 },
   { name: "Lima",        continent: "S.America", lat:-12.05, lng: -77.04 },
   { name: "Bogota",      continent: "S.America", lat:  4.71, lng: -74.07 },
-  // Oceania
   { name: "Sydney",      continent: "Oceania",   lat:-33.87, lng: 151.21 },
   { name: "Auckland",    continent: "Oceania",   lat:-36.85, lng: 174.76 },
   { name: "Melbourne",   continent: "Oceania",   lat:-37.81, lng: 144.96 },
 ];
+
+// Contours de continents — coordonnées (lat, lng) en degrés, équirectangulaire.
+// Tracés détaillés à partir de points côtiers réels pour que les villes tombent
+// précisément sur les terres.
+const CONTINENT_SHAPES = {
+  'Europe': [
+    [[71,28],[69,33],[66,40],[60,50],[55,60],[51,55],[47,51],[43,47],[44,40],
+     [44,33],[41,29],[38,26],[36,23],[40,18],[37,14],[37,-1],[36,-6],[37,-9],
+     [43,-9],[49,-5],[55,-8],[58,-3],[62,5],[68,16],[71,28]],
+    [[59,-2],[58,-5],[55,-5],[52,-5],[50,-2],[51,1],[53,1],[55,-1],[58,-2],[59,-2]],
+    [[66,-22],[64,-22],[63,-19],[63,-15],[65,-13],[66,-15],[66,-22]],
+  ],
+  'Africa': [
+    [[37,10],[33,22],[31,32],[27,34],[22,36],[15,40],[11,51],[2,47],[-4,41],
+     [-12,40],[-22,35],[-26,33],[-34,26],[-35,19],[-29,16],[-22,13],[-12,13],
+     [-5,12],[0,9],[4,8],[6,3],[4,-3],[6,-8],[10,-13],[14,-17],[21,-17],
+     [27,-13],[33,-9],[36,-2],[37,10]],
+    [[-12,49],[-15,50],[-25,47],[-25,44],[-15,45],[-12,49]],
+  ],
+  'Asia': [
+    [[70,60],[73,80],[75,100],[75,130],[73,145],[70,175],[66,180],[60,164],
+     [55,160],[50,155],[45,142],[42,140],[36,138],[33,130],[38,128],[33,126],
+     [22,121],[18,109],[10,107],[10,103],[1,104],[-7,105],[-8,116],[-9,122],
+     [-10,140],[-1,135],[5,124],[16,122],[22,113],[16,108],[13,100],[16,94],
+     [22,88],[8,77],[15,73],[21,72],[23,67],[25,56],[22,59],[16,53],[12,45],
+     [21,39],[27,35],[31,35],[36,35],[36,28],[40,26],[42,28],[45,35],[42,50],
+     [44,65],[48,70],[52,80],[60,70],[70,60]],
+    [[45,141],[42,144],[38,141],[35,140],[33,130],[35,135],[39,141],[45,141]],
+  ],
+  'N.America': [
+    [[71,-156],[71,-141],[60,-141],[55,-130],[49,-123],[37,-122],[33,-118],
+     [25,-110],[22,-106],[18,-100],[14,-90],[9,-82],[13,-84],[22,-90],
+     [29,-90],[25,-80],[35,-76],[42,-70],[45,-65],[50,-55],[60,-65],[65,-75],
+     [73,-80],[80,-95],[73,-130],[71,-156]],
+    [[83,-30],[78,-15],[70,-25],[65,-40],[70,-55],[80,-50],[83,-30]],
+  ],
+  'S.America': [
+    [[12,-72],[11,-65],[8,-60],[5,-52],[0,-50],[-7,-35],[-22,-42],[-34,-53],
+     [-40,-65],[-52,-69],[-54,-72],[-46,-75],[-30,-71],[-18,-71],[-12,-77],
+     [-5,-81],[1,-78],[8,-78],[12,-72]],
+  ],
+  'Oceania': [
+    [[-11,132],[-13,142],[-19,147],[-28,153],[-34,151],[-38,145],[-35,138],
+     [-32,116],[-22,114],[-17,122],[-12,130],[-11,132]],
+    [[-37,175],[-41,174],[-46,167],[-43,172],[-37,175]],
+  ],
+};
+
+const CONTINENT_LABEL_POS = {
+  'Europe':    [55, 25],
+  'Africa':    [5, 22],
+  'Asia':      [50, 95],
+  'N.America': [45, -100],
+  'S.America': [-13, -60],
+  'Oceania':   [-25, 135],
+};
+const CONTINENT_LABEL_FR = {
+  'Europe': 'Europe',
+  'Africa': 'Afrique',
+  'Asia': 'Asie',
+  'N.America': 'Am. Nord',
+  'S.America': 'Am. Sud',
+  'Oceania': 'Océanie',
+};
 
 // =================== DESCRIPTIONS / NAMES ===================
 const PET_NAMES = {
@@ -804,16 +690,11 @@ const BLURB_TEMPLATES = {
 };
 
 function pickBlurb(type, vars) {
-  const template = rng(BLURB_TEMPLATES[type]);
-  let s = template;
-  for (const k of Object.keys(vars)) {
-    s = s.replaceAll('{' + k + '}', vars[k]);
-  }
-  // capitalize first letter at sentence start if needed
+  let s = rng(BLURB_TEMPLATES[type]);
+  for (const k of Object.keys(vars)) s = s.replaceAll('{' + k + '}', vars[k]);
   return s;
 }
 
-// =================== UTILS ===================
 function rng(arr) { return arr[Math.floor(Math.random() * arr.length)]; }
 function rint(min, max) { return Math.floor(Math.random() * (max - min + 1)) + min; }
 function rfloat(min, max) { return Math.random() * (max - min) + min; }
@@ -838,8 +719,6 @@ function needsPlane(c1, c2) {
 function bestTransport(distance_km, days_available, src_continent, dst_continent) {
   if (distance_km < 1) return { mode: 'none', cost: 0, days: 0, label: 'Sur place', icon: '·' };
   const must_cross_sea = needsPlane(src_continent, dst_continent);
-  // Si trans-océanique : seulement les modes qui passent l'océan (boat-stop, ferry, avion).
-  // Sinon : on peut prendre n'importe quel mode terrestre (qui sont tous moins chers que la mer).
   const candidates = must_cross_sea ? SEA_MODES : LAND_MODES;
   for (const m of candidates) {
     const spec = TRANSPORT[m];
@@ -851,9 +730,13 @@ function bestTransport(distance_km, days_available, src_continent, dst_continent
   return null;
 }
 function fmtMoney(n) { return Math.round(n) + ' €'; }
-
+function fmtDate(week) {
+  const start = new Date(2026, 0, 1);
+  start.setDate(start.getDate() + week * 7);
+  const months = ['janv','fév','mars','avr','mai','juin','juil','août','sept','oct','nov','déc'];
+  return `${start.getDate()} ${months[start.getMonth()]} ${start.getFullYear()}`;
+}
 function dealQuality(card) {
-  // Estimation : moyenne du prix journalier × durée × bonus continent éloigné
   const meanPerDay = (PAY_RANGES[card.type][0] + PAY_RANGES[card.type][1]) / 2;
   const far = card.srcCity && card.srcCity.continent !== card.city.continent;
   const expected = meanPerDay * card.durationDays * (far ? FAR_BONUS : 1.0);
@@ -867,50 +750,26 @@ function dealQuality(card) {
   const sign = pct >= 0 ? '+' : '';
   return { label, color, hint, pct: `${sign}${pct}%` };
 }
-function fmtDate(week) {
-  // Date de jeu : on commence le 1er janvier d'une année arbitraire (2026)
-  const start = new Date(2026, 0, 1);
-  start.setDate(start.getDate() + week * 7);
-  const months = ['janv','fév','mars','avr','mai','juin','juil','août','sept','oct','nov','déc'];
-  return `${start.getDate()} ${months[start.getMonth()]} ${start.getFullYear()}`;
-}
 
-// =================== ÉTAT DE JEU ===================
 const STATE = {
   phase: 'menu',
-  characterName: '',
-  characterIcon: '🧳',
-  week: 0,
-  balance: INITIAL_BALANCE,
-  points: 0,
-  startCity: null,
-  agenda: [],            // {id, type, city, startWeek, endWeek, durationDays, payTotal, travelCost, travelMode, points, animal, housing, isRareHousing, hasPotes, blurb, srcCity}
-  completed: [],
-  achievements: new Set(),
-  animalsDone: new Set(),
-  continentsDone: new Set(),
+  characterName: '', characterIcon: '🧳',
+  week: 0, balance: INITIAL_BALANCE, points: 0,
+  startCity: null, agenda: [], completed: [],
+  achievements: new Set(), animalsDone: new Set(), continentsDone: new Set(),
   typeCount: { dog: 0, cat: 0, house: 0, bird: 0 },
-  potesCount: 0,
-  pendingCard: null,     // current opportunity awaiting decision
-  log: [],               // { week, text }
-  refusedCount: 0,
-  acceptedCount: 0,
-  endReason: null,       // 'victory' | 'defeat'
-  tookPlane: false,      // tracking pour succès Écolo
+  potesCount: 0, pendingCard: null,
+  log: [], refusedCount: 0, acceptedCount: 0, endReason: null,
+  tookPlane: false,
   perks: { friendInsider: false, digitalNomad: false, socialStar: false },
-  nomadLastIncomeWeek: -1,
-  urssafYearMarked: -1,  // dernière année (en multiple de 52) où l'URSSAF a frappé
+  nomadLastIncomeWeek: -1, urssafYearMarked: -1,
 };
-
 let _missionId = 1;
 
-// =================== JEU : LOGIQUE ===================
 function currentCityAt(targetWeek) {
-  // Cas 1 : aucune mission acceptée → on est encore à la ville de départ.
   if (STATE.agenda.length === 0) {
     return { city: STATE.startCity, availableFrom: STATE.week };
   }
-  // Cas 2 : mission qui se termine LE PLUS TARD avant (ou pile à) targetWeek.
   let prior = null;
   for (const m of STATE.agenda) {
     if (m.endWeek <= targetWeek) {
@@ -918,16 +777,12 @@ function currentCityAt(targetWeek) {
     }
   }
   if (prior) return { city: prior.city, availableFrom: prior.endWeek };
-  // Cas 3 : aucune mission ne se termine avant targetWeek (chevauchement).
-  // Le joueur est nomade : la position de référence devient la mission engagée la plus tardive.
-  // La carte sera marquée infaisable par hasOverlap, mais l'affichage reste cohérent.
   let latest = STATE.agenda[0];
   for (const m of STATE.agenda) if (m.endWeek > latest.endWeek) latest = m;
   return { city: latest.city, availableFrom: latest.endWeek };
 }
 
 function generateCard() {
-  // type avec biais expert
   const weights = { ...POOL_BASE };
   if (STATE.achievements.has('expert_chien')) weights.dog *= 2;
   if (STATE.achievements.has('expert_chat')) weights.cat *= 2;
@@ -935,7 +790,6 @@ function generateCard() {
   const types = Object.keys(weights);
   const type = weighted(types, types.map(t=>weights[t]));
 
-  // ville : par défaut 60% locale, 40% mondiale ; Star des réseaux : 30% locale (plus loin)
   const here = currentCityAt(STATE.week);
   const here_continent = here.city.continent;
   const pLocal = STATE.perks.socialStar ? 0.30 : P_LOCAL_CARD;
@@ -947,7 +801,6 @@ function generateCard() {
     city = rng(CITIES);
   }
 
-  // durée
   const bucket = weighted(['short','medium','long','tiny'], [0.60, 0.25, 0.10, 0.05]);
   let duration;
   if (bucket==='short')  duration = rint(7, 21);
@@ -976,13 +829,11 @@ function generateCard() {
   const durationWeeks = Math.ceil(duration / 7);
   const endWeek = startWeek + durationWeeks;
 
-  // animal
   let petName = null, petType = null;
   if (type === 'dog') { petName = rng(PET_NAMES.dog); petType = 'chien'; }
   else if (type === 'cat') { petName = rng(PET_NAMES.cat); petType = 'chat'; }
   else if (type === 'bird') { petName = rng(PET_NAMES.bird); petType = rng(BIRD_TYPES); }
 
-  // blurb (variations + extra ambiance + mention potes)
   const traitDog = rng(DOG_TRAITS);
   const traitCat = rng(CAT_TRAITS);
   const blurbVars = {
@@ -997,7 +848,6 @@ function generateCard() {
   let blurb = pickBlurb(type, blurbVars) + ' ' + rng(BLURB_EXTRAS);
   if (hasPotes) blurb += ' Vous pouvez inviter des amis sans souci.';
 
-  // calculer le voyage requis depuis la position juste avant startWeek
   const at = currentCityAt(startWeek);
   const days_available = Math.max(0, (startWeek - at.availableFrom) * 7);
   const distance = haversine(at.city, city);
@@ -1005,37 +855,29 @@ function generateCard() {
 
   const far = at.city.continent !== city.continent;
   const payTotal = payPerDay * duration * (far ? FAR_BONUS : 1.0);
-
   const feasible = travel !== null && !hasOverlap(startWeek, endWeek);
 
   return {
-    id: _missionId++,
-    type, city,
+    id: _missionId++, type, city,
     startWeek, endWeek, durationDays: duration, durationWeeks,
     payPerDay, payTotal,
     travelCost: travel ? travel.cost : null,
     travelMode: travel ? travel.mode : null,
     travelLabel: travel ? travel.label : 'Pas de transport possible',
     travelIcon: travel ? travel.icon : '✖',
-    points,
-    petName, petType, animal: petType,
-    housing, isRareHousing,
-    hasPotes,
-    blurb,
-    srcCity: at.city,
-    distance,
-    feasible,
+    points, petName, petType, animal: petType,
+    housing, isRareHousing, hasPotes, blurb,
+    srcCity: at.city, distance, feasible,
   };
 }
 
 function hasOverlap(s, e) {
-  for (const m of STATE.agenda) {
-    if (!(e <= m.startWeek || s >= m.endWeek)) return true;
-  }
+  for (const m of STATE.agenda) if (!(e <= m.startWeek || s >= m.endWeek)) return true;
   return false;
 }
 
 function acceptCard(card) {
+  if (!card || !card.feasible) return;
   STATE.agenda.push(card);
   STATE.acceptedCount++;
   STATE.pendingCard = null;
@@ -1060,7 +902,6 @@ function nextTurn() {
   if (STATE.phase !== 'playing') return;
   STATE.week++;
 
-  // résoudre fins de mission
   const ending = STATE.agenda.filter(m => m.endWeek === STATE.week);
   for (const m of ending) {
     STATE.points += m.points;
@@ -1070,18 +911,14 @@ function nextTurn() {
     STATE.continentsDone.add(m.city.continent);
     if (m.hasPotes) STATE.potesCount++;
     log(`✓ Mission terminée à ${m.city.name} : +${m.points} pts`);
-
-    // succès
     checkAchievements();
   }
   STATE.agenda = STATE.agenda.filter(m => m.endWeek > STATE.week);
 
-  // résoudre départs (paiement + transport)
   const starting = STATE.agenda.filter(m => m.startWeek === STATE.week);
   for (const m of starting) {
     STATE.balance += m.payTotal;
 
-    // Coût de transport (potentiellement modifié par Star des réseaux)
     let actualCost = m.travelCost;
     let costNote = '';
     if (STATE.perks.socialStar && ['train','ferry','boatstop','bus'].includes(m.travelMode)) {
@@ -1092,7 +929,6 @@ function nextTurn() {
 
     if (m.travelMode === 'plane') {
       STATE.tookPlane = true;
-      // Star des réseaux : badbuzz si avion → -30% du solde
       if (STATE.perks.socialStar) {
         const loss = Math.max(0, STATE.balance) * 0.30;
         STATE.balance -= loss;
@@ -1102,23 +938,20 @@ function nextTurn() {
     log(`→ Départ pour ${m.city.name} : +${fmtMoney(m.payTotal)} payé · ${m.travelIcon} ${m.travelLabel} ${fmtMoney(-actualCost)}${costNote}`);
   }
 
-  // Digital Nomad : revenu aléatoire mensuel
+  // Digital Nomad
   if (STATE.perks.digitalNomad && STATE.week % 4 === 0 && STATE.week !== STATE.nomadLastIncomeWeek) {
     STATE.nomadLastIncomeWeek = STATE.week;
-    // 70% chance d'un petit revenu, sinon rien
     if (Math.random() < 0.70) {
       const income = rint(30, 220);
       STATE.balance += income;
       log(`💻 Digital Nomad : +${fmtMoney(income)} de freelance.`);
     }
   }
-  // Digital Nomad : URSSAF en septembre (autour de la semaine 35-40 de chaque année)
   if (STATE.perks.digitalNomad) {
     const yearIndex = Math.floor(STATE.week / 52);
     const weekInYear = STATE.week % 52;
     if (weekInYear >= 35 && weekInYear <= 40 && STATE.urssafYearMarked < yearIndex) {
-      // 60% de chances que l'URSSAF tombe cette année (et que ça tombe pile cette semaine)
-      if (Math.random() < 0.18) {  // ~60% étalé sur 6 semaines
+      if (Math.random() < 0.18) {
         STATE.urssafYearMarked = yearIndex;
         const hit = rint(600, 1400);
         STATE.balance -= hit;
@@ -1127,36 +960,24 @@ function nextTurn() {
     }
   }
 
-  // nourriture hebdomadaire
   STATE.balance -= WEEKLY_FOOD;
 
-  // Vérifier les succès qui peuvent se déclencher hors fin de mission (Écolo)
   checkAchievements();
 
-  // défaite
   if (STATE.balance < 0) {
-    STATE.phase = 'over';
-    STATE.endReason = 'defeat';
-    log(`✗ DÉFAITE : solde épuisé.`);
-    render();
-    return;
+    STATE.phase = 'over'; STATE.endReason = 'defeat';
+    log(`✗ DÉFAITE : solde épuisé.`); render(); return;
   }
-  // victoire
   if (STATE.points >= VICTORY_POINTS) {
-    STATE.phase = 'over';
-    STATE.endReason = 'victory';
-    log(`★ VICTOIRE en semaine ${STATE.week} !`);
-    render();
-    return;
+    STATE.phase = 'over'; STATE.endReason = 'victory';
+    log(`★ VICTOIRE en semaine ${STATE.week} !`); render(); return;
   }
 
-  // tirage carte (Star des réseaux : +opp et -local)
   const pOpp = STATE.perks.socialStar ? 0.65 : P_OPPORTUNITY;
   if (Math.random() < pOpp) {
     STATE.pendingCard = generateCard();
     log(`Une opportunité ! ${TYPE_LABEL[STATE.pendingCard.type]} à ${STATE.pendingCard.city.name}`);
   }
-
   render();
 }
 
@@ -1186,14 +1007,12 @@ function checkAchievements() {
     A.add('kiffeur'); STATE.points += ACHIEVEMENT_POINTS.kiffeur;
     log(`★ Succès : Kiffeur (+${ACHIEVEMENT_POINTS.kiffeur} pts)`);
   }
-  // Écolo : 1 an (52 semaines) sans avoir pris l'avion
   if (STATE.week >= 52 && !STATE.tookPlane && !A.has('ecolo')) {
     A.add('ecolo'); STATE.points += ACHIEVEMENT_POINTS.ecolo;
     log(`★ Succès : Écolo (+${ACHIEVEMENT_POINTS.ecolo} pts) — un an sans avion !`);
   }
 }
 
-// =================== PERSIST ===================
 const SAVE_KEY = 'petsitter_save_v1';
 function saveGame() {
   try {
@@ -1227,14 +1046,14 @@ function resetGame() {
     startCity: null, agenda: [], completed: [],
     achievements: new Set(), animalsDone: new Set(), continentsDone: new Set(),
     typeCount: { dog: 0, cat: 0, house: 0, bird: 0 }, potesCount: 0,
-    pendingCard: null, log: [], refusedCount: 0, acceptedCount: 0, endReason: null, tookPlane: false,
+    pendingCard: null, log: [], refusedCount: 0, acceptedCount: 0, endReason: null,
+    tookPlane: false,
     perks: { friendInsider: false, digitalNomad: false, socialStar: false },
     nomadLastIncomeWeek: -1, urssafYearMarked: -1,
   });
   try { localStorage.removeItem(SAVE_KEY); } catch(e) {}
 }
 
-// =================== RENDU ===================
 const app = document.getElementById('app');
 
 function render() {
@@ -1285,11 +1104,8 @@ function startGame() {
 }
 
 function continueGame() {
-  if (loadGame() && STATE.phase !== 'menu') {
-    render();
-  } else {
-    resetGame(); render();
-  }
+  if (loadGame() && STATE.phase !== 'menu') render();
+  else { resetGame(); render(); }
 }
 
 function renderGame() {
@@ -1345,36 +1161,31 @@ function renderGame() {
   `;
 }
 
+function shapeD(continent) {
+  return CONTINENT_SHAPES[continent].map(poly =>
+    poly.map(([lat,lng], i) =>
+      `${i===0?'M':'L'}${(lng+180).toFixed(1)} ${(90-lat).toFixed(1)}`
+    ).join(' ') + 'Z'
+  ).join(' ');
+}
+
 function renderMap(currentCity) {
-  // Equirectangular projection 800x400
-  const W = 800, H = 400;
-  const proj = (lat, lng) => ({
-    x: (lng + 180) / 360 * W,
-    y: (90 - lat) / 180 * H,
-  });
+  // viewBox 360 × 180 : 1 unité = 1 degré.
+  const proj = (lat, lng) => ({ x: lng + 180, y: 90 - lat });
 
-  // Continents simplifiés (paths approximatifs)
-  const continents = `
-    <path class="continent-fill" d="M 360,80 Q 380,60 420,72 L 470,90 L 460,140 L 400,160 L 360,150 Z"/> <!-- Europe -->
-    <path class="continent-fill" d="M 360,160 Q 380,180 420,190 L 470,200 L 480,290 L 430,320 Q 380,310 360,260 Z"/> <!-- Africa -->
-    <path class="continent-fill" d="M 460,80 Q 530,60 600,80 L 700,110 L 700,200 L 620,240 L 540,210 L 470,140 Z"/> <!-- Asia -->
-    <path class="continent-fill" d="M 110,90 Q 180,70 270,100 L 320,150 L 280,200 L 220,210 L 150,170 Z"/> <!-- N.America -->
-    <path class="continent-fill" d="M 240,210 Q 290,220 320,260 L 320,330 L 270,360 L 240,330 Z"/> <!-- S.America -->
-    <path class="continent-fill" d="M 620,260 Q 680,250 720,270 L 750,310 L 700,330 L 640,310 Z"/> <!-- Oceania -->
-  `;
-  const continentLabels = `
-    <text class="continent-label" x="395" y="118">Europe</text>
-    <text class="continent-label" x="415" y="240">Afrique</text>
-    <text class="continent-label" x="580" y="155">Asie</text>
-    <text class="continent-label" x="220" y="145">Am. Nord</text>
-    <text class="continent-label" x="285" y="295">Am. Sud</text>
-    <text class="continent-label" x="685" y="295">Océanie</text>
-  `;
+  let continents = '';
+  for (const name of Object.keys(CONTINENT_SHAPES)) {
+    continents += `<path class="continent-fill" d="${shapeD(name)}"/>`;
+  }
+  let labels = '';
+  for (const name of Object.keys(CONTINENT_LABEL_POS)) {
+    const [lat, lng] = CONTINENT_LABEL_POS[name];
+    const p = proj(lat, lng);
+    labels += `<text class="continent-label" x="${p.x}" y="${p.y}">${CONTINENT_LABEL_FR[name]}</text>`;
+  }
 
-  // dots & lines
   const agendaCities = STATE.agenda.map(m => m.city.name);
   let lines = '';
-  // ligne current → première mission de l'agenda triée
   const sortedAgenda = [...STATE.agenda].sort((a,b) => a.startWeek - b.startWeek);
   let lastCity = currentCity;
   for (const m of sortedAgenda) {
@@ -1388,18 +1199,19 @@ function renderMap(currentCity) {
   for (const c of CITIES) {
     const p = proj(c.lat, c.lng);
     let cls = 'city-dot';
-    if (c.name === currentCity.name) cls += ' current';
-    else if (agendaCities.includes(c.name)) cls += ' agenda';
-    dots += `<circle class="${cls}" cx="${p.x}" cy="${p.y}" r="3.5"/>`;
+    let r = 1.6;
+    if (c.name === currentCity.name) { cls += ' current'; r = 2.6; }
+    else if (agendaCities.includes(c.name)) { cls += ' agenda'; r = 2.2; }
+    dots += `<circle class="${cls}" cx="${p.x.toFixed(2)}" cy="${p.y.toFixed(2)}" r="${r}"/>`;
     if (c.name === currentCity.name || agendaCities.includes(c.name)) {
-      dots += `<text class="city-label" x="${p.x+6}" y="${p.y+3}">${c.name}</text>`;
+      dots += `<text class="city-label" x="${(p.x+3).toFixed(2)}" y="${(p.y+1.5).toFixed(2)}">${c.name}</text>`;
     }
   }
 
   return `
-    <svg id="map-svg" viewBox="0 0 ${W} ${H}" preserveAspectRatio="xMidYMid meet">
+    <svg id="map-svg" viewBox="0 0 360 180" preserveAspectRatio="xMidYMid meet">
       ${continents}
-      ${continentLabels}
+      ${labels}
       ${lines}
       ${dots}
     </svg>
@@ -1473,13 +1285,11 @@ function togglePerk(key) {
 }
 
 function renderCalendarPane(card) {
-  // 26 semaines à partir de la semaine courante
   const startW = STATE.week;
   const endW = startW + 26;
   let rows = '';
   let lastMonth = -1;
   for (let w = startW; w < endW; w++) {
-    // Find any booked mission active this week
     const mission = STATE.agenda.find(m => w >= m.startWeek && w < m.endWeek);
     const isCandidate = card && w >= card.startWeek && w < card.endWeek;
     const both = mission && isCandidate;
@@ -1560,7 +1370,7 @@ function renderPendingCardModal() {
             }
             <div class="card-actions">
               <button class="danger" onclick="refuseCard()">Refuser</button>
-              <button class="primary" onclick='acceptCard(STATE.pendingCard)' ${!c.feasible?'disabled':''}>Accepter</button>
+              <button class="primary" onclick="acceptCard(STATE.pendingCard)" ${!c.feasible?'disabled':''}>Accepter</button>
             </div>
           </div>
         </div>
@@ -1583,7 +1393,7 @@ function renderEndModal() {
             ? `Vous avez accumulé ${STATE.points} points en ${STATE.week} semaines (${months} mois).`
             : `Vous avez tenu ${STATE.week} semaines (${months} mois) avant que les caisses ne soient vides.`}
         </p>
-        <div style="display:flex;justify-content:center;gap:14px;margin:18px 0;">
+        <div style="display:flex;justify-content:center;gap:14px;margin:18px 0;flex-wrap:wrap;">
           <div class="stat"><div class="label">Missions</div><div class="value">${STATE.completed.length}</div></div>
           <div class="stat"><div class="label">Continents</div><div class="value">${STATE.continentsDone.size}/6</div></div>
           <div class="stat"><div class="label">Succès</div><div class="value">${STATE.achievements.size}</div></div>
@@ -1602,7 +1412,6 @@ function toggleHelp() {
   h.style.display = h.style.display === 'none' ? 'flex' : 'none';
 }
 
-// =================== INIT ===================
 window.acceptCard = acceptCard;
 window.refuseCard = refuseCard;
 window.nextTurn = nextTurn;
@@ -1614,13 +1423,8 @@ window.togglePerk = togglePerk;
 window.STATE = STATE;
 window.render = render;
 
-// Charger save si présente
-if (loadGame() && STATE.phase !== 'menu') {
-  render();
-} else {
-  resetGame();
-  render();
-}
+if (loadGame() && STATE.phase !== 'menu') render();
+else { resetGame(); render(); }
 </script>
 </body>
 </html>

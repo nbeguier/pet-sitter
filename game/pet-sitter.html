@@ -57,7 +57,7 @@ input[type=text] {
   font-size: 48px; width: 80px; height: 80px;
   border: 1.5px solid #8b6f47; border-radius: 50%;
   display: flex; align-items: center; justify-content: center;
-  cursor: pointer; background: #f5e6c8;
+  cursor: pointer; background: #f5e6c8; padding: 0;
   transition: transform 0.15s, border-color 0.15s;
 }
 #menu .avatar.selected { border-color: #2b1f10; border-width: 3px; transform: scale(1.1); }
@@ -86,9 +86,15 @@ input[type=text] {
 .continent-label { fill: #6e5532; font-size: 5.5px; font-style: italic; text-anchor: middle; text-transform: uppercase; letter-spacing: 0.15em; pointer-events: none; }
 .city-dot { fill: #6e5532; stroke: #f5e6c8; stroke-width: 0.4; }
 .city-dot.current { fill: #a83232; stroke-width: 0.8; }
+.city-dot.done { fill: #4a8bc2; stroke: #f5e6c8; stroke-width: 0.5; }
 .city-dot.agenda { fill: #2d6e3e; }
 .city-label { fill: #2b1f10; font-size: 4px; pointer-events: none; }
 .travel-line { stroke: #a83232; stroke-width: 0.5; stroke-dasharray: 1.5 1.5; fill: none; opacity: 0.7; }
+.journey-line { stroke: #4a8bc2; stroke-width: 0.8; fill: none; opacity: 0.8; }
+.current-avatar {
+  font-size: 8px; text-anchor: middle; dominant-baseline: middle;
+  paint-order: stroke; stroke: #f5e6c8; stroke-width: 0.7px;
+}
 
 .card {
   background: #faf0d4; border: 2px solid #6e5532;
@@ -123,6 +129,35 @@ input[type=text] {
   font-size: 13px; background: rgba(168, 50, 50, 0.08);
   padding: 6px 10px; border-left: 3px solid #a83232; margin: 10px 0;
 }
+.overlap-compare {
+  margin: 10px 0;
+  padding: 10px;
+  border: 1px solid #d4b896;
+  background: rgba(234, 217, 184, 0.36);
+  border-radius: 3px;
+}
+.overlap-compare-title {
+  font-size: 12px; text-transform: uppercase; letter-spacing: 0.08em;
+  color: #6e5532; margin-bottom: 8px; font-weight: 700;
+}
+.overlap-compare-card {
+  padding: 8px 0;
+  border-top: 1px dotted #d4b896;
+}
+.overlap-compare-card:first-of-type { border-top: none; padding-top: 0; }
+.overlap-compare-head {
+  display: flex; justify-content: space-between; gap: 10px; align-items: baseline;
+  font-size: 13px;
+}
+.overlap-compare-date {
+  color: #6e5532; font-size: 11px; font-style: italic; white-space: nowrap;
+}
+.overlap-compare-metrics {
+  display: flex; flex-wrap: wrap; gap: 8px 14px;
+  margin-top: 6px; font-size: 12px; color: #4a3520;
+}
+.overlap-compare-metrics strong { color: #2b1f10; }
+.overlap-compare-metrics .loss strong { color: #a83232; }
 
 .deal-badge {
   display: flex; flex-wrap: wrap; align-items: center; gap: 6px;
@@ -141,6 +176,15 @@ input[type=text] {
 .agenda-mission .am-sub { font-size: 12px; color: #6e5532; margin-top: 2px; }
 .agenda-mission .am-bar { font-size: 11px; color: #6e5532; margin-top: 4px; }
 .agenda-mission.active { background: rgba(45, 110, 62, 0.08); padding-left: 8px; border-left: 3px solid #2d6e3e; }
+.agenda-transport {
+  font-size: 11px; color: #5c5c5c; margin-bottom: 5px;
+  padding: 5px 8px; background: rgba(120, 120, 120, 0.08); border-left: 3px solid #9a9a9a;
+}
+.agenda-transport.cancellable {
+  background-image: repeating-linear-gradient(-45deg, rgba(150,150,150,0.14) 0, rgba(150,150,150,0.14) 4px, transparent 4px, transparent 8px);
+}
+.agenda-actions { margin-top: 8px; display: flex; justify-content: flex-end; }
+.agenda-friends { margin-top: 6px; font-size: 11px; color: #6e5532; }
 
 .ach-grid { display: grid; grid-template-columns: 1fr 1fr; gap: 6px; }
 .ach {
@@ -148,11 +192,24 @@ input[type=text] {
   padding: 6px 8px; border-radius: 2px; font-size: 12px;
   display: flex; align-items: center; gap: 6px;
 }
-.ach.locked { opacity: 0.5; }
+.ach.locked {
+  background: rgba(110,85,50,0.05);
+  border-color: rgba(139,111,71,0.7);
+}
 .ach.unlocked { background: rgba(45, 110, 62, 0.18); border: 1.5px solid #2d6e3e; opacity: 1; }
 .ach .ach-icon { font-size: 18px; }
 .ach .ach-name { font-weight: 600; }
 .ach .ach-prog { font-size: 10px; color: #6e5532; }
+.ach.locked .ach-icon,
+.ach.locked .ach-name,
+.ach.locked .ach-prog { color: #8b6f47; }
+.ach-icons { display: flex; flex-wrap: wrap; gap: 4px; margin-top: 6px; }
+.ach-cell {
+  width: 20px; height: 20px; display: inline-flex; align-items: center; justify-content: center;
+  border-radius: 50%; background: rgba(110,85,50,0.04); font-size: 13px;
+  opacity: 0.28; filter: grayscale(1) saturate(0.15);
+}
+.ach-cell.done { background: rgba(45, 110, 62, 0.18); opacity: 1; filter: none; }
 
 #log-panel { max-height: 200px; overflow-y: auto; font-size: 13px; }
 .log-entry { padding: 4px 0; border-top: 1px dotted #d4b896; }
@@ -180,8 +237,20 @@ input[type=text] {
 .cal-date { width: 70px; font-size: 10px; color: #6e5532; font-style: italic; flex-shrink: 0; }
 .cal-bar { flex: 1; height: 16px; border: 1px solid #d4b896; position: relative; overflow: hidden; background: #fff; }
 .cal-bar.booked { background: #2d6e3e; border-color: #1f4e2c; }
+.cal-bar.travel { background: rgba(140,140,140,0.32); border-color: #8f8f8f; }
+.cal-bar.travel-cancellable {
+  background:
+    repeating-linear-gradient(-45deg, rgba(165,165,165,0.45) 0, rgba(165,165,165,0.45) 4px, rgba(232,232,232,0.75) 4px, rgba(232,232,232,0.75) 8px);
+  border-color: #8f8f8f;
+}
 .cal-bar.candidate {
   background-image: repeating-linear-gradient(-45deg, #4a8bc2 0, #4a8bc2 4px, #b6dbf2 4px, #b6dbf2 8px);
+  border-color: #2c6896;
+}
+.cal-bar.candidate-travel { background: rgba(74, 139, 194, 0.22); border-color: #2c6896; }
+.cal-bar.candidate-travel-cancellable {
+  background:
+    repeating-linear-gradient(-45deg, rgba(74,139,194,0.5) 0, rgba(74,139,194,0.5) 4px, rgba(214,231,245,0.9) 4px, rgba(214,231,245,0.9) 8px);
   border-color: #2c6896;
 }
 .cal-bar.both {
@@ -202,35 +271,69 @@ input[type=text] {
 .cal-legend-item { display: flex; align-items: center; gap: 6px; }
 .cal-swatch { width: 14px; height: 12px; border: 1px solid #6e5532; }
 .cal-swatch.booked { background: #2d6e3e; }
+.cal-swatch.travel { background: rgba(140,140,140,0.32); }
+.cal-swatch.travel-cancellable {
+  background:
+    repeating-linear-gradient(-45deg, rgba(165,165,165,0.45) 0, rgba(165,165,165,0.45) 3px, rgba(232,232,232,0.75) 3px, rgba(232,232,232,0.75) 6px);
+}
 .cal-swatch.candidate {
   background-image: repeating-linear-gradient(-45deg, #4a8bc2 0, #4a8bc2 3px, #b6dbf2 3px, #b6dbf2 6px);
 }
 .cal-swatch.free { background: #fff; }
 
-.perk-row {
-  display: flex; align-items: flex-start; gap: 10px;
-  padding: 8px 0; border-top: 1px dotted #d4b896;
-  cursor: pointer; user-select: none;
+.perk-card {
+  border: 1px dashed #8b6f47; border-radius: 3px; padding: 10px;
+  background: rgba(110,85,50,0.06);
 }
-.perk-row:first-child { border-top: none; }
-.perk-row:hover { background: rgba(110,85,50,0.04); }
-.perk-toggle {
-  width: 36px; height: 20px;
-  border: 1.5px solid #6e5532; border-radius: 12px;
-  background: #f5e6c8; position: relative; flex-shrink: 0;
-  margin-top: 2px; transition: background 0.15s;
+.perk-card.empty { background: rgba(110,85,50,0.03); }
+.perk-header { display: flex; gap: 10px; align-items: flex-start; }
+.perk-badge {
+  width: 42px; height: 42px; border-radius: 50%;
+  display: flex; align-items: center; justify-content: center;
+  background: #ead9b8; border: 1px solid #8b6f47; font-size: 22px; flex-shrink: 0;
 }
-.perk-toggle::after {
-  content: ''; position: absolute;
-  width: 14px; height: 14px; border-radius: 50%;
-  background: #6e5532; top: 1.5px; left: 2px;
-  transition: left 0.15s, background 0.15s;
-}
-.perk-row.on .perk-toggle { background: #2d6e3e; border-color: #1f4e2c; }
-.perk-row.on .perk-toggle::after { left: 18px; background: #f5e6c8; }
-.perk-info { flex: 1; }
 .perk-name { font-weight: 600; font-size: 13px; }
 .perk-desc { font-size: 11px; color: #6e5532; margin-top: 2px; line-height: 1.3; }
+.status-note {
+  margin-top: 8px; font-size: 11px; color: #6e5532;
+  padding-top: 8px; border-top: 1px dotted #d4b896;
+}
+
+.transport-panel {
+  margin-top: 10px; padding: 10px; border: 1px solid #d4b896;
+  background: rgba(234, 217, 184, 0.4); border-radius: 3px;
+}
+.transport-title { font-weight: 700; font-size: 13px; }
+.transport-caption { font-size: 11px; color: #6e5532; margin-top: 2px; }
+.transport-options { display: flex; flex-direction: column; gap: 6px; margin-top: 8px; }
+.transport-option {
+  display: flex; justify-content: space-between; gap: 8px;
+  text-align: left; font-size: 13px; padding: 8px 10px;
+}
+.transport-option.selected {
+  background: #2b1f10; color: #f5e6c8; border-color: #2b1f10;
+}
+.toggle-chip { margin-top: 8px; font-size: 12px; padding: 6px 10px; }
+.toggle-chip.on { background: #6e5532; color: #f5e6c8; }
+.transport-mini { margin-top: 8px; font-size: 11px; color: #6e5532; }
+.potes-pill {
+  margin: 10px 0; padding: 7px 10px;
+  border: 1px dashed #a83232; background: rgba(168, 50, 50, 0.08);
+  font-size: 12px;
+}
+.pending-strip {
+  display: flex; align-items: center; justify-content: space-between;
+  gap: 12px; flex-wrap: wrap;
+  border: 1px dashed #8b6f47;
+  background: rgba(245, 230, 200, 0.9);
+}
+.pending-strip-main { display: flex; flex-direction: column; gap: 3px; }
+.pending-strip-title {
+  font-size: 12px; text-transform: uppercase; letter-spacing: 0.08em; color: #6e5532;
+}
+.pending-strip-text { font-size: 16px; font-weight: 600; }
+.pending-strip-note { font-size: 12px; color: #6e5532; }
+.pending-strip-actions { display: flex; gap: 8px; flex-wrap: wrap; }
 
 .modal {
   background: #f5e6c8; border: 2px solid #2b1f10;
@@ -245,6 +348,25 @@ input[type=text] {
   display: flex; align-items: center; justify-content: center;
   font-size: 22px; border: 2px solid #f5e6c8;
 }
+.chance-modal { max-width: 500px; }
+.chance-icon { font-size: 56px; margin-top: 8px; }
+.end-modal { max-width: 1040px; text-align: left; }
+.end-stats { display: flex; gap: 14px; margin: 16px 0 20px; flex-wrap: wrap; justify-content: center; }
+.end-layout { display: grid; grid-template-columns: 1.15fr 1fr; gap: 18px; align-items: start; }
+.summary-map-block { min-width: 0; }
+.summary-map {
+  margin-top: 8px; border: 1px solid #d4b896; background: #ead9b8; border-radius: 3px; overflow: hidden;
+}
+.summary-side { min-width: 0; }
+.recap-list {
+  margin-top: 8px; display: flex; flex-direction: column; gap: 6px;
+  font-size: 13px;
+}
+.recap-row {
+  display: flex; justify-content: space-between; gap: 12px;
+  padding: 6px 8px; border-bottom: 1px dotted #d4b896;
+}
+.recap-empty { margin-top: 8px; font-style: italic; color: #6e5532; }
 
 .help-button {
   position: fixed; top: 16px; right: 16px;
@@ -261,6 +383,7 @@ input[type=text] {
 @media (max-width: 1100px) {
   .modal-twocol { flex-direction: column; max-width: 540px; }
   .calendar-pane { max-height: 280px; }
+  .end-layout { grid-template-columns: 1fr; }
 }
 @media (max-width: 980px) {
   #game { grid-template-columns: 1fr; }
@@ -284,19 +407,24 @@ input[type=text] {
     <h2>Chaque tour = 1 semaine</h2>
     <ul>
       <li>45 % de chances qu'une carte Opportunité apparaisse.</li>
+      <li>Si votre réputation est abîmée, cette chance baisse de 10 % pendant 6 mois.</li>
       <li>Vous pouvez l'accepter ou la refuser. Une carte refusée disparaît.</li>
-      <li>Le calendrier à droite de chaque carte montre les semaines occupées (vert) et la période proposée (hachuré bleu).</li>
+      <li>Le calendrier à droite montre les missions (vert), les transports (gris) et la carte en cours (bleu).</li>
     </ul>
     <h2>Transport</h2>
-    <p>Modes : auto-stop, bateau-stop, bus, ferry, train, avion. Plus c'est rapide, plus c'est cher. Les océans se traversent en bateau-stop, ferry ou avion.</p>
+    <p>Modes : auto-stop, bateau-stop, bus, ferry, train, avion. Le train et le ferry sont souvent les plus chers, puis le bus, puis l'avion. L'auto-stop et le bateau-stop restent les options low-cost. Vous choisissez le trajet vers la mission, et parfois aussi le trajet vers la mission suivante.</p>
+    <p>Un billet <strong>annulable</strong> coûte un peu plus cher, mais permet de réorganiser l'agenda si une mission s'insère avant.</p>
     <h2>Succès</h2>
-    <p>Globe-trotter (6 continents, +30), Bestiaire (chien/chat/oiseau, +20), Kiffeur (5 missions « potes invités », +20), Écolo (1 an sans avion, +25), Experts +7 par animal après 5 sittings, Ermite (5 House sittings, +7).</p>
-    <h2>Bonus activables</h2>
+    <p>Globe-trotter (6 continents, +30), Bestiaire (3 animaux, +20), Agent Immobilier (tous les logements, +20), Pékin Express (tous les transports sauf l'avion, +20), Kiffeur (5 missions « potes invités », +20), Écolo (+25 dès le départ, perdu au premier avion), Expert Chien (5 dog sittings, +7), Ermite (5 House sittings, +7).</p>
+    <h2>Cartes Chance</h2>
     <ul>
+      <li>2 % des tirages d'opportunité peuvent devenir une carte Chance.</li>
       <li><strong>Un ami qui s'y connaît</strong> : juge la qualité du paiement de chaque carte.</li>
       <li><strong>Digital Nomad</strong> : petits revenus freelance mensuels. Attention l'URSSAF en septembre.</li>
-      <li><strong>Star des réseaux</strong> : +20 % d'opportunités, missions plus lointaines, train/bateau/bus payés par les collabs. Mais l'avion = badbuzz (−30 % du solde).</li>
+      <li><strong>Star des réseaux</strong> : +20 % d'opportunités, missions plus lointaines, 50 % de chance que train/bateau/bus soient offerts. Le premier avion fait perdre la carte.</li>
     </ul>
+    <h2>Annuler une mission</h2>
+    <p>Plus de 2 mois avant le départ : pas de pénalité. Moins de 2 mois : malus de réputation pendant 6 mois.</p>
     <div class="row" style="justify-content:center;margin-top:20px;">
       <button onclick="toggleHelp()">Fermer</button>
     </div>
@@ -310,10 +438,16 @@ const INITIAL_BALANCE = 1500;
 const WEEKLY_FOOD = 500 * 12 / 52;
 const P_OPPORTUNITY = 0.45;
 const P_LOCAL_CARD = 0.60;
+const P_CHANCE_CARD = 0.02;
 const VICTORY_POINTS = 100;
 const FAR_BONUS = 1.20;
 const P_RARE_HOUSING = 0.25;
 const P_POTES = 0.30;
+const POTES_BONUS_POINTS = 1;
+const CANCELLABLE_MULTIPLIER = 1.15;
+const SOCIAL_STAR_FREE_CHANCE = 0.50;
+const REPUTATION_PENALTY_WEEKS = 26;
+const SAFE_CANCEL_WEEKS = 8;
 
 const POOL_BASE = { dog: 0.60, cat: 0.18, house: 0.17, bird: 0.05 };
 const PAY_RANGES = { dog: [35,55], cat: [25,40], bird: [30,50], house: [20,35] };
@@ -324,13 +458,14 @@ const TYPE_ICON = { dog: '🐕', cat: '🐈', bird: '🦜', house: '🏠' };
 const TRANSPORT = {
   hitch:    { name: 'Auto-stop',  cost_km: 0.005, km_day:  60, trans_ocean: false, icon: '👍' },
   boatstop: { name: 'Bateau-stop',cost_km: 0.01,  km_day:  80, trans_ocean: true,  icon: '⛵' },
-  bus:      { name: 'Bus',        cost_km: 0.04,  km_day: 200, trans_ocean: false, icon: '🚌' },
-  ferry:    { name: 'Ferry',      cost_km: 0.05,  km_day: 200, trans_ocean: true,  icon: '🚢' },
+  plane:    { name: 'Avion',      cost_km: 0.03,  km_day: 800, trans_ocean: true,  icon: '✈️' },
+  bus:      { name: 'Bus',        cost_km: 0.05,  km_day: 200, trans_ocean: false, icon: '🚌' },
   train:    { name: 'Train',      cost_km: 0.08,  km_day: 400, trans_ocean: false, icon: '🚆' },
-  plane:    { name: 'Avion',      cost_km: 0.15,  km_day: 800, trans_ocean: true,  icon: '✈️' },
+  ferry:    { name: 'Ferry',      cost_km: 0.09,  km_day: 200, trans_ocean: true,  icon: '🚢' },
 };
 const LAND_MODES = ['hitch','bus','train'];
-const SEA_MODES  = ['boatstop','ferry','plane'];
+const SEA_MODES  = ['boatstop','plane','ferry'];
+const PEKIN_EXPRESS_MODES = ['hitch', 'boatstop', 'bus', 'train', 'ferry'];
 
 const LAND_CONNECTED = new Set([
   'Europe|Asia', 'Asia|Europe',
@@ -340,16 +475,16 @@ const LAND_CONNECTED = new Set([
 ]);
 
 const ACHIEVEMENT_POINTS = {
-  expert_chien: 7, expert_chat: 7, ermite: 7,
-  bestiaire: 20, globetrotter: 30, kiffeur: 20, ecolo: 25,
+  expert_chien: 7, ermite: 7,
+  bestiaire: 20, agent_immo: 20, pekin_express: 20, globetrotter: 30, kiffeur: 20, ecolo: 25,
 };
 const ACHIEVEMENT_LABEL = {
-  expert_chien: 'Expert Chien', expert_chat: 'Expert Chat', ermite: 'Ermite',
-  bestiaire: 'Bestiaire', globetrotter: 'Globe-trotter', kiffeur: 'Kiffeur', ecolo: 'Écolo',
+  expert_chien: 'Expert Chien', ermite: 'Ermite',
+  bestiaire: 'Bestiaire', agent_immo: 'Agent Immobilier', pekin_express: 'Pékin Express', globetrotter: 'Globe-trotter', kiffeur: 'Kiffeur', ecolo: 'Écolo',
 };
 const ACHIEVEMENT_ICON = {
-  expert_chien: '🐕', expert_chat: '🐈', ermite: '🏚️',
-  bestiaire: '📚', globetrotter: '🌍', kiffeur: '🎉', ecolo: '🌱',
+  expert_chien: '🐕', ermite: '🏚️',
+  bestiaire: '📚', agent_immo: '🏘️', pekin_express: '🧭', globetrotter: '🌍', kiffeur: '🎉', ecolo: '🌱',
 };
 
 const CITIES = [
@@ -695,251 +830,1038 @@ function pickBlurb(type, vars) {
   return s;
 }
 
+const PERK_DEFS = {
+  friendInsider: {
+    name: 'Un ami qui s\'y connaît',
+    icon: '🧐',
+    desc: 'Juge instantanément la qualité de paiement de chaque mission.',
+  },
+  digitalNomad: {
+    name: 'Digital Nomad',
+    icon: '💻',
+    desc: 'Petit revenu freelance aléatoire chaque mois, avec le risque de l\'URSSAF à la rentrée.',
+  },
+  socialStar: {
+    name: 'Star des réseaux',
+    icon: '📸',
+    desc: '+20 points de chance d\'opportunité, plus de cartes lointaines, 50 % de chance que train/bateau/bus soient offerts. Mais le premier avion fait perdre la carte.',
+  },
+};
+
+const ANIMAL_ORDER = ['chien', 'chat', 'oiseau'];
+const ANIMAL_ICONS = { chien: '🐕', chat: '🐈', oiseau: '🦜' };
+const CONTINENT_ORDER = ['Europe', 'Africa', 'Asia', 'N.America', 'S.America', 'Oceania'];
+const CONTINENT_ICONS = {
+  Europe: '🗼',
+  Africa: '🦒',
+  Asia: '⛩️',
+  'N.America': '🗽',
+  'S.America': '🦜',
+  Oceania: '🏄',
+};
+const HOUSING_ORDER = [...HOUSING_TYPES.common, ...HOUSING_TYPES.rare];
+const HOUSING_ICONS = {
+  appartement: '🏢',
+  studio: '🪟',
+  maison: '🏠',
+  loft: '🧱',
+  villa: '🏡',
+  château: '🏰',
+  péniche: '🛥️',
+  'cabane perchée': '🛖',
+  yourte: '⛺',
+  'tiny house': '🏘️',
+  'van aménagé': '🚐',
+  voilier: '⛵',
+};
+const SAVE_KEY = 'petsitter_save_v2';
+const LEGACY_SAVE_KEY = 'petsitter_save_v1';
+
 function rng(arr) { return arr[Math.floor(Math.random() * arr.length)]; }
 function rint(min, max) { return Math.floor(Math.random() * (max - min + 1)) + min; }
 function rfloat(min, max) { return Math.random() * (max - min) + min; }
 function weighted(items, weights) {
-  let total = weights.reduce((a,b)=>a+b, 0);
+  let total = weights.reduce((a, b) => a + b, 0);
   let r = Math.random() * total;
-  for (let i = 0; i < items.length; i++) { r -= weights[i]; if (r <= 0) return items[i]; }
-  return items[items.length-1];
+  for (let i = 0; i < items.length; i++) {
+    r -= weights[i];
+    if (r <= 0) return items[i];
+  }
+  return items[items.length - 1];
 }
 function haversine(a, b) {
   const R = 6371;
-  const p1 = a.lat * Math.PI/180, p2 = b.lat * Math.PI/180;
-  const dp = (b.lat - a.lat) * Math.PI/180;
-  const dl = (b.lng - a.lng) * Math.PI/180;
-  const h = Math.sin(dp/2)**2 + Math.cos(p1)*Math.cos(p2)*Math.sin(dl/2)**2;
+  const p1 = a.lat * Math.PI / 180;
+  const p2 = b.lat * Math.PI / 180;
+  const dp = (b.lat - a.lat) * Math.PI / 180;
+  const dl = (b.lng - a.lng) * Math.PI / 180;
+  const h = Math.sin(dp / 2) ** 2 + Math.cos(p1) * Math.cos(p2) * Math.sin(dl / 2) ** 2;
   return 2 * R * Math.asin(Math.sqrt(h));
 }
 function needsPlane(c1, c2) {
   if (c1 === c2) return false;
   return !LAND_CONNECTED.has(`${c1}|${c2}`);
 }
-function bestTransport(distance_km, days_available, src_continent, dst_continent) {
-  if (distance_km < 1) return { mode: 'none', cost: 0, days: 0, label: 'Sur place', icon: '·' };
-  const must_cross_sea = needsPlane(src_continent, dst_continent);
-  const candidates = must_cross_sea ? SEA_MODES : LAND_MODES;
-  for (const m of candidates) {
-    const spec = TRANSPORT[m];
-    const d_needed = distance_km / spec.km_day;
-    if (d_needed <= days_available) {
-      return { mode: m, cost: distance_km * spec.cost_km, days: d_needed, label: spec.name, icon: spec.icon };
-    }
-  }
-  return null;
+function esc(value) {
+  return String(value || '')
+    .replaceAll('&', '&amp;')
+    .replaceAll('<', '&lt;')
+    .replaceAll('>', '&gt;')
+    .replaceAll('"', '&quot;')
+    .replaceAll('\'', '&#39;');
 }
-function fmtMoney(n) { return Math.round(n) + ' €'; }
+function weekToDay(week) { return week * 7; }
+function dayToDate(day) {
+  const date = new Date(2026, 0, 1);
+  date.setDate(date.getDate() + Math.floor(day));
+  return date;
+}
+function fmtMoney(n) { return `${Math.round(n)} €`; }
 function fmtDate(week) {
-  const start = new Date(2026, 0, 1);
-  start.setDate(start.getDate() + week * 7);
-  const months = ['janv','fév','mars','avr','mai','juin','juil','août','sept','oct','nov','déc'];
-  return `${start.getDate()} ${months[start.getMonth()]} ${start.getFullYear()}`;
+  return fmtDay(weekToDay(week));
+}
+function fmtDay(day) {
+  const date = dayToDate(day);
+  const months = ['janv', 'fév', 'mars', 'avr', 'mai', 'juin', 'juil', 'août', 'sept', 'oct', 'nov', 'déc'];
+  return `${date.getDate()} ${months[date.getMonth()]} ${date.getFullYear()}`;
+}
+function fmtDayRange(startDay, endDay) {
+  if (endDay - startDay < 0.5) return 'sur place';
+  return `${fmtDay(startDay)} → ${fmtDay(Math.max(startDay, endDay - 1))}`;
+}
+function fmtDays(days) {
+  if (days < 0.1) return 'sur place';
+  return `${Math.max(1, Math.ceil(days))} j`;
+}
+function weekOverlapsRange(week, startDay, endDay) {
+  return startDay < weekToDay(week + 1) && endDay > weekToDay(week);
+}
+function rangesOverlap(aStart, aEnd, bStart, bEnd) {
+  return !(aEnd <= bStart || aStart >= bEnd);
+}
+function missionLabel(mission) {
+  return `${TYPE_LABEL[mission.type]} à ${mission.city.name}`;
+}
+function missionTitle(mission) {
+  return `${TYPE_ICON[mission.type]} ${TYPE_LABEL[mission.type]} à ${mission.city.name}`;
+}
+function hasPerk(key) {
+  return STATE.activePerk === key;
+}
+function hasReputationPenalty() {
+  return STATE.reputationPenaltyUntil > STATE.week;
+}
+function getTransportModes(srcContinent, dstContinent) {
+  return needsPlane(srcContinent, dstContinent) ? SEA_MODES : LAND_MODES;
+}
+function getTransportOptions(distanceKm, daysAvailable, srcContinent, dstContinent) {
+  if (distanceKm < 1) {
+    return [{
+      mode: 'none',
+      baseCost: 0,
+      cost: 0,
+      days: 0,
+      label: 'Sur place',
+      icon: '·',
+    }];
+  }
+  if (daysAvailable < 0) return [];
+  const modes = getTransportModes(srcContinent, dstContinent);
+  return modes.map(mode => {
+    const spec = TRANSPORT[mode];
+    const days = distanceKm / spec.km_day;
+    return {
+      mode,
+      baseCost: distanceKm * spec.cost_km,
+      cost: distanceKm * spec.cost_km,
+      days,
+      label: spec.name,
+      icon: spec.icon,
+    };
+  }).filter(option => option.days <= daysAvailable + 0.001);
+}
+function isAutoCancellableMode(mode) {
+  return mode === 'hitch' || mode === 'boatstop' || mode === 'none';
+}
+function applyCancellable(option, cancellable) {
+  const autoCancellable = isAutoCancellableMode(option.mode);
+  return {
+    ...option,
+    cancellable: autoCancellable || cancellable,
+    cost: option.baseCost * (!autoCancellable && cancellable ? CANCELLABLE_MULTIPLIER : 1),
+  };
+}
+function getSelectedTransport(options, mode, cancellable) {
+  if (!options || !options.length) return null;
+  const base = options.find(option => option.mode === mode) || options[0];
+  return applyCancellable(base, cancellable);
 }
 function dealQuality(card) {
   const meanPerDay = (PAY_RANGES[card.type][0] + PAY_RANGES[card.type][1]) / 2;
   const far = card.srcCity && card.srcCity.continent !== card.city.continent;
   const expected = meanPerDay * card.durationDays * (far ? FAR_BONUS : 1.0);
   const ratio = card.payTotal / expected;
-  let label, color, hint;
-  if (ratio < 0.85)        { label = 'Arnaque';     color = '#a83232'; hint = 'Mal payé pour ce que c\'est.'; }
-  else if (ratio < 1.05)   { label = 'Moyen';       color = '#8b6f47'; hint = 'Tarif standard.'; }
-  else if (ratio < 1.20)   { label = 'Bon deal';    color = '#2d6e3e'; hint = 'Au-dessus de la moyenne.'; }
-  else                     { label = 'Excellent !'; color = '#1f4e2c'; hint = 'Très bien payé pour ce type de mission.'; }
+  let label;
+  let color;
+  let hint;
+  if (ratio < 0.85) { label = 'Arnaque'; color = '#a83232'; hint = 'Mal payé pour ce que c\'est.'; }
+  else if (ratio < 1.05) { label = 'Moyen'; color = '#8b6f47'; hint = 'Tarif standard.'; }
+  else if (ratio < 1.20) { label = 'Bon deal'; color = '#2d6e3e'; hint = 'Au-dessus de la moyenne.'; }
+  else { label = 'Excellent !'; color = '#1f4e2c'; hint = 'Très bien payé pour ce type de mission.'; }
   const pct = Math.round((ratio - 1) * 100);
   const sign = pct >= 0 ? '+' : '';
   return { label, color, hint, pct: `${sign}${pct}%` };
 }
 
-const STATE = {
-  phase: 'menu',
-  characterName: '', characterIcon: '🧳',
-  week: 0, balance: INITIAL_BALANCE, points: 0,
-  startCity: null, agenda: [], completed: [],
-  achievements: new Set(), animalsDone: new Set(), continentsDone: new Set(),
-  typeCount: { dog: 0, cat: 0, house: 0, bird: 0 },
-  potesCount: 0, pendingCard: null,
-  log: [], refusedCount: 0, acceptedCount: 0, endReason: null,
-  tookPlane: false,
-  perks: { friendInsider: false, digitalNomad: false, socialStar: false },
-  nomadLastIncomeWeek: -1, urssafYearMarked: -1,
-};
-let _missionId = 1;
-
-function currentCityAt(targetWeek) {
-  if (STATE.agenda.length === 0) {
-    return { city: STATE.startCity, availableFrom: STATE.week };
-  }
-  let prior = null;
-  for (const m of STATE.agenda) {
-    if (m.endWeek <= targetWeek) {
-      if (prior === null || m.endWeek > prior.endWeek) prior = m;
-    }
-  }
-  if (prior) return { city: prior.city, availableFrom: prior.endWeek };
-  let latest = STATE.agenda[0];
-  for (const m of STATE.agenda) if (m.endWeek > latest.endWeek) latest = m;
-  return { city: latest.city, availableFrom: latest.endWeek };
+function buildDefaultState() {
+  return {
+    phase: 'menu',
+    characterName: '',
+    characterIcon: '🧳',
+    week: 0,
+    balance: INITIAL_BALANCE,
+    points: 0,
+    startCity: null,
+    currentCity: null,
+    agenda: [],
+    completed: [],
+    achievements: new Set(),
+    animalsDone: new Set(),
+    housingsDone: new Set(),
+    continentsDone: new Set(),
+    transportModesDone: new Set(),
+    typeCount: { dog: 0, cat: 0, house: 0, bird: 0 },
+    potesCount: 0,
+    pendingCard: null,
+    pendingCardMinimized: false,
+    log: [],
+    refusedCount: 0,
+    acceptedCount: 0,
+    endReason: null,
+    tookPlane: false,
+    activePerk: null,
+    socialStarBlocked: false,
+    reputationPenaltyUntil: -1,
+    nomadLastIncomeWeek: -1,
+    urssafYearMarked: -1,
+  };
 }
 
-function generateCard() {
+const STATE = buildDefaultState();
+let _missionId = 1;
+const app = document.getElementById('app');
+
+function addFrenchNoBreakSpaces(text) {
+  return String(text).replace(/ ([!?])/g, '\u00A0$1');
+}
+function applyFrenchPunctuation(root) {
+  if (!root) return;
+  const walker = document.createTreeWalker(root, NodeFilter.SHOW_TEXT);
+  const nodes = [];
+  let node = walker.nextNode();
+  while (node) {
+    nodes.push(node);
+    node = walker.nextNode();
+  }
+  for (const textNode of nodes) {
+    const updated = addFrenchNoBreakSpaces(textNode.nodeValue);
+    if (updated !== textNode.nodeValue) textNode.nodeValue = updated;
+  }
+}
+function hasSaveAvailable() {
+  try {
+    return !!(localStorage.getItem(SAVE_KEY) || localStorage.getItem(LEGACY_SAVE_KEY));
+  } catch (error) {
+    return false;
+  }
+}
+function clearSaves() {
+  try {
+    localStorage.removeItem(SAVE_KEY);
+    localStorage.removeItem(LEGACY_SAVE_KEY);
+  } catch (error) {}
+}
+function log(text) {
+  STATE.log.unshift({ week: STATE.week, text });
+  if (STATE.log.length > 60) STATE.log.pop();
+}
+function deriveCurrentCityFromState() {
+  const active = STATE.agenda.find(mission => mission.startWeek <= STATE.week && mission.endWeek > STATE.week);
+  if (active) return active.city;
+  if (STATE.currentCity) return STATE.currentCity;
+  if (STATE.completed.length) {
+    const sorted = [...STATE.completed].sort((a, b) => a.endWeek - b.endWeek);
+    return sorted[sorted.length - 1].city;
+  }
+  return STATE.startCity;
+}
+function syncMissionShape(mission) {
+  mission.durationWeeks = mission.durationWeeks || Math.ceil((mission.durationDays || 7) / 7);
+  mission.startWeek = typeof mission.startWeek === 'number' ? mission.startWeek : 0;
+  mission.endWeek = typeof mission.endWeek === 'number' ? mission.endWeek : mission.startWeek + mission.durationWeeks;
+  mission.startDay = typeof mission.startDay === 'number' ? mission.startDay : weekToDay(mission.startWeek);
+  mission.endDay = typeof mission.endDay === 'number' ? mission.endDay : weekToDay(mission.endWeek);
+  mission.travelMode = mission.travelMode || (mission.travelDistance && mission.travelDistance > 1 ? 'bus' : 'none');
+  mission.travelCancellable = isAutoCancellableMode(mission.travelMode) || !!mission.travelCancellable;
+  mission.travelDays = typeof mission.travelDays === 'number' ? mission.travelDays : 0;
+  mission.travelCost = typeof mission.travelCost === 'number' ? mission.travelCost : 0;
+  mission.travelBaseCost = typeof mission.travelBaseCost === 'number' ? mission.travelBaseCost : mission.travelCost;
+  mission.travelStartDay = typeof mission.travelStartDay === 'number' ? mission.travelStartDay : mission.startDay;
+  mission.isRareHousing = !!mission.isRareHousing;
+  mission.hasPotes = !!mission.hasPotes;
+  return mission;
+}
+function getSortedAgenda() {
+  return [...STATE.agenda].sort((a, b) => {
+    if (a.startWeek !== b.startWeek) return a.startWeek - b.startWeek;
+    return a.id - b.id;
+  });
+}
+function applyTransportToMission(mission, previousCity, selectedTransport) {
+  mission.travelMode = selectedTransport.mode;
+  mission.travelCancellable = !!selectedTransport.cancellable;
+  mission.travelLabel = selectedTransport.label;
+  mission.travelIcon = selectedTransport.icon;
+  mission.travelDays = selectedTransport.days;
+  mission.travelCost = selectedTransport.cost;
+  mission.travelBaseCost = selectedTransport.baseCost;
+  mission.travelDistance = haversine(previousCity, mission.city);
+  mission.travelStartDay = mission.startDay - selectedTransport.days;
+  mission.travelFrom = previousCity;
+  mission.scheduleBroken = false;
+}
+function recomputeAgenda(logChanges) {
+  let guard = 0;
+  while (guard < 20) {
+    guard++;
+    const sorted = getSortedAgenda();
+    let previousCity = deriveCurrentCityFromState();
+    let availableDay = weekToDay(STATE.week);
+    const brokenIds = [];
+
+    for (const mission of sorted) {
+      syncMissionShape(mission);
+      if (mission.startWeek <= STATE.week) {
+        previousCity = mission.city;
+        availableDay = mission.endDay;
+        continue;
+      }
+
+      if (!previousCity) previousCity = STATE.startCity;
+      const distance = haversine(previousCity, mission.city);
+      const options = getTransportOptions(distance, mission.startDay - availableDay, previousCity.continent, mission.city.continent);
+      if (!options.length) {
+        mission.scheduleBroken = true;
+        brokenIds.push(mission.id);
+        continue;
+      }
+
+      const beforeMode = mission.travelMode;
+      const selected = getSelectedTransport(options, mission.travelMode, mission.travelCancellable)
+        || getSelectedTransport(options, options[0].mode, mission.travelCancellable);
+      applyTransportToMission(mission, previousCity, selected);
+      if (logChanges && beforeMode && selected.mode !== beforeMode) {
+        log(`↺ Trajet réajusté pour ${mission.city.name} : ${selected.label}.`);
+      }
+      previousCity = mission.city;
+      availableDay = mission.endDay;
+    }
+
+    if (!brokenIds.length) {
+      STATE.agenda = sorted;
+      return true;
+    }
+
+    STATE.agenda = STATE.agenda.filter(mission => {
+      if (!brokenIds.includes(mission.id)) return true;
+      if (logChanges) log(`✗ ${missionLabel(mission)} a sauté : plus assez de temps pour y aller.`);
+      return false;
+    });
+  }
+  return false;
+}
+function normalizeLoadedState(snap) {
+  STATE.achievements = new Set(snap.achievements || []);
+  STATE.animalsDone = new Set(snap.animalsDone || []);
+  STATE.housingsDone = new Set(snap.housingsDone || []);
+  STATE.continentsDone = new Set(snap.continentsDone || []);
+  STATE.transportModesDone = new Set(snap.transportModesDone || []);
+  STATE.agenda = (snap.agenda || []).map(syncMissionShape);
+  STATE.completed = (snap.completed || []).map(syncMissionShape);
+  if (!STATE.housingsDone.size) {
+    for (const mission of STATE.completed) STATE.housingsDone.add(mission.housing);
+  }
+  if (!STATE.transportModesDone.size) {
+    for (const mission of STATE.completed) {
+      if (PEKIN_EXPRESS_MODES.includes(mission.travelMode)) STATE.transportModesDone.add(mission.travelMode);
+    }
+    for (const mission of STATE.agenda) {
+      if (mission.startWeek <= STATE.week && PEKIN_EXPRESS_MODES.includes(mission.travelMode)) {
+        STATE.transportModesDone.add(mission.travelMode);
+      }
+    }
+  }
+  if (STATE.achievements.delete('expert_chat')) {
+    STATE.points -= 7;
+  }
+  if (!STATE.activePerk && snap.perks) {
+    if (snap.perks.socialStar) STATE.activePerk = 'socialStar';
+    else if (snap.perks.digitalNomad) STATE.activePerk = 'digitalNomad';
+    else if (snap.perks.friendInsider) STATE.activePerk = 'friendInsider';
+  }
+  STATE.socialStarBlocked = !!STATE.socialStarBlocked || !!STATE.tookPlane;
+  STATE.currentCity = deriveCurrentCityFromState();
+
+  if (!STATE.tookPlane && !STATE.achievements.has('ecolo')) {
+    STATE.achievements.add('ecolo');
+    STATE.points += ACHIEVEMENT_POINTS.ecolo;
+  }
+  if (STATE.tookPlane && STATE.achievements.has('ecolo')) {
+    STATE.achievements.delete('ecolo');
+    STATE.points -= ACHIEVEMENT_POINTS.ecolo;
+  }
+  if (STATE.activePerk === 'socialStar' && STATE.socialStarBlocked) {
+    STATE.activePerk = null;
+  }
+  recomputeAgenda(false);
+  refreshPendingMissionFromAgenda();
+
+  let maxId = 0;
+  for (const mission of [...STATE.agenda, ...STATE.completed]) {
+    if (mission.id > maxId) maxId = mission.id;
+  }
+  _missionId = maxId + 1;
+}
+function saveGame() {
+  try {
+    if (STATE.phase === 'menu' && !STATE.startCity) {
+      localStorage.removeItem(SAVE_KEY);
+      return;
+    }
+    const snap = {
+      ...STATE,
+      achievements: [...STATE.achievements],
+      animalsDone: [...STATE.animalsDone],
+      housingsDone: [...STATE.housingsDone],
+      continentsDone: [...STATE.continentsDone],
+      transportModesDone: [...STATE.transportModesDone],
+    };
+    localStorage.setItem(SAVE_KEY, JSON.stringify(snap));
+  } catch (error) {}
+}
+function loadGame() {
+  try {
+    const raw = localStorage.getItem(SAVE_KEY) || localStorage.getItem(LEGACY_SAVE_KEY);
+    if (!raw) return false;
+    const snap = JSON.parse(raw);
+    Object.assign(STATE, buildDefaultState(), snap);
+    normalizeLoadedState(snap);
+    return true;
+  } catch (error) {
+    return false;
+  }
+}
+function resetGame() {
+  Object.assign(STATE, buildDefaultState());
+  clearSaves();
+  render();
+}
+function returnToMenu() {
+  STATE.phase = 'menu';
+  render();
+}
+function updateMenuName(value) {
+  STATE.characterName = value;
+}
+function chooseAvatar(icon) {
+  STATE.characterIcon = icon;
+  render();
+}
+function startGame() {
+  const chosenName = (STATE.characterName || 'Anonyme').trim() || 'Anonyme';
+  const chosenIcon = STATE.characterIcon || '🧳';
+  Object.assign(STATE, buildDefaultState());
+  STATE.characterName = chosenName;
+  STATE.characterIcon = chosenIcon;
+  STATE.startCity = rng(CITIES);
+  STATE.currentCity = STATE.startCity;
+  STATE.phase = 'playing';
+  STATE.achievements = new Set(['ecolo']);
+  STATE.points = ACHIEVEMENT_POINTS.ecolo;
+  log(`Partie commencée à ${STATE.startCity.name}.`);
+  render();
+}
+function continueGame() {
+  if (loadGame() && STATE.phase !== 'menu') render();
+  else resetGame();
+}
+
+function generateRawMission() {
   const weights = { ...POOL_BASE };
   if (STATE.achievements.has('expert_chien')) weights.dog *= 2;
-  if (STATE.achievements.has('expert_chat')) weights.cat *= 2;
   if (STATE.achievements.has('ermite')) weights.house *= 2;
   const types = Object.keys(weights);
-  const type = weighted(types, types.map(t=>weights[t]));
+  const type = weighted(types, types.map(key => weights[key]));
 
-  const here = currentCityAt(STATE.week);
-  const here_continent = here.city.continent;
-  const pLocal = STATE.perks.socialStar ? 0.30 : P_LOCAL_CARD;
+  const currentCity = deriveCurrentCityFromState();
+  const pLocal = hasPerk('socialStar') ? 0.30 : P_LOCAL_CARD;
   let city;
-  if (Math.random() < pLocal) {
-    const sameContinent = CITIES.filter(c => c.continent === here_continent && c.name !== here.city.name);
+  if (currentCity && Math.random() < pLocal) {
+    const sameContinent = CITIES.filter(candidate => candidate.continent === currentCity.continent && candidate.name !== currentCity.name);
     city = sameContinent.length ? rng(sameContinent) : rng(CITIES);
   } else {
     city = rng(CITIES);
   }
 
-  const bucket = weighted(['short','medium','long','tiny'], [0.60, 0.25, 0.10, 0.05]);
-  let duration;
-  if (bucket==='short')  duration = rint(7, 21);
-  else if (bucket==='medium') duration = rint(22, 60);
-  else if (bucket==='long')   duration = rint(61, 90);
-  else duration = rint(5, 6);
+  const bucket = weighted(['short', 'medium', 'long', 'tiny'], [0.60, 0.25, 0.10, 0.05]);
+  let durationDays;
+  if (bucket === 'short') durationDays = rint(7, 21);
+  else if (bucket === 'medium') durationDays = rint(22, 60);
+  else if (bucket === 'long') durationDays = rint(61, 90);
+  else durationDays = rint(5, 6);
 
-  const [pay_lo, pay_hi] = PAY_RANGES[type];
-  const payPerDay = rfloat(pay_lo, pay_hi);
-  const [pts_lo, pts_hi] = POINT_RANGES[type];
-  let points = rint(pts_lo, pts_hi);
+  const [payLo, payHi] = PAY_RANGES[type];
+  const payPerDay = rfloat(payLo, payHi);
+  const [ptsLo, ptsHi] = POINT_RANGES[type];
+  let points = rint(ptsLo, ptsHi);
 
   const isRareHousing = Math.random() < P_RARE_HOUSING;
   if (isRareHousing) points += 2;
   const housing = isRareHousing ? rng(HOUSING_TYPES.rare) : rng(HOUSING_TYPES.common);
 
   const hasPotes = Math.random() < P_POTES;
+  if (hasPotes) points += POTES_BONUS_POINTS;
 
-  const offsetBucket = weighted(['near','mid','far'], [0.5, 0.3, 0.2]);
-  let offset;
-  if (offsetBucket==='near') offset = rint(1, 4);
-  else if (offsetBucket==='mid') offset = rint(5, 8);
-  else offset = rint(9, 12);
+  const offsetBucket = weighted(['urgent', 'near', 'far', 'very_far'], [0.40, 0.10, 0.40, 0.10]);
+  let offsetWeeks;
+  if (offsetBucket === 'urgent') offsetWeeks = rint(1, 2);
+  else if (offsetBucket === 'near') offsetWeeks = rint(3, 22);
+  else if (offsetBucket === 'far') offsetWeeks = rint(23, 39);
+  else offsetWeeks = rint(40, 52);
 
-  const startWeek = STATE.week + offset;
-  const durationWeeks = Math.ceil(duration / 7);
+  const startWeek = STATE.week + offsetWeeks;
+  const durationWeeks = Math.ceil(durationDays / 7);
   const endWeek = startWeek + durationWeeks;
+  const startDay = weekToDay(startWeek);
+  const endDay = weekToDay(endWeek);
 
-  let petName = null, petType = null;
+  let petName = null;
+  let petType = null;
   if (type === 'dog') { petName = rng(PET_NAMES.dog); petType = 'chien'; }
   else if (type === 'cat') { petName = rng(PET_NAMES.cat); petType = 'chat'; }
   else if (type === 'bird') { petName = rng(PET_NAMES.bird); petType = rng(BIRD_TYPES); }
 
   const traitDog = rng(DOG_TRAITS);
   const traitCat = rng(CAT_TRAITS);
+  const trait = type === 'dog' ? traitDog : type === 'cat' ? traitCat : '';
   const blurbVars = {
     name: petName || '',
-    trait: type === 'dog' ? traitDog : type === 'cat' ? traitCat : '',
-    trait_capital: (() => {
-      const t = type === 'dog' ? traitDog : type === 'cat' ? traitCat : '';
-      return t.charAt(0).toUpperCase() + t.slice(1);
-    })(),
+    trait,
+    trait_capital: trait ? trait.charAt(0).toUpperCase() + trait.slice(1) : '',
     bird_type: petType || '',
   };
-  let blurb = pickBlurb(type, blurbVars) + ' ' + rng(BLURB_EXTRAS);
-  if (hasPotes) blurb += ' Vous pouvez inviter des amis sans souci.';
-
-  const at = currentCityAt(startWeek);
-  const days_available = Math.max(0, (startWeek - at.availableFrom) * 7);
-  const distance = haversine(at.city, city);
-  const travel = bestTransport(distance, days_available, at.city.continent, city.continent);
-
-  const far = at.city.continent !== city.continent;
-  const payTotal = payPerDay * duration * (far ? FAR_BONUS : 1.0);
-  const feasible = travel !== null && !hasOverlap(startWeek, endWeek);
+  let blurb = `${pickBlurb(type, blurbVars)} ${rng(BLURB_EXTRAS)}`;
+  if (hasPotes) blurb += ' Les potes peuvent passer sans souci.';
 
   return {
-    id: _missionId++, type, city,
-    startWeek, endWeek, durationDays: duration, durationWeeks,
-    payPerDay, payTotal,
-    travelCost: travel ? travel.cost : null,
-    travelMode: travel ? travel.mode : null,
-    travelLabel: travel ? travel.label : 'Pas de transport possible',
-    travelIcon: travel ? travel.icon : '✖',
-    points, petName, petType, animal: petType,
-    housing, isRareHousing, hasPotes, blurb,
-    srcCity: at.city, distance, feasible,
+    kind: 'mission',
+    id: _missionId++,
+    type,
+    city,
+    startWeek,
+    endWeek,
+    startDay,
+    endDay,
+    durationDays,
+    durationWeeks,
+    payPerDay,
+    points,
+    petName,
+    petType,
+    animal: petType === 'chien' || petType === 'chat' ? petType : (type === 'bird' ? 'oiseau' : null),
+    housing,
+    isRareHousing,
+    hasPotes,
+    blurb,
   };
 }
+function buildMissionOffer(baseMission) {
+  const sorted = getSortedAgenda();
+  const overlappingMissions = sorted.filter(mission => rangesOverlap(baseMission.startDay, baseMission.endDay, mission.startDay, mission.endDay));
+  const overlapMission = overlappingMissions[0] || null;
+  const timelineWithoutOverlaps = sorted.filter(mission => !rangesOverlap(baseMission.startDay, baseMission.endDay, mission.startDay, mission.endDay));
 
-function hasOverlap(s, e) {
-  for (const m of STATE.agenda) if (!(e <= m.startWeek || s >= m.endWeek)) return true;
-  return false;
+  let insertIndex = timelineWithoutOverlaps.findIndex(mission => mission.startDay >= baseMission.startDay);
+  if (insertIndex === -1) insertIndex = timelineWithoutOverlaps.length;
+  const previousMission = insertIndex > 0 ? timelineWithoutOverlaps[insertIndex - 1] : null;
+  const nextMission = timelineWithoutOverlaps[insertIndex] || null;
+  const previousCity = previousMission ? previousMission.city : deriveCurrentCityFromState();
+  const previousAvailableDay = previousMission ? previousMission.endDay : weekToDay(STATE.week);
+
+  const distance = previousCity ? haversine(previousCity, baseMission.city) : 0;
+  const inboundOptions = previousCity
+    ? getTransportOptions(distance, baseMission.startDay - previousAvailableDay, previousCity.continent, baseMission.city.continent)
+    : [];
+
+  let outboundOptions = [];
+  let outboundBlockedReason = '';
+  if (nextMission) {
+    outboundOptions = getTransportOptions(
+      haversine(baseMission.city, nextMission.city),
+      nextMission.startDay - baseMission.endDay,
+      baseMission.city.continent,
+      nextMission.city.continent
+    );
+    if (!outboundOptions.length) {
+      outboundBlockedReason = `Impossible de rejoindre ensuite ${nextMission.city.name} à temps.`;
+    }
+  }
+
+  const far = previousCity ? previousCity.continent !== baseMission.city.continent : false;
+  const offer = {
+    ...baseMission,
+    srcCity: previousCity,
+    distance,
+    payTotal: baseMission.payPerDay * baseMission.durationDays * (far ? FAR_BONUS : 1),
+    inboundOptions,
+    outboundOptions,
+    nextMissionId: nextMission ? nextMission.id : null,
+    nextMissionTitle: nextMission ? missionLabel(nextMission) : '',
+    selectedInboundMode: inboundOptions[0] ? inboundOptions[0].mode : null,
+    selectedInboundCancellable: false,
+    selectedOutboundMode: nextMission && outboundOptions.length
+      ? ((outboundOptions.find(option => option.mode === nextMission.travelMode) || outboundOptions[0]).mode)
+      : null,
+    selectedOutboundCancellable: nextMission ? !!nextMission.travelCancellable : false,
+    overlapMissionId: overlapMission ? overlapMission.id : null,
+    overlapMissionTitle: overlapMission
+      ? missionLabel(overlapMission) + (overlappingMissions.length > 1 ? ` (+${overlappingMissions.length - 1})` : '')
+      : '',
+    overlapMissionIds: overlappingMissions.map(mission => mission.id),
+    outboundBlockedReason,
+    feasible: true,
+  };
+  refreshPendingMissionSelections(offer);
+  return offer;
 }
+function buildMissionCardBase(card) {
+  return {
+    kind: 'mission',
+    id: card.id,
+    type: card.type,
+    city: card.city,
+    startWeek: card.startWeek,
+    endWeek: card.endWeek,
+    startDay: card.startDay,
+    endDay: card.endDay,
+    durationDays: card.durationDays,
+    durationWeeks: card.durationWeeks,
+    payPerDay: card.payPerDay,
+    points: card.points,
+    petName: card.petName,
+    petType: card.petType,
+    animal: card.animal,
+    housing: card.housing,
+    isRareHousing: card.isRareHousing,
+    hasPotes: card.hasPotes,
+    blurb: card.blurb,
+  };
+}
+function refreshPendingMissionFromAgenda() {
+  const card = STATE.pendingCard;
+  if (!card || card.kind !== 'mission') return;
+  const preserved = {
+    selectedInboundMode: card.selectedInboundMode,
+    selectedInboundCancellable: card.selectedInboundCancellable,
+    selectedOutboundMode: card.selectedOutboundMode,
+    selectedOutboundCancellable: card.selectedOutboundCancellable,
+    nextMissionId: card.nextMissionId,
+  };
+  const refreshed = buildMissionOffer(buildMissionCardBase(card));
+  if (preserved.selectedInboundMode && refreshed.inboundOptions.some(option => option.mode === preserved.selectedInboundMode)) {
+    refreshed.selectedInboundMode = preserved.selectedInboundMode;
+  }
+  refreshed.selectedInboundCancellable = !!preserved.selectedInboundCancellable;
+  if (
+    refreshed.nextMissionId
+    && refreshed.nextMissionId === preserved.nextMissionId
+    && preserved.selectedOutboundMode
+    && refreshed.outboundOptions.some(option => option.mode === preserved.selectedOutboundMode)
+  ) {
+    refreshed.selectedOutboundMode = preserved.selectedOutboundMode;
+    refreshed.selectedOutboundCancellable = !!preserved.selectedOutboundCancellable;
+  }
+  refreshPendingMissionSelections(refreshed);
+  STATE.pendingCard = refreshed;
+}
+function generateChanceOffer() {
+  if (STATE.activePerk) return null;
+  const pool = Object.keys(PERK_DEFS).filter(key => key !== 'socialStar' || !STATE.socialStarBlocked);
+  if (!pool.length) return null;
+  const perkKey = rng(pool);
+  return { kind: 'chance', perkKey };
+}
+function generateOffer() {
+  if (!STATE.activePerk && Math.random() < P_CHANCE_CARD) {
+    const chance = generateChanceOffer();
+    if (chance) return chance;
+  }
+  for (let attempt = 0; attempt < 12; attempt++) {
+    const offer = buildMissionOffer(generateRawMission());
+    const startsSoon = offer.startWeek - STATE.week <= 2;
+    if (offer.selectedInbound || !startsSoon) return offer;
+  }
+  return null;
+}
+function refreshPendingMissionSelections(card) {
+  if (!card || card.kind !== 'mission') return;
+  card.selectedInbound = getSelectedTransport(card.inboundOptions, card.selectedInboundMode, card.selectedInboundCancellable);
+  card.selectedOutbound = card.nextMissionId
+    ? getSelectedTransport(card.outboundOptions, card.selectedOutboundMode, card.selectedOutboundCancellable)
+    : null;
+  card.travelMode = card.selectedInbound ? card.selectedInbound.mode : null;
+  card.travelLabel = card.selectedInbound ? card.selectedInbound.label : 'Pas de trajet';
+  card.travelIcon = card.selectedInbound ? card.selectedInbound.icon : '✖';
+  card.travelCost = card.selectedInbound ? card.selectedInbound.cost : 0;
+  card.travelDays = card.selectedInbound ? card.selectedInbound.days : 0;
+  card.travelStartDay = card.selectedInbound ? card.startDay - card.selectedInbound.days : card.startDay;
+  const issues = [];
+  const overlapMissions = (card.overlapMissionIds || [])
+    .map(id => STATE.agenda.find(mission => mission.id === id))
+    .filter(Boolean);
+  if (overlapMissions.length) issues.push(`Chevauchement avec ${card.overlapMissionTitle}.`);
+  if (!card.selectedInbound) issues.push('Aucun trajet possible pour arriver à temps.');
+  const outboundIssue = card.outboundBlockedReason || 'Aucun trajet possible vers la mission suivante.';
+  if (card.nextMissionId && !card.selectedOutbound) issues.push(outboundIssue);
+  card.overlapRefundCost = overlapMissions
+    .filter(mission => !mission.travelCancellable)
+    .reduce((sum, mission) => sum + (mission.travelCost || 0), 0);
+  const nextMission = card.nextMissionId
+    ? STATE.agenda.find(mission => mission.id === card.nextMissionId)
+    : null;
+  card.nextMissionCancellationRefundCost = nextMission && !card.selectedOutbound && !nextMission.travelCancellable
+    ? (nextMission.travelCost || 0)
+    : 0;
+  card.nextMissionRefundCost = nextMission && card.selectedOutbound && !nextMission.travelCancellable
+    ? (nextMission.travelCost || 0)
+    : 0;
+  card.refundCost = card.overlapRefundCost + card.nextMissionRefundCost;
+  card.netEstimate = card.payTotal - card.travelCost - card.refundCost - (WEEKLY_FOOD * card.durationWeeks);
+  card.feasibilityIssues = issues;
+  card.feasible = issues.length === 0;
+  const nonOverlapIssues = issues.filter(issue => !issue.startsWith('Chevauchement avec '));
+  card.canAcceptByCancellingOverlap = overlapMissions.length > 0
+    && overlapMissions.every(mission => mission.startWeek > STATE.week)
+    && nonOverlapIssues.length === 0;
+  card.canAcceptByCancellingNextMission = !!nextMission
+    && !card.selectedOutbound
+    && nextMission.startWeek > STATE.week
+    && issues.length === 1
+    && issues[0] === outboundIssue;
+  card.blockingNextMissionId = card.canAcceptByCancellingNextMission ? nextMission.id : null;
+  card.overlapCancellationPenalty = overlapMissions.some(mission => mission.startWeek - STATE.week < SAFE_CANCEL_WEEKS);
+  if (card.selectedOutbound) {
+    card.nextTravelStartDay = nextMission ? nextMission.startDay - card.selectedOutbound.days : null;
+    card.nextTravelCost = card.selectedOutbound.cost;
+  } else {
+    card.nextTravelStartDay = null;
+    card.nextTravelCost = null;
+  }
+}
+function selectPendingTransport(which, mode) {
+  const card = STATE.pendingCard;
+  if (!card || card.kind !== 'mission') return;
+  if (which === 'inbound') card.selectedInboundMode = mode;
+  if (which === 'outbound') card.selectedOutboundMode = mode;
+  refreshPendingMissionSelections(card);
+  render();
+}
+function togglePendingCancellable(which) {
+  const card = STATE.pendingCard;
+  if (!card || card.kind !== 'mission') return;
+  const mode = which === 'inbound' ? card.selectedInboundMode : card.selectedOutboundMode;
+  if (isAutoCancellableMode(mode)) return;
+  if (which === 'inbound') card.selectedInboundCancellable = !card.selectedInboundCancellable;
+  if (which === 'outbound') card.selectedOutboundCancellable = !card.selectedOutboundCancellable;
+  refreshPendingMissionSelections(card);
+  render();
+}
+function getCardOverlapMissions(card) {
+  return ((card && card.overlapMissionIds) || [])
+    .map(id => STATE.agenda.find(mission => mission.id === id))
+    .filter(Boolean);
+}
+function applyMissionCancellation(mission, { reflow = true } = {}) {
+  if (!mission || mission.startWeek <= STATE.week) return false;
+  const isLateCancel = mission.startWeek - STATE.week < SAFE_CANCEL_WEEKS;
+  const lostTicketCost = !mission.travelCancellable ? (mission.travelCost || 0) : 0;
+  STATE.agenda = STATE.agenda.filter(entry => entry.id !== mission.id);
+  if (lostTicketCost > 0) {
+    STATE.balance -= lostTicketCost;
+  }
+  if (isLateCancel) {
+    STATE.reputationPenaltyUntil = Math.max(STATE.reputationPenaltyUntil, STATE.week + REPUTATION_PENALTY_WEEKS);
+    log(`✗ Annulation tardive : ${missionLabel(mission)}.${lostTicketCost > 0 ? ` Billet perdu : −${fmtMoney(lostTicketCost)}.` : ''} Réputation en baisse jusqu'à ${fmtDate(STATE.reputationPenaltyUntil)}.`);
+  } else {
+    log(`Mission annulée : ${missionLabel(mission)}.${lostTicketCost > 0 ? ` Billet perdu : −${fmtMoney(lostTicketCost)}.` : ''}`);
+  }
+  if (reflow) recomputeAgenda(true);
+  return true;
+}
+function commitPendingMission(card) {
+  if (!card.selectedInbound) return;
+  const mission = syncMissionShape({
+    id: card.id,
+    type: card.type,
+    city: card.city,
+    startWeek: card.startWeek,
+    endWeek: card.endWeek,
+    startDay: card.startDay,
+    endDay: card.endDay,
+    durationDays: card.durationDays,
+    durationWeeks: card.durationWeeks,
+    payPerDay: card.payPerDay,
+    payTotal: card.payTotal,
+    points: card.points,
+    petName: card.petName,
+    petType: card.petType,
+    animal: card.animal,
+    housing: card.housing,
+    isRareHousing: card.isRareHousing,
+    hasPotes: card.hasPotes,
+    blurb: card.blurb,
+    travelMode: card.selectedInbound.mode,
+    travelCancellable: card.selectedInbound.cancellable,
+  });
 
-function acceptCard(card) {
-  if (!card || !card.feasible) return;
-  STATE.agenda.push(card);
+  STATE.agenda.push(mission);
+  if (card.nextMissionId && card.selectedOutbound) {
+    const nextMission = STATE.agenda.find(entry => entry.id === card.nextMissionId);
+    if (nextMission) {
+      if (!nextMission.travelCancellable && (nextMission.travelCost || 0) > 0) {
+        STATE.balance -= nextMission.travelCost;
+        log(`↺ Trajet remplacé pour ${missionLabel(nextMission)} : billet précédent perdu (−${fmtMoney(nextMission.travelCost)}).`);
+      }
+      nextMission.travelMode = card.selectedOutbound.mode;
+      nextMission.travelCancellable = card.selectedOutbound.cancellable;
+    }
+  }
   STATE.acceptedCount++;
   STATE.pendingCard = null;
-  log(`Accepté : ${TYPE_LABEL[card.type]} à ${card.city.name} (${fmtDate(card.startWeek)})`);
+  STATE.pendingCardMinimized = false;
+  recomputeAgenda(false);
+  log(`Accepté : ${missionLabel(mission)} (${fmtDate(mission.startWeek)}).`);
+  if (STATE.balance < 0) {
+    STATE.phase = 'over';
+    STATE.endReason = 'defeat';
+    log('✗ DÉFAITE : solde épuisé.');
+  }
+}
+function acceptCard() {
+  const card = STATE.pendingCard;
+  if (!card) return;
+
+  if (card.kind === 'chance') {
+    STATE.activePerk = card.perkKey;
+    STATE.pendingCard = null;
+    STATE.pendingCardMinimized = false;
+    log(`★ Carte Chance acceptée : ${PERK_DEFS[card.perkKey].name}.`);
+    render();
+    return;
+  }
+
+  if (!card.feasible || !card.selectedInbound) return;
+  commitPendingMission(card);
   render();
 }
-
-function refuseCard() {
+function minimizePendingCard() {
+  if (!STATE.pendingCard) return;
+  STATE.pendingCardMinimized = true;
+  render();
+}
+function reopenPendingCard() {
+  if (!STATE.pendingCard) return;
+  STATE.pendingCardMinimized = false;
+  render();
+}
+function discardPendingCard(logText) {
+  if (!STATE.pendingCard) return;
   STATE.refusedCount++;
+  if (logText) log(logText);
   STATE.pendingCard = null;
-  log(`Carte refusée.`);
+  STATE.pendingCardMinimized = false;
+}
+function acceptCardByCancellingOverlap() {
+  const card = STATE.pendingCard;
+  if (!card || card.kind !== 'mission' || !card.canAcceptByCancellingOverlap || !card.selectedInbound) return;
+  const overlapMissions = getCardOverlapMissions(card);
+  if (!overlapMissions.length) return;
+  const names = overlapMissions.map(mission => missionLabel(mission)).join(', ');
+  const lateWarning = card.overlapCancellationPenalty ? ' Une annulation tardive appliquera le malus de réputation pendant 6 mois.' : '';
+  const refundWarning = card.overlapRefundCost > 0 ? ` Les billets non annulables perdus coûtent ${fmtMoney(card.overlapRefundCost)}.` : '';
+  const okay = window.confirm(`Accepter cette opportunité en annulant ${names} ?${refundWarning}${lateWarning}`);
+  if (!okay) return;
+  for (const mission of overlapMissions) applyMissionCancellation(mission, { reflow: false });
+  refreshPendingMissionSelections(card);
+  if (!card.feasible) {
+    render();
+    return;
+  }
+  commitPendingMission(card);
   render();
 }
-
-function log(text) {
-  STATE.log.unshift({ week: STATE.week, text });
-  if (STATE.log.length > 50) STATE.log.pop();
+function acceptCardByCancellingNextMission() {
+  const card = STATE.pendingCard;
+  if (!card || card.kind !== 'mission' || !card.canAcceptByCancellingNextMission || !card.selectedInbound) return;
+  const nextMission = card.blockingNextMissionId
+    ? STATE.agenda.find(mission => mission.id === card.blockingNextMissionId)
+    : null;
+  if (!nextMission) return;
+  const lateWarning = nextMission.startWeek - STATE.week < SAFE_CANCEL_WEEKS
+    ? ' Une annulation tardive appliquera le malus de réputation pendant 6 mois.'
+    : '';
+  const refundWarning = card.nextMissionCancellationRefundCost > 0
+    ? ` Le trajet déjà réservé sera perdu (−${fmtMoney(card.nextMissionCancellationRefundCost)}).`
+    : '';
+  const okay = window.confirm(`Accepter cette opportunité en annulant ${missionLabel(nextMission)} ?${refundWarning}${lateWarning}`);
+  if (!okay) return;
+  applyMissionCancellation(nextMission, { reflow: true });
+  refreshPendingMissionFromAgenda();
+  if (!STATE.pendingCard || STATE.pendingCard.kind !== 'mission' || !STATE.pendingCard.feasible || !STATE.pendingCard.selectedInbound) {
+    render();
+    return;
+  }
+  commitPendingMission(STATE.pendingCard);
+  render();
 }
+function refuseCard() {
+  if (STATE.pendingCard && STATE.pendingCard.kind === 'chance') discardPendingCard('Carte Chance refusée.');
+  else discardPendingCard('Opportunité refusée.');
+  render();
+}
+function cancelMission(id) {
+  const mission = STATE.agenda.find(entry => entry.id === id);
+  if (!mission || mission.startWeek <= STATE.week) return;
+  const isLateCancel = mission.startWeek - STATE.week < SAFE_CANCEL_WEEKS;
+  const okay = window.confirm(
+    `Annuler ${missionLabel(mission)} ?${isLateCancel ? ' Ta réputation sera plombée pendant 6 mois.' : ''}`
+  );
+  if (!okay) return;
 
+  applyMissionCancellation(mission, { reflow: true });
+  refreshPendingMissionFromAgenda();
+  render();
+}
+function removeEcolo() {
+  if (!STATE.achievements.has('ecolo')) return;
+  STATE.achievements.delete('ecolo');
+  STATE.points -= ACHIEVEMENT_POINTS.ecolo;
+  log(`🌱 Succès Écolo perdu : le premier avion a tout fait sauter.`);
+}
+function blockSocialStar() {
+  if (STATE.socialStarBlocked && STATE.activePerk !== 'socialStar') return;
+  STATE.socialStarBlocked = true;
+  if (STATE.activePerk === 'socialStar') {
+    STATE.activePerk = null;
+    log(`📵 Star des réseaux perdue pour le reste de la partie.`);
+  }
+}
+function checkAchievements() {
+  const achieved = STATE.achievements;
+  if (STATE.typeCount.dog >= 5 && !achieved.has('expert_chien')) {
+    achieved.add('expert_chien');
+    STATE.points += ACHIEVEMENT_POINTS.expert_chien;
+    log(`★ Succès : Expert Chien (+${ACHIEVEMENT_POINTS.expert_chien} pts)`);
+  }
+  if (STATE.typeCount.house >= 5 && !achieved.has('ermite')) {
+    achieved.add('ermite');
+    STATE.points += ACHIEVEMENT_POINTS.ermite;
+    log(`★ Succès : Ermite (+${ACHIEVEMENT_POINTS.ermite} pts)`);
+  }
+  if (STATE.animalsDone.size >= ANIMAL_ORDER.length && !achieved.has('bestiaire')) {
+    achieved.add('bestiaire');
+    STATE.points += ACHIEVEMENT_POINTS.bestiaire;
+    log(`★ Succès : Bestiaire (+${ACHIEVEMENT_POINTS.bestiaire} pts)`);
+  }
+  if (STATE.housingsDone.size >= HOUSING_ORDER.length && !achieved.has('agent_immo')) {
+    achieved.add('agent_immo');
+    STATE.points += ACHIEVEMENT_POINTS.agent_immo;
+    log(`★ Succès : Agent Immobilier (+${ACHIEVEMENT_POINTS.agent_immo} pts)`);
+  }
+  if (PEKIN_EXPRESS_MODES.every(mode => STATE.transportModesDone.has(mode)) && !achieved.has('pekin_express')) {
+    achieved.add('pekin_express');
+    STATE.points += ACHIEVEMENT_POINTS.pekin_express;
+    log(`★ Succès : Pékin Express (+${ACHIEVEMENT_POINTS.pekin_express} pts)`);
+  }
+  if (STATE.continentsDone.size >= CONTINENT_ORDER.length && !achieved.has('globetrotter')) {
+    achieved.add('globetrotter');
+    STATE.points += ACHIEVEMENT_POINTS.globetrotter;
+    log(`★ Succès : Globe-trotter (+${ACHIEVEMENT_POINTS.globetrotter} pts)`);
+  }
+  if (STATE.potesCount >= 5 && !achieved.has('kiffeur')) {
+    achieved.add('kiffeur');
+    STATE.points += ACHIEVEMENT_POINTS.kiffeur;
+    log(`★ Succès : Kiffeur (+${ACHIEVEMENT_POINTS.kiffeur} pts)`);
+  }
+}
 function nextTurn() {
-  if (STATE.pendingCard) return;
   if (STATE.phase !== 'playing') return;
+  if (STATE.pendingCard && !STATE.pendingCardMinimized) return;
+  if (STATE.pendingCard && STATE.pendingCardMinimized) {
+    const logText = STATE.pendingCard.kind === 'chance'
+      ? 'Carte Chance laissée passer en prenant le tour suivant.'
+      : 'Opportunité laissée passer en prenant le tour suivant.';
+    discardPendingCard(logText);
+  }
   STATE.week++;
 
-  const ending = STATE.agenda.filter(m => m.endWeek === STATE.week);
-  for (const m of ending) {
-    STATE.points += m.points;
-    STATE.completed.push(m);
-    STATE.typeCount[m.type]++;
-    if (m.animal) STATE.animalsDone.add(m.animal);
-    STATE.continentsDone.add(m.city.continent);
-    if (m.hasPotes) STATE.potesCount++;
-    log(`✓ Mission terminée à ${m.city.name} : +${m.points} pts`);
+  const ending = STATE.agenda.filter(mission => mission.endWeek === STATE.week);
+  for (const mission of ending) {
+    STATE.points += mission.points;
+    STATE.completed.push(mission);
+    STATE.typeCount[mission.type]++;
+    if (mission.animal) STATE.animalsDone.add(mission.animal);
+    if (mission.housing) STATE.housingsDone.add(mission.housing);
+    STATE.continentsDone.add(mission.city.continent);
+    if (mission.hasPotes) STATE.potesCount++;
+    log(`✓ Mission terminée à ${mission.city.name} : +${mission.points} pts`);
     checkAchievements();
   }
-  STATE.agenda = STATE.agenda.filter(m => m.endWeek > STATE.week);
+  STATE.agenda = STATE.agenda.filter(mission => mission.endWeek > STATE.week);
 
-  const starting = STATE.agenda.filter(m => m.startWeek === STATE.week);
-  for (const m of starting) {
-    STATE.balance += m.payTotal;
-
-    let actualCost = m.travelCost;
+  const starting = STATE.agenda.filter(mission => mission.startWeek === STATE.week);
+  for (const mission of starting) {
+    STATE.balance += mission.payTotal;
+    let actualCost = mission.travelCost;
     let costNote = '';
-    if (STATE.perks.socialStar && ['train','ferry','boatstop','bus'].includes(m.travelMode)) {
+    const hadSocialStar = hasPerk('socialStar');
+
+    if (mission.travelMode === 'plane') {
+      if (!STATE.tookPlane) {
+        STATE.tookPlane = true;
+        removeEcolo();
+      }
+      if (hadSocialStar) {
+        const loss = Math.max(0, STATE.balance - actualCost) * 0.30;
+        STATE.balance -= loss;
+        log(`💢 Badbuzz ! L'avion fait hurler tes abonnés. −${fmtMoney(loss)}`);
+      }
+      blockSocialStar();
+    } else if (hasPerk('socialStar') && ['train', 'ferry', 'boatstop', 'bus'].includes(mission.travelMode) && Math.random() < SOCIAL_STAR_FREE_CHANCE) {
       actualCost = 0;
       costNote = ' (offert par collab)';
     }
-    STATE.balance -= actualCost;
 
-    if (m.travelMode === 'plane') {
-      STATE.tookPlane = true;
-      if (STATE.perks.socialStar) {
-        const loss = Math.max(0, STATE.balance) * 0.30;
-        STATE.balance -= loss;
-        log(`💢 Badbuzz ! Tu prends l'avion, ta communauté hurle. −${fmtMoney(loss)}`);
-      }
+    if (PEKIN_EXPRESS_MODES.includes(mission.travelMode)) {
+      STATE.transportModesDone.add(mission.travelMode);
     }
-    log(`→ Départ pour ${m.city.name} : +${fmtMoney(m.payTotal)} payé · ${m.travelIcon} ${m.travelLabel} ${fmtMoney(-actualCost)}${costNote}`);
+    STATE.balance -= actualCost;
+    STATE.currentCity = mission.city;
+
+    log(`→ Départ pour ${mission.city.name} : +${fmtMoney(mission.payTotal)} · ${mission.travelIcon} ${mission.travelLabel} ${fmtMoney(-actualCost)}${costNote}`);
   }
 
-  // Digital Nomad
-  if (STATE.perks.digitalNomad && STATE.week % 4 === 0 && STATE.week !== STATE.nomadLastIncomeWeek) {
+  if (hasPerk('digitalNomad') && STATE.week % 4 === 0 && STATE.week !== STATE.nomadLastIncomeWeek) {
     STATE.nomadLastIncomeWeek = STATE.week;
     if (Math.random() < 0.70) {
       const income = rint(30, 220);
@@ -947,7 +1869,7 @@ function nextTurn() {
       log(`💻 Digital Nomad : +${fmtMoney(income)} de freelance.`);
     }
   }
-  if (STATE.perks.digitalNomad) {
+  if (hasPerk('digitalNomad')) {
     const yearIndex = Math.floor(STATE.week / 52);
     const weekInYear = STATE.week % 52;
     if (weekInYear >= 35 && weekInYear <= 40 && STATE.urssafYearMarked < yearIndex) {
@@ -961,107 +1883,533 @@ function nextTurn() {
   }
 
   STATE.balance -= WEEKLY_FOOD;
-
   checkAchievements();
 
   if (STATE.balance < 0) {
-    STATE.phase = 'over'; STATE.endReason = 'defeat';
-    log(`✗ DÉFAITE : solde épuisé.`); render(); return;
+    STATE.phase = 'over';
+    STATE.endReason = 'defeat';
+    log('✗ DÉFAITE : solde épuisé.');
+    render();
+    return;
   }
   if (STATE.points >= VICTORY_POINTS) {
-    STATE.phase = 'over'; STATE.endReason = 'victory';
-    log(`★ VICTOIRE en semaine ${STATE.week} !`); render(); return;
+    STATE.phase = 'over';
+    STATE.endReason = 'victory';
+    log(`★ VICTOIRE en semaine ${STATE.week} !`);
+    render();
+    return;
   }
 
-  const pOpp = STATE.perks.socialStar ? 0.65 : P_OPPORTUNITY;
-  if (Math.random() < pOpp) {
-    STATE.pendingCard = generateCard();
-    log(`Une opportunité ! ${TYPE_LABEL[STATE.pendingCard.type]} à ${STATE.pendingCard.city.name}`);
+  let pOpportunity = P_OPPORTUNITY;
+  if (hasPerk('socialStar')) pOpportunity += 0.20;
+  if (hasReputationPenalty()) pOpportunity -= 0.10;
+  pOpportunity = Math.max(0.05, Math.min(0.95, pOpportunity));
+
+  if (Math.random() < pOpportunity) {
+    const offer = generateOffer();
+    if (offer) {
+      STATE.pendingCard = offer;
+      STATE.pendingCardMinimized = false;
+      if (offer.kind === 'chance') log(`Une carte Chance apparaît : ${PERK_DEFS[offer.perkKey].name}.`);
+      else log(`Une opportunité ! ${TYPE_LABEL[offer.type]} à ${offer.city.name}.`);
+    }
   }
   render();
 }
 
-function checkAchievements() {
-  const A = STATE.achievements;
-  if (STATE.typeCount.dog >= 5 && !A.has('expert_chien')) {
-    A.add('expert_chien'); STATE.points += ACHIEVEMENT_POINTS.expert_chien;
-    log(`★ Succès : Expert Chien (+${ACHIEVEMENT_POINTS.expert_chien} pts)`);
-  }
-  if (STATE.typeCount.cat >= 5 && !A.has('expert_chat')) {
-    A.add('expert_chat'); STATE.points += ACHIEVEMENT_POINTS.expert_chat;
-    log(`★ Succès : Expert Chat (+${ACHIEVEMENT_POINTS.expert_chat} pts)`);
-  }
-  if (STATE.typeCount.house >= 5 && !A.has('ermite')) {
-    A.add('ermite'); STATE.points += ACHIEVEMENT_POINTS.ermite;
-    log(`★ Succès : Ermite (+${ACHIEVEMENT_POINTS.ermite} pts)`);
-  }
-  if (STATE.animalsDone.size >= 3 && !A.has('bestiaire')) {
-    A.add('bestiaire'); STATE.points += ACHIEVEMENT_POINTS.bestiaire;
-    log(`★ Succès : Bestiaire (+${ACHIEVEMENT_POINTS.bestiaire} pts)`);
-  }
-  if (STATE.continentsDone.size >= 6 && !A.has('globetrotter')) {
-    A.add('globetrotter'); STATE.points += ACHIEVEMENT_POINTS.globetrotter;
-    log(`★ Succès : Globe-trotter (+${ACHIEVEMENT_POINTS.globetrotter} pts)`);
-  }
-  if (STATE.potesCount >= 5 && !A.has('kiffeur')) {
-    A.add('kiffeur'); STATE.points += ACHIEVEMENT_POINTS.kiffeur;
-    log(`★ Succès : Kiffeur (+${ACHIEVEMENT_POINTS.kiffeur} pts)`);
-  }
-  if (STATE.week >= 52 && !STATE.tookPlane && !A.has('ecolo')) {
-    A.add('ecolo'); STATE.points += ACHIEVEMENT_POINTS.ecolo;
-    log(`★ Succès : Écolo (+${ACHIEVEMENT_POINTS.ecolo} pts) — un an sans avion !`);
-  }
+function getAchievementProgress(key) {
+  if (key === 'bestiaire') return { done: STATE.animalsDone.size, total: ANIMAL_ORDER.length };
+  if (key === 'agent_immo') return { done: STATE.housingsDone.size, total: HOUSING_ORDER.length };
+  if (key === 'pekin_express') return { done: [...STATE.transportModesDone].filter(mode => PEKIN_EXPRESS_MODES.includes(mode)).length, total: PEKIN_EXPRESS_MODES.length };
+  if (key === 'globetrotter') return { done: STATE.continentsDone.size, total: CONTINENT_ORDER.length };
+  if (key === 'kiffeur') return { done: STATE.potesCount, total: 5 };
+  if (key === 'expert_chien') return { done: STATE.typeCount.dog, total: 5 };
+  if (key === 'ermite') return { done: STATE.typeCount.house, total: 5 };
+  if (key === 'ecolo') return { done: STATE.achievements.has('ecolo') ? 1 : 0, total: 1 };
+  return { done: 0, total: 1 };
 }
+function renderIconTrail(items, isDoneFn) {
+  return `<div class="ach-icons">${items.map(item => {
+    const value = typeof item === 'string' ? item : item.value;
+    const icon = typeof item === 'string' ? item : item.icon;
+    const label = typeof item === 'string' ? item : item.label;
+    return `<span class="ach-cell ${isDoneFn(value) ? 'done' : ''}" title="${esc(label || value)}">${icon}</span>`;
+  }).join('')}</div>`;
+}
+function renderAchievements() {
+  const all = ['globetrotter', 'bestiaire', 'agent_immo', 'pekin_express', 'kiffeur', 'ecolo', 'expert_chien', 'ermite'];
+  return `<div class="ach-grid">${all.map(key => {
+    const unlocked = STATE.achievements.has(key);
+    let icons = '';
+    if (key === 'bestiaire') {
+      icons = renderIconTrail(ANIMAL_ORDER.map(animal => ({ value: animal, icon: ANIMAL_ICONS[animal], label: animal })), animal => STATE.animalsDone.has(animal));
+    } else if (key === 'agent_immo') {
+      icons = renderIconTrail(HOUSING_ORDER.map(housing => ({ value: housing, icon: HOUSING_ICONS[housing] || '🏠', label: housing })), housing => STATE.housingsDone.has(housing));
+    } else if (key === 'globetrotter') {
+      icons = renderIconTrail(CONTINENT_ORDER.map(continent => ({ value: continent, icon: CONTINENT_ICONS[continent], label: CONTINENT_LABEL_FR[continent] })), continent => STATE.continentsDone.has(continent));
+    } else if (key === 'pekin_express') {
+      icons = renderIconTrail(PEKIN_EXPRESS_MODES.map(mode => ({ value: mode, icon: TRANSPORT[mode].icon, label: TRANSPORT[mode].name })), mode => STATE.transportModesDone.has(mode));
+    } else if (key === 'kiffeur') {
+      icons = renderIconTrail([0, 1, 2, 3, 4].map(value => ({ value, icon: '🎉', label: 'soirée' })), value => value < STATE.potesCount);
+    } else if (key === 'expert_chien') {
+      icons = renderIconTrail([0, 1, 2, 3, 4].map(value => ({ value, icon: '🐕', label: 'chien' })), value => value < STATE.typeCount.dog);
+    } else if (key === 'ermite') {
+      icons = renderIconTrail([0, 1, 2, 3, 4].map(value => ({ value, icon: '🧘', label: 'ermite' })), value => value < STATE.typeCount.house);
+    } else if (key === 'ecolo') {
+      icons = renderIconTrail([{ value: 'ecolo', icon: '🌱', label: STATE.achievements.has('ecolo') ? 'toujours propre' : 'perdu au premier avion' }], () => STATE.achievements.has('ecolo'));
+    }
+    const progress = getAchievementProgress(key);
+    const pct = Math.round((progress.done / progress.total) * 100);
+    return `<div class="ach ${unlocked ? 'unlocked' : 'locked'}">
+      <span class="ach-icon">${ACHIEVEMENT_ICON[key]}</span>
+      <div style="flex:1;line-height:1.2">
+        <div class="ach-name">${ACHIEVEMENT_LABEL[key]}</div>
+        <div class="ach-prog">+${ACHIEVEMENT_POINTS[key]} · ${pct}%</div>
+        ${icons}
+      </div>
+    </div>`;
+  }).join('')}</div>`;
+}
+function renderPerkPanel() {
+  const active = STATE.activePerk ? PERK_DEFS[STATE.activePerk] : null;
+  const reputationText = hasReputationPenalty()
+    ? `<div class="status-note">Réputation refroidie : −10 % d'opportunités jusqu'au ${fmtDate(STATE.reputationPenaltyUntil)}.</div>`
+    : '';
+  const socialNote = STATE.socialStarBlocked
+    ? `<div class="status-note">Star des réseaux ne peut plus retomber après un avion.</div>`
+    : '';
 
-const SAVE_KEY = 'petsitter_save_v1';
-function saveGame() {
-  try {
-    const snap = { ...STATE,
-      achievements: [...STATE.achievements],
-      animalsDone: [...STATE.animalsDone],
-      continentsDone: [...STATE.continentsDone],
-    };
-    localStorage.setItem(SAVE_KEY, JSON.stringify(snap));
-  } catch(e) {}
-}
-function loadGame() {
-  try {
-    const raw = localStorage.getItem(SAVE_KEY);
-    if (!raw) return false;
-    const snap = JSON.parse(raw);
-    Object.assign(STATE, snap);
-    STATE.achievements = new Set(snap.achievements || []);
-    STATE.animalsDone = new Set(snap.animalsDone || []);
-    STATE.continentsDone = new Set(snap.continentsDone || []);
-    STATE.perks = Object.assign({ friendInsider: false, digitalNomad: false, socialStar: false }, snap.perks || {});
-    if (typeof STATE.nomadLastIncomeWeek !== 'number') STATE.nomadLastIncomeWeek = -1;
-    if (typeof STATE.urssafYearMarked !== 'number') STATE.urssafYearMarked = -1;
-    return true;
-  } catch(e) { return false; }
-}
-function resetGame() {
-  Object.assign(STATE, {
-    phase: 'menu', characterName: '', characterIcon: '🧳',
-    week: 0, balance: INITIAL_BALANCE, points: 0,
-    startCity: null, agenda: [], completed: [],
-    achievements: new Set(), animalsDone: new Set(), continentsDone: new Set(),
-    typeCount: { dog: 0, cat: 0, house: 0, bird: 0 }, potesCount: 0,
-    pendingCard: null, log: [], refusedCount: 0, acceptedCount: 0, endReason: null,
-    tookPlane: false,
-    perks: { friendInsider: false, digitalNomad: false, socialStar: false },
-    nomadLastIncomeWeek: -1, urssafYearMarked: -1,
-  });
-  try { localStorage.removeItem(SAVE_KEY); } catch(e) {}
-}
+  if (!active) {
+    return `
+      <div class="perk-card empty">
+        <div class="perk-name">Aucune carte Chance active</div>
+        <div class="perk-desc">2 % des tirages peuvent se transformer en perk permanent. Tu n'en portes qu'un à la fois.</div>
+        ${reputationText}
+        ${socialNote}
+      </div>
+    `;
+  }
 
-const app = document.getElementById('app');
-
-function render() {
-  if (STATE.phase === 'menu') renderMenu();
-  else renderGame();
-  saveGame();
+  return `
+    <div class="perk-card">
+      <div class="perk-header">
+        <div class="perk-badge">${active.icon}</div>
+        <div>
+          <div class="perk-name">${active.name}</div>
+          <div class="perk-desc">${active.desc}</div>
+        </div>
+      </div>
+      ${reputationText}
+      ${socialNote}
+    </div>
+  `;
 }
+function renderAgenda() {
+  if (!STATE.agenda.length) {
+    return '<div class="agenda-empty">Aucune mission planifiée. Accepte une opportunité pour remplir ton carnet.</div>';
+  }
+  return getSortedAgenda().map(mission => {
+    const isActive = mission.startWeek <= STATE.week && mission.endWeek > STATE.week;
+    const isFuture = mission.startWeek > STATE.week;
+    const travelClass = mission.travelCancellable ? 'cancellable' : '';
+    const travelLabel = mission.travelDays < 0.1
+      ? 'Sur place'
+      : `${mission.travelIcon} ${mission.travelLabel} · ${fmtDays(mission.travelDays)} · ${fmtDayRange(mission.travelStartDay, mission.startDay)}${mission.travelCancellable ? ' · annulable' : ''}`;
+    const status = isActive ? 'En cours' : `Démarre S${mission.startWeek}`;
+    return `
+      <div class="agenda-mission ${isActive ? 'active' : ''}">
+        <div class="agenda-transport ${travelClass}">${travelLabel}</div>
+        <div class="am-title">${missionTitle(mission)}</div>
+        <div class="am-sub">${mission.housing}${mission.isRareHousing ? ' ✦' : ''} · ${mission.durationDays} jours · ${fmtMoney(mission.payTotal)}</div>
+        <div class="am-bar">${status} · ${fmtDate(mission.startWeek)} → ${fmtDate(mission.endWeek)}</div>
+        ${mission.hasPotes ? `<div class="agenda-friends"><strong>Potes invités</strong> · +${POTES_BONUS_POINTS} pt</div>` : ''}
+        ${isFuture ? `<div class="agenda-actions"><button class="danger" onclick="cancelMission(${mission.id})">Annuler</button></div>` : ''}
+      </div>
+    `;
+  }).join('');
+}
+function shapeD(continent) {
+  return CONTINENT_SHAPES[continent].map(poly =>
+    poly.map(([lat, lng], index) => `${index === 0 ? 'M' : 'L'}${(lng + 180).toFixed(1)} ${(90 - lat).toFixed(1)}`).join(' ') + 'Z'
+  ).join(' ');
+}
+function buildJourneyPoints() {
+  const points = [];
+  if (STATE.startCity) points.push(STATE.startCity);
+  const completed = [...STATE.completed].sort((a, b) => a.endWeek - b.endWeek);
+  for (const mission of completed) {
+    if (!points.length || points[points.length - 1].name !== mission.city.name) points.push(mission.city);
+  }
+  const current = deriveCurrentCityFromState();
+  if (current && (!points.length || points[points.length - 1].name !== current.name)) points.push(current);
+  return points;
+}
+function renderMap(currentCity, options = {}) {
+  const showFuture = options.showFuture !== false;
+  const showJourney = !!options.showJourney;
+  const proj = (lat, lng) => ({ x: lng + 180, y: 90 - lat });
 
+  let continents = '';
+  for (const name of Object.keys(CONTINENT_SHAPES)) {
+    continents += `<path class="continent-fill" d="${shapeD(name)}"/>`;
+  }
+
+  let labels = '';
+  for (const name of Object.keys(CONTINENT_LABEL_POS)) {
+    const [lat, lng] = CONTINENT_LABEL_POS[name];
+    const point = proj(lat, lng);
+    labels += `<text class="continent-label" x="${point.x}" y="${point.y}">${CONTINENT_LABEL_FR[name]}</text>`;
+  }
+
+  const completedCities = new Set(STATE.completed.map(mission => mission.city.name));
+  const agendaCities = new Set(STATE.agenda.filter(mission => mission.startWeek > STATE.week).map(mission => mission.city.name));
+
+  let lines = '';
+  if (showJourney) {
+    const points = buildJourneyPoints();
+    for (let i = 1; i < points.length; i++) {
+      const from = proj(points[i - 1].lat, points[i - 1].lng);
+      const to = proj(points[i].lat, points[i].lng);
+      lines += `<line class="journey-line" x1="${from.x}" y1="${from.y}" x2="${to.x}" y2="${to.y}"/>`;
+    }
+  } else if (showFuture && currentCity) {
+    const sortedAgenda = getSortedAgenda().filter(mission => mission.startWeek > STATE.week);
+    let fromCity = currentCity;
+    for (const mission of sortedAgenda) {
+      const from = proj(fromCity.lat, fromCity.lng);
+      const to = proj(mission.city.lat, mission.city.lng);
+      lines += `<line class="travel-line" x1="${from.x}" y1="${from.y}" x2="${to.x}" y2="${to.y}"/>`;
+      fromCity = mission.city;
+    }
+  }
+
+  let markers = '';
+  for (const city of CITIES) {
+    const point = proj(city.lat, city.lng);
+    let classes = 'city-dot';
+    let radius = 1.6;
+    if (completedCities.has(city.name)) { classes += ' done'; radius = 2.1; }
+    if (agendaCities.has(city.name)) { classes += ' agenda'; radius = Math.max(radius, 2.2); }
+    markers += `<circle class="${classes}" cx="${point.x.toFixed(2)}" cy="${point.y.toFixed(2)}" r="${radius}"/>`;
+    if (agendaCities.has(city.name) || (currentCity && city.name === currentCity.name)) {
+      markers += `<text class="city-label" x="${(point.x + 3).toFixed(2)}" y="${(point.y + 1.5).toFixed(2)}">${city.name}</text>`;
+    }
+  }
+  if (currentCity) {
+    const point = proj(currentCity.lat, currentCity.lng);
+    markers += `<text class="current-avatar" x="${point.x.toFixed(2)}" y="${(point.y + 1.8).toFixed(2)}">${STATE.characterIcon}</text>`;
+  }
+
+  return `
+    <svg id="map-svg" viewBox="0 0 360 180" preserveAspectRatio="xMidYMid meet">
+      ${continents}
+      ${labels}
+      ${lines}
+      ${markers}
+    </svg>
+  `;
+}
+function renderCalendarPane(card) {
+  const startWeek = STATE.week;
+  const endWeek = startWeek + 52;
+  let rows = '';
+  let lastMonth = -1;
+  const booked = getSortedAgenda();
+  const candidate = card && card.kind === 'mission' ? card : null;
+  const candidateNextMission = candidate && candidate.nextMissionId
+    ? booked.find(entry => entry.id === candidate.nextMissionId)
+    : null;
+  const replacedTravelMissionId = candidate && candidate.selectedOutbound && candidateNextMission
+    ? candidate.nextMissionId
+    : null;
+
+  for (let week = startWeek; week < endWeek; week++) {
+    const date = new Date(2026, 0, 1);
+    date.setDate(date.getDate() + week * 7);
+    const months = ['janv', 'fév', 'mars', 'avr', 'mai', 'juin', 'juil', 'août', 'sept', 'oct', 'nov', 'déc'];
+    const dateLabel = `${date.getDate()} ${months[date.getMonth()]}`;
+    const monthStart = date.getMonth() !== lastMonth;
+    lastMonth = date.getMonth();
+
+    let cls = '';
+    let label = '';
+    const mission = booked.find(entry => weekOverlapsRange(week, entry.startDay, entry.endDay));
+    const travel = booked.find(entry =>
+      entry.id !== replacedTravelMissionId
+      && entry.travelDays > 0.1
+      && weekOverlapsRange(week, entry.travelStartDay, entry.startDay)
+    );
+    const candidateMission = candidate && weekOverlapsRange(week, candidate.startDay, candidate.endDay);
+    const candidateTravel = candidate && candidate.travelDays > 0.1 && weekOverlapsRange(week, candidate.travelStartDay, candidate.startDay);
+    const candidateOutboundTravel = candidate && candidateNextMission && candidate.selectedOutbound
+      && candidate.selectedOutbound.days > 0.1
+      && candidate.nextTravelStartDay != null
+      && weekOverlapsRange(week, candidate.nextTravelStartDay, candidateNextMission.startDay);
+
+    if (mission && candidateMission) cls = 'both';
+    else if (mission) cls = 'booked';
+    else if (candidateMission) cls = 'candidate';
+    else if (candidateOutboundTravel) cls = candidate.selectedOutbound.cancellable ? 'candidate-travel-cancellable' : 'candidate-travel';
+    else if (candidateTravel) cls = candidate.selectedInbound && candidate.selectedInbound.cancellable ? 'candidate-travel-cancellable' : 'candidate-travel';
+    else if (travel) cls = travel.travelCancellable ? 'travel-cancellable' : 'travel';
+
+    if (mission && week === mission.startWeek) label = mission.city.name;
+    else if (candidateOutboundTravel && Math.floor(candidate.nextTravelStartDay / 7) === week) label = candidate.selectedOutbound.label;
+    else if (candidateMission && week === candidate.startWeek) label = candidate.city.name;
+    else if (candidateTravel && Math.floor(candidate.travelStartDay / 7) === week) label = candidate.travelLabel;
+    else if (travel && Math.floor(travel.travelStartDay / 7) === week) label = travel.travelLabel;
+
+    rows += `
+      <div class="calendar-row ${monthStart ? 'month-start' : ''}">
+        <div class="cal-week-tag">S${week}</div>
+        <div class="cal-date">${dateLabel}</div>
+        <div class="cal-bar ${cls}">${label ? `<span class="cal-label">${label}</span>` : ''}</div>
+      </div>`;
+  }
+
+  return `
+    <div class="calendar-pane">
+      <h3>Calendrier (12 mois)</h3>
+      ${rows}
+      <div class="cal-legend">
+        <div class="cal-legend-item"><span class="cal-swatch free"></span> Libre</div>
+        <div class="cal-legend-item"><span class="cal-swatch booked"></span> Mission acceptée</div>
+        <div class="cal-legend-item"><span class="cal-swatch travel"></span> Temps de transport</div>
+        <div class="cal-legend-item"><span class="cal-swatch travel-cancellable"></span> Transport annulable</div>
+        <div class="cal-legend-item"><span class="cal-swatch candidate"></span> Carte en cours</div>
+      </div>
+    </div>
+  `;
+}
+function renderTransportPlanner(card, which, title, options, selectedMode, cancellable, extraText) {
+  const selected = getSelectedTransport(options, selectedMode, cancellable);
+  const showCancellableToggle = selected && !isAutoCancellableMode(selected.mode);
+  return `
+    <div class="transport-panel">
+      <div class="transport-title">${title}</div>
+      ${extraText ? `<div class="transport-caption">${extraText}</div>` : ''}
+      ${options.length ? `
+        <div class="transport-options">
+          ${options.map(option => {
+            const priced = applyCancellable(option, cancellable);
+            return `
+              <button class="transport-option ${selectedMode === option.mode ? 'selected' : ''}" onclick="selectPendingTransport('${which}','${option.mode}')">
+                <span>${option.icon} ${option.label}</span>
+                <span>${fmtDays(option.days)} · ${fmtMoney(priced.cost)}</span>
+              </button>
+            `;
+          }).join('')}
+        </div>
+        ${showCancellableToggle ? `<button class="toggle-chip ${cancellable ? 'on' : ''}" onclick="togglePendingCancellable('${which}')">
+          Billet annulable (+${Math.round((CANCELLABLE_MULTIPLIER - 1) * 100)} %)
+        </button>` : '<div class="transport-mini">Annulable d\'office, sans surcoût.</div>'}
+      ` : `<div class="transport-empty">Aucune option réaliste pour ce segment.</div>`}
+      ${selected ? `<div class="transport-mini">${selected.icon} ${selected.label} · ${fmtDayRange(card[which === 'inbound' ? 'travelStartDay' : 'nextTravelStartDay'], which === 'inbound' ? card.startDay : (STATE.agenda.find(mission => mission.id === card.nextMissionId)?.startDay || card.startDay))}</div>` : ''}
+    </div>
+  `;
+}
+function renderPendingCardStrip(card) {
+  if (!card) return '';
+  const title = card.kind === 'chance' ? 'Carte en attente' : 'Opportunité en attente';
+  const label = card.kind === 'chance'
+    ? `Carte Chance : ${PERK_DEFS[card.perkKey].name}`
+    : `${missionTitle(card)} · ${fmtMoney(card.payTotal)} · +${card.points} pts`;
+  const note = 'Tu peux la rouvrir, la refuser, ou passer la semaine et la perdre.';
+  return `
+    <div class="paper pending-strip">
+      <div class="pending-strip-main">
+        <div class="pending-strip-title">${title}</div>
+        <div class="pending-strip-text">${label}</div>
+        <div class="pending-strip-note">${note}</div>
+      </div>
+      <div class="pending-strip-actions">
+        <button onclick="reopenPendingCard()">Reconsulter</button>
+        <button class="danger" onclick="refuseCard()">Refuser</button>
+      </div>
+    </div>
+  `;
+}
+function renderOverlapComparison(card) {
+  const overlapMissions = getCardOverlapMissions(card);
+  if (!overlapMissions.length) return '';
+  return `
+    <div class="overlap-compare">
+      <div class="overlap-compare-title">${overlapMissions.length > 1 ? 'Missions à annuler' : 'Mission à annuler'}</div>
+      ${overlapMissions.map(mission => {
+        const lostTicketCost = !mission.travelCancellable ? (mission.travelCost || 0) : 0;
+        return `
+          <div class="overlap-compare-card">
+            <div class="overlap-compare-head">
+              <strong>${missionTitle(mission)}</strong>
+              <span class="overlap-compare-date">${fmtDate(mission.startWeek)}</span>
+            </div>
+            <div class="overlap-compare-metrics">
+              <span>Paiement prévu : <strong>${fmtMoney(mission.payTotal)}</strong></span>
+              <span>Satisfaction : <strong>+${mission.points} pts</strong></span>
+              ${lostTicketCost > 0
+                ? `<span class="loss">Coût du trajet : <strong>−${fmtMoney(lostTicketCost)}</strong></span>`
+                : `<span>${isAutoCancellableMode(mission.travelMode) ? 'Trajet' : 'Billet'} : <strong>annulable sans frais</strong></span>`}
+            </div>
+          </div>
+        `;
+      }).join('')}
+    </div>
+  `;
+}
+function renderPendingCardModal() {
+  const card = STATE.pendingCard;
+  if (!card) return '';
+
+  if (card.kind === 'chance') {
+    const perk = PERK_DEFS[card.perkKey];
+    return `
+      <div class="modal-overlay" id="card-modal">
+        <div class="modal chance-modal">
+          <div class="seal">☘️</div>
+          <h1 style="margin-top:8px;">Carte Chance</h1>
+          <p class="chance-icon">${perk.icon}</p>
+          <p style="font-size:22px;font-weight:600;">${perk.name}</p>
+          <p style="margin-top:10px;line-height:1.5;color:#6e5532;">${perk.desc}</p>
+          <p style="margin-top:14px;font-size:13px;color:#6e5532;">Tu peux la refuser. Une seule carte Chance peut rester active à la fois.</p>
+          <div class="row" style="justify-content:center;margin-top:18px;">
+            <button onclick="minimizePendingCard()">Réfléchir</button>
+            <button class="danger" onclick="refuseCard()">Refuser</button>
+            <button class="primary" onclick="acceptCard()">Accepter</button>
+          </div>
+        </div>
+      </div>
+    `;
+  }
+
+  const subjectIcon = TYPE_ICON[card.type];
+  const stamp = card.type === 'house'
+    ? 'House sitting'
+    : (card.petType ? `${card.petType.charAt(0).toUpperCase() + card.petType.slice(1)}` : '');
+  const nextMission = card.nextMissionId ? STATE.agenda.find(mission => mission.id === card.nextMissionId) : null;
+
+  return `
+    <div class="modal-overlay" id="card-modal">
+      <div class="modal-twocol">
+        <div class="card" style="background:#faf0d4;">
+          <div class="card-image">
+            ${subjectIcon}
+            <div class="stamp">${stamp}</div>
+          </div>
+          <div class="card-body">
+            <div class="card-title">${card.petName || 'Logement à garder'}</div>
+            <div class="card-loc">${card.city.name}, ${card.city.continent} · ${card.housing}${card.isRareHousing ? ' ✦' : ''}</div>
+            <div class="card-blurb">"${card.blurb}"</div>
+            ${card.hasPotes ? `<div class="potes-pill"><strong>Potes invités</strong> · bonus immédiat de +${POTES_BONUS_POINTS} pt</div>` : ''}
+            <div class="card-attrs">
+              <div><div class="attr-label">Démarrage</div><div class="attr-value">${fmtDate(card.startWeek)}</div></div>
+              <div><div class="attr-label">Durée</div><div class="attr-value">${card.durationDays} jours</div></div>
+              <div><div class="attr-label">Paiement</div><div class="attr-value">${fmtMoney(card.payTotal)}</div></div>
+              <div><div class="attr-label">Satisfaction</div><div class="attr-value">+${card.points} pts</div></div>
+            </div>
+            ${hasPerk('friendInsider') ? (() => {
+              const quality = dealQuality(card);
+              return `<div class="deal-badge" style="border-color:${quality.color};color:${quality.color};">
+                <span class="deal-icon">🧐</span>
+                <span class="deal-label">${quality.label}</span>
+                <span class="deal-pct">(${quality.pct} vs moyenne)</span>
+                <span class="deal-hint">— ${quality.hint}</span>
+              </div>`;
+            })() : ''}
+
+            ${renderTransportPlanner(
+              card,
+              'inbound',
+              `Trajet vers ${card.city.name}`,
+              card.inboundOptions,
+              card.selectedInboundMode,
+              card.selectedInboundCancellable,
+              `Depuis ${card.srcCity.name} · ${Math.round(card.distance)} km`
+            )}
+
+            ${nextMission ? renderTransportPlanner(
+              card,
+              'outbound',
+              `Puis vers ${nextMission.city.name}`,
+              card.outboundOptions,
+              card.selectedOutboundMode,
+              card.selectedOutboundCancellable,
+              `Remplace le trajet déjà réservé pour ${missionLabel(nextMission)}`
+            ) : ''}
+
+            <div class="travel-info">
+              ${card.selectedInbound ? `${card.travelIcon} <strong>${card.travelLabel}</strong> · ${fmtDays(card.travelDays)} · ${fmtMoney(card.travelCost)}` : '✖ <strong>Trajet d’arrivée impossible</strong>'}<br>
+              <span style="font-size:12px;color:#6e5532;">Bénéfice net estimé de cette mission : <strong style="color:${card.netEstimate >= 0 ? '#2d6e3e' : '#a83232'}">${fmtMoney(card.netEstimate)}</strong></span>
+              ${card.selectedOutbound ? `<br><span style="font-size:12px;color:#6e5532;">Trajet vers le sitting suivant réservé à ${fmtMoney(card.selectedOutbound.cost)}.</span>` : ''}
+              ${card.refundCost > 0 ? `<br><span style="font-size:12px;color:#6e5532;">Billets non annulables perdus : <strong style="color:#a83232;">−${fmtMoney(card.refundCost)}</strong></span>` : ''}
+              ${card.feasibilityIssues.length ? `<div class="travel-warnings">${card.feasibilityIssues.map(issue => `<div>⚠ ${issue}</div>`).join('')}</div>` : ''}
+            </div>
+            ${renderOverlapComparison(card)}
+            <div class="card-actions">
+              <button onclick="minimizePendingCard()">Réfléchir</button>
+              <button class="danger" onclick="refuseCard()">Refuser</button>
+              ${card.canAcceptByCancellingOverlap ? `<button onclick="acceptCardByCancellingOverlap()">Accepter en annulant${card.refundCost > 0 ? ` (−${fmtMoney(card.refundCost)})` : ''}</button>` : ''}
+              ${card.canAcceptByCancellingNextMission ? `<button onclick="acceptCardByCancellingNextMission()">Accepter en annulant${card.nextMissionCancellationRefundCost > 0 ? ` (−${fmtMoney(card.nextMissionCancellationRefundCost)})` : ''}</button>` : ''}
+              <button class="primary" onclick="acceptCard()" ${!card.feasible ? 'disabled' : ''}>Accepter</button>
+            </div>
+          </div>
+        </div>
+        ${renderCalendarPane(card)}
+      </div>
+    </div>
+  `;
+}
+function renderMissingAchievementRecap() {
+  const all = ['globetrotter', 'bestiaire', 'agent_immo', 'pekin_express', 'kiffeur', 'ecolo', 'expert_chien', 'ermite'];
+  const missing = all.filter(key => !STATE.achievements.has(key));
+  if (!missing.length) return '<div class="recap-empty">Tous les succès ont été débloqués.</div>';
+  return `<div class="recap-list">${missing.map(key => {
+    const progress = getAchievementProgress(key);
+    const pct = Math.round((progress.done / progress.total) * 100);
+    return `<div class="recap-row"><span>${ACHIEVEMENT_LABEL[key]}</span><strong>${pct}%</strong></div>`;
+  }).join('')}</div>`;
+}
+function renderEndModal() {
+  const win = STATE.endReason === 'victory';
+  const months = (STATE.week / 4.33).toFixed(1);
+  const currentCity = deriveCurrentCityFromState();
+  return `
+    <div class="modal-overlay">
+      <div class="modal end-modal">
+        <div class="seal">${win ? '★' : '⚱'}</div>
+        <h1 style="margin-top:8px;color:${win ? '#2d6e3e' : '#a83232'};">${win ? 'Victoire !' : 'Défaite'}</h1>
+        <p style="margin:14px 0 18px;font-size:18px;font-style:italic;color:#6e5532;">
+          ${win
+            ? `Tu as accumulé ${STATE.points} points en ${STATE.week} semaines (${months} mois).`
+            : `Tu as tenu ${STATE.week} semaines (${months} mois) avant que les caisses ne soient vides.`}
+        </p>
+        <div class="end-stats">
+          <div class="stat"><div class="label">Missions</div><div class="value">${STATE.completed.length}</div></div>
+          <div class="stat"><div class="label">Continents</div><div class="value">${STATE.continentsDone.size}/6</div></div>
+          <div class="stat"><div class="label">Succès</div><div class="value">${STATE.achievements.size}</div></div>
+          <div class="stat"><div class="label">Solde final</div><div class="value">${fmtMoney(STATE.balance)}</div></div>
+        </div>
+
+        <div class="end-layout">
+          <div class="summary-map-block">
+            <h2>Carnet de voyage</h2>
+            <div class="summary-map">${renderMap(currentCity, { showFuture: false, showJourney: true })}</div>
+          </div>
+          <div class="summary-side">
+            <h2>Mes cartes</h2>
+            ${renderAchievements()}
+            <h2 style="margin-top:14px;">Encore à gratter</h2>
+            ${renderMissingAchievementRecap()}
+          </div>
+        </div>
+
+        <div class="row" style="justify-content:center;margin-top:16px;">
+          <button onclick="returnToMenu()">Menu principal</button>
+          <button class="primary" onclick="resetGame()">Nouvelle partie</button>
+        </div>
+      </div>
+    </div>
+  `;
+}
 function renderMenu() {
   app.innerHTML = `
     <div id="menu" class="paper">
@@ -1070,48 +2418,32 @@ function renderMenu() {
       <div class="col" style="gap:18px;align-items:center;">
         <div>
           <div style="font-size:13px;text-transform:uppercase;letter-spacing:0.1em;color:#6e5532;margin-bottom:8px;">Votre prénom</div>
-          <input type="text" id="name-input" placeholder="ex : Lucile" maxlength="20" />
+          <input type="text" placeholder="ex : Lucile" maxlength="20" value="${esc(STATE.characterName)}" oninput="updateMenuName(this.value)" />
         </div>
         <div>
           <div style="font-size:13px;text-transform:uppercase;letter-spacing:0.1em;color:#6e5532;margin-bottom:8px;">Choisissez un avatar</div>
-          <div class="avatar-row" id="avatar-row">
-            ${['🧳','🎒','🧣','📷','🌿','🗺️'].map(ic =>
-              `<div class="avatar ${STATE.characterIcon===ic?'selected':''}" data-icon="${ic}">${ic}</div>`).join('')}
+          <div class="avatar-row">
+            ${['🧳', '🎒', '🧣', '📷', '🌿', '🗺️'].map(icon =>
+              `<button type="button" class="avatar ${STATE.characterIcon === icon ? 'selected' : ''}" onclick="chooseAvatar('${icon}')">${icon}</button>`
+            ).join('')}
           </div>
         </div>
         <button class="primary" style="font-size:18px;padding:12px 32px;margin-top:12px;" onclick="startGame()">Commencer la partie</button>
-        <div style="font-size:13px;color:#6e5532;margin-top:8px;">Ville de départ : tirée au sort · Solde initial : ${fmtMoney(INITIAL_BALANCE)}</div>
-        ${localStorage.getItem(SAVE_KEY) ? `<button onclick="continueGame()">Reprendre la partie sauvegardée</button>` : ''}
+        <div style="font-size:13px;color:#6e5532;margin-top:8px;">Ville de départ : tirée au sort · Solde initial : ${fmtMoney(INITIAL_BALANCE)} · Écolo démarre déjà actif (+${ACHIEVEMENT_POINTS.ecolo} pts)</div>
+        ${hasSaveAvailable() ? '<button onclick="continueGame()">Reprendre la partie sauvegardée</button>' : ''}
       </div>
     </div>
   `;
-  document.getElementById('avatar-row').addEventListener('click', e => {
-    const t = e.target.closest('.avatar');
-    if (!t) return;
-    STATE.characterIcon = t.dataset.icon;
-    renderMenu();
-  });
 }
-
-function startGame() {
-  const name = (document.getElementById('name-input').value || 'Anonyme').trim();
-  STATE.characterName = name;
-  STATE.startCity = rng(CITIES);
-  STATE.phase = 'playing';
-  STATE.week = 0;
-  log(`Partie commencée à ${STATE.startCity.name}.`);
-  render();
-}
-
-function continueGame() {
-  if (loadGame() && STATE.phase !== 'menu') render();
-  else { resetGame(); render(); }
-}
-
 function renderGame() {
-  const here = currentCityAt(STATE.week);
+  const currentCity = deriveCurrentCityFromState();
   const balanceClass = STATE.balance < 200 ? 'danger' : (STATE.balance > 2000 ? 'success' : '');
   const pointsClass = STATE.points >= VICTORY_POINTS ? 'success' : '';
+  const opportunityText = hasReputationPenalty()
+    ? `Malus réputation actif jusqu'au ${fmtDate(STATE.reputationPenaltyUntil)}`
+    : 'Réputation intacte';
+  const pendingCardOpen = !!STATE.pendingCard && !STATE.pendingCardMinimized;
+  const pendingCardHidden = !!STATE.pendingCard && STATE.pendingCardMinimized;
 
   app.innerHTML = `
     <div id="game">
@@ -1119,23 +2451,29 @@ function renderGame() {
         <div class="row">
           <div style="font-size:32px">${STATE.characterIcon}</div>
           <div>
-            <div style="font-weight:600;font-size:18px;">${STATE.characterName}</div>
-            <div style="font-size:13px;color:#6e5532;font-style:italic;">à ${here.city.name}, ${here.city.continent}</div>
+            <div style="font-weight:600;font-size:18px;">${esc(STATE.characterName)}</div>
+            <div style="font-size:13px;color:#6e5532;font-style:italic;">à ${currentCity ? currentCity.name : 'quelque part'}, ${currentCity ? currentCity.continent : 'Monde'}</div>
           </div>
         </div>
         <div class="stat"><div class="label">Semaine</div><div class="value">${STATE.week} <span style="font-size:13px;font-weight:400;color:#6e5532;font-style:italic">· ${fmtDate(STATE.week)}</span></div></div>
         <div class="stat"><div class="label">Solde</div><div class="value ${balanceClass}">${fmtMoney(STATE.balance)}</div></div>
         <div class="stat"><div class="label">Points</div><div class="value ${pointsClass}">${STATE.points} / ${VICTORY_POINTS}</div></div>
-        <button class="primary" onclick="nextTurn()" ${STATE.pendingCard?'disabled':''} ${STATE.phase!=='playing'?'disabled':''}>Tour suivant →</button>
+        <div class="stat"><div class="label">Réputation</div><div class="value" style="font-size:15px;">${opportunityText}</div></div>
+        <div class="row">
+          <button onclick="returnToMenu()">Menu</button>
+          <button class="primary" onclick="nextTurn()" ${pendingCardOpen ? 'disabled' : ''} ${STATE.phase !== 'playing' ? 'disabled' : ''}>Tour suivant →</button>
+        </div>
       </div>
 
       <div id="main-area">
-        <div id="map-container" class="paper">${renderMap(here.city)}</div>
+        ${pendingCardHidden ? renderPendingCardStrip(STATE.pendingCard) : ''}
+        <div id="map-container" class="paper">${renderMap(currentCity)}</div>
         <div class="paper">
           <h3>Journal</h3>
           <div id="log-panel">
-            ${STATE.log.length === 0 ? '<div style="font-style:italic;color:#6e5532">Rien à signaler.</div>'
-              : STATE.log.map(e => `<div class="log-entry"><span class="week-tag">S${e.week}</span>${e.text}</div>`).join('')}
+            ${STATE.log.length
+              ? STATE.log.map(entry => `<div class="log-entry"><span class="week-tag">S${entry.week}</span>${entry.text}</div>`).join('')
+              : '<div style="font-style:italic;color:#6e5532">Rien à signaler.</div>'}
           </div>
         </div>
       </div>
@@ -1146,8 +2484,8 @@ function renderGame() {
           ${renderAgenda()}
         </div>
         <div class="paper">
-          <h3>Bonus</h3>
-          ${renderPerks()}
+          <h3>Carte Chance</h3>
+          ${renderPerkPanel()}
         </div>
         <div class="paper">
           <h3>Succès</h3>
@@ -1155,261 +2493,20 @@ function renderGame() {
         </div>
       </div>
     </div>
-
-    ${STATE.pendingCard ? renderPendingCardModal() : ''}
+    ${pendingCardOpen ? renderPendingCardModal() : ''}
     ${STATE.phase === 'over' ? renderEndModal() : ''}
   `;
 }
-
-function shapeD(continent) {
-  return CONTINENT_SHAPES[continent].map(poly =>
-    poly.map(([lat,lng], i) =>
-      `${i===0?'M':'L'}${(lng+180).toFixed(1)} ${(90-lat).toFixed(1)}`
-    ).join(' ') + 'Z'
-  ).join(' ');
+function render() {
+  if (STATE.phase === 'menu') renderMenu();
+  else renderGame();
+  applyFrenchPunctuation(app);
+  applyFrenchPunctuation(document.getElementById('help-overlay'));
+  saveGame();
 }
-
-function renderMap(currentCity) {
-  // viewBox 360 × 180 : 1 unité = 1 degré.
-  const proj = (lat, lng) => ({ x: lng + 180, y: 90 - lat });
-
-  let continents = '';
-  for (const name of Object.keys(CONTINENT_SHAPES)) {
-    continents += `<path class="continent-fill" d="${shapeD(name)}"/>`;
-  }
-  let labels = '';
-  for (const name of Object.keys(CONTINENT_LABEL_POS)) {
-    const [lat, lng] = CONTINENT_LABEL_POS[name];
-    const p = proj(lat, lng);
-    labels += `<text class="continent-label" x="${p.x}" y="${p.y}">${CONTINENT_LABEL_FR[name]}</text>`;
-  }
-
-  const agendaCities = STATE.agenda.map(m => m.city.name);
-  let lines = '';
-  const sortedAgenda = [...STATE.agenda].sort((a,b) => a.startWeek - b.startWeek);
-  let lastCity = currentCity;
-  for (const m of sortedAgenda) {
-    const a = proj(lastCity.lat, lastCity.lng);
-    const b = proj(m.city.lat, m.city.lng);
-    lines += `<line class="travel-line" x1="${a.x}" y1="${a.y}" x2="${b.x}" y2="${b.y}"/>`;
-    lastCity = m.city;
-  }
-
-  let dots = '';
-  for (const c of CITIES) {
-    const p = proj(c.lat, c.lng);
-    let cls = 'city-dot';
-    let r = 1.6;
-    if (c.name === currentCity.name) { cls += ' current'; r = 2.6; }
-    else if (agendaCities.includes(c.name)) { cls += ' agenda'; r = 2.2; }
-    dots += `<circle class="${cls}" cx="${p.x.toFixed(2)}" cy="${p.y.toFixed(2)}" r="${r}"/>`;
-    if (c.name === currentCity.name || agendaCities.includes(c.name)) {
-      dots += `<text class="city-label" x="${(p.x+3).toFixed(2)}" y="${(p.y+1.5).toFixed(2)}">${c.name}</text>`;
-    }
-  }
-
-  return `
-    <svg id="map-svg" viewBox="0 0 360 180" preserveAspectRatio="xMidYMid meet">
-      ${continents}
-      ${labels}
-      ${lines}
-      ${dots}
-    </svg>
-  `;
-}
-
-function renderAgenda() {
-  if (STATE.agenda.length === 0) return '<div class="agenda-empty">Aucune mission planifiée. Acceptez une opportunité pour remplir votre agenda.</div>';
-  return [...STATE.agenda].sort((a,b)=>a.startWeek-b.startWeek).map(m => {
-    const isActive = m.startWeek <= STATE.week && m.endWeek > STATE.week;
-    const status = isActive ? 'En cours' : `Démarre S${m.startWeek}`;
-    return `
-      <div class="agenda-mission ${isActive ? 'active' : ''}">
-        <div class="am-title">${TYPE_ICON[m.type]} ${TYPE_LABEL[m.type]} à ${m.city.name}</div>
-        <div class="am-sub">${m.housing} · ${m.durationDays} jours · ${fmtMoney(m.payTotal)}</div>
-        <div class="am-bar">${status} · ${fmtDate(m.startWeek)} → ${fmtDate(m.endWeek)}</div>
-      </div>
-    `;
-  }).join('');
-}
-
-function renderAchievements() {
-  const all = ['globetrotter','bestiaire','kiffeur','ecolo','expert_chien','expert_chat','ermite'];
-  const ecoloProg = STATE.tookPlane
-    ? '✈ pris'
-    : (STATE.week >= 52 ? 'OK' : `${STATE.week}/52 sem`);
-  const progress = {
-    globetrotter: `${STATE.continentsDone.size}/6`,
-    bestiaire: `${STATE.animalsDone.size}/3`,
-    kiffeur: `${STATE.potesCount}/5`,
-    ecolo: ecoloProg,
-    expert_chien: `${STATE.typeCount.dog}/5`,
-    expert_chat: `${STATE.typeCount.cat}/5`,
-    ermite: `${STATE.typeCount.house}/5`,
-  };
-  return `<div class="ach-grid">${all.map(a => {
-    const unlocked = STATE.achievements.has(a);
-    return `<div class="ach ${unlocked?'unlocked':'locked'}">
-      <span class="ach-icon">${ACHIEVEMENT_ICON[a]}</span>
-      <div style="flex:1;line-height:1.2">
-        <div class="ach-name">${ACHIEVEMENT_LABEL[a]}</div>
-        <div class="ach-prog">${progress[a]} · +${ACHIEVEMENT_POINTS[a]}</div>
-      </div>
-    </div>`;
-  }).join('')}</div>`;
-}
-
-function renderPerks() {
-  const list = [
-    { key: 'friendInsider', name: 'Un ami qui s\'y connaît', desc: 'Affiche si une carte est un bon deal vs la moyenne du marché.' },
-    { key: 'digitalNomad',  name: 'Digital Nomad',          desc: 'Petit revenu freelance aléatoire chaque mois. Mais l\'URSSAF tape parfois en septembre…' },
-    { key: 'socialStar',    name: 'Star des réseaux',       desc: '+ d\'opportunités, plus mondiales. Train/bateau/bus offerts par tes collabs. Mais l\'avion = badbuzz (−30 % du solde).' },
-  ];
-  return list.map(p => {
-    const on = !!STATE.perks[p.key];
-    return `<div class="perk-row ${on?'on':''}" onclick="togglePerk('${p.key}')">
-      <div class="perk-toggle"></div>
-      <div class="perk-info">
-        <div class="perk-name">${p.name}</div>
-        <div class="perk-desc">${p.desc}</div>
-      </div>
-    </div>`;
-  }).join('');
-}
-
-function togglePerk(key) {
-  if (STATE.phase !== 'playing') return;
-  STATE.perks[key] = !STATE.perks[key];
-  log(`${STATE.perks[key]?'✓ Bonus activé':'Bonus désactivé'} : ${key}`);
-  render();
-}
-
-function renderCalendarPane(card) {
-  const startW = STATE.week;
-  const endW = startW + 26;
-  let rows = '';
-  let lastMonth = -1;
-  for (let w = startW; w < endW; w++) {
-    const mission = STATE.agenda.find(m => w >= m.startWeek && w < m.endWeek);
-    const isCandidate = card && w >= card.startWeek && w < card.endWeek;
-    const both = mission && isCandidate;
-    let cls = '';
-    if (both) cls = 'both';
-    else if (mission) cls = 'booked';
-    else if (isCandidate) cls = 'candidate';
-    let label = '';
-    if (mission && (w === mission.startWeek)) label = mission.city.name;
-    if (isCandidate && !mission && w === card.startWeek) label = card.city.name;
-    if (both && w === card.startWeek) label = '⚠ ' + card.city.name;
-
-    const date = new Date(2026, 0, 1);
-    date.setDate(date.getDate() + w * 7);
-    const months = ['janv','fév','mars','avr','mai','juin','juil','août','sept','oct','nov','déc'];
-    const dateLabel = `${date.getDate()} ${months[date.getMonth()]}`;
-    const monthStart = date.getMonth() !== lastMonth;
-    lastMonth = date.getMonth();
-
-    rows += `
-      <div class="calendar-row ${monthStart ? 'month-start' : ''}">
-        <div class="cal-week-tag">S${w}</div>
-        <div class="cal-date">${dateLabel}</div>
-        <div class="cal-bar ${cls}">${label ? `<span class="cal-label">${label}</span>` : ''}</div>
-      </div>`;
-  }
-  return `
-    <div class="calendar-pane">
-      <h3>Calendrier (6 mois)</h3>
-      ${rows}
-      <div class="cal-legend">
-        <div class="cal-legend-item"><span class="cal-swatch free"></span> Disponible</div>
-        <div class="cal-legend-item"><span class="cal-swatch booked"></span> Mission acceptée</div>
-        <div class="cal-legend-item"><span class="cal-swatch candidate"></span> Carte en cours</div>
-      </div>
-    </div>
-  `;
-}
-
-function renderPendingCardModal() {
-  const c = STATE.pendingCard;
-  const profit = c.feasible ? (c.payTotal - c.travelCost - WEEKLY_FOOD * c.durationWeeks) : null;
-  const subjectIcon = TYPE_ICON[c.type];
-  const stamp = c.type === 'house' ? 'House sitting' : (c.petType ? `${c.petType.charAt(0).toUpperCase()+c.petType.slice(1)}` : '');
-  return `
-    <div class="modal-overlay" id="card-modal">
-      <div class="modal-twocol">
-        <div class="card" style="background:#faf0d4;">
-          <div class="card-image">
-            ${subjectIcon}
-            <div class="stamp">${stamp}</div>
-          </div>
-          <div class="card-body">
-            <div class="card-title">${c.petName ? c.petName : 'Logement à garder'}</div>
-            <div class="card-loc">${c.city.name}, ${c.city.continent} · ${c.housing}${c.isRareHousing?' ✦':''}</div>
-            <div class="card-blurb">"${c.blurb}"</div>
-            <div class="card-attrs">
-              <div><div class="attr-label">Démarrage</div><div class="attr-value">${fmtDate(c.startWeek)}</div></div>
-              <div><div class="attr-label">Durée</div><div class="attr-value">${c.durationDays} jours</div></div>
-              <div><div class="attr-label">Paiement</div><div class="attr-value">${fmtMoney(c.payTotal)}</div></div>
-              <div><div class="attr-label">Satisfaction</div><div class="attr-value">+${c.points} pts</div></div>
-            </div>
-            ${STATE.perks.friendInsider ? (() => {
-              const dq = dealQuality(c);
-              return `<div class="deal-badge" style="border-color:${dq.color};color:${dq.color};">
-                <span class="deal-icon">🧐</span>
-                <span class="deal-label">${dq.label}</span>
-                <span class="deal-pct">(${dq.pct} vs moyenne)</span>
-                <span class="deal-hint">— ${dq.hint}</span>
-              </div>`;
-            })() : ''}
-            ${c.feasible ?
-              `<div class="travel-info">
-                Depuis ${c.srcCity.name} : ${c.travelIcon} <strong>${c.travelLabel}</strong> · ${Math.round(c.distance)} km · ${fmtMoney(c.travelCost)}<br>
-                <span style="font-size:12px;color:#6e5532;">Bénéfice net estimé : <strong style="color:${profit>=0?'#2d6e3e':'#a83232'}">${fmtMoney(profit)}</strong></span>
-               </div>`
-              : `<div class="travel-info" style="border-color:#6e5532;background:rgba(110,85,50,0.1);">⚠ Mission infaisable : ${hasOverlap(c.startWeek,c.endWeek)?'chevauchement avec votre agenda':'pas le temps de voyager jusque-là'}.</div>`
-            }
-            <div class="card-actions">
-              <button class="danger" onclick="refuseCard()">Refuser</button>
-              <button class="primary" onclick="acceptCard(STATE.pendingCard)" ${!c.feasible?'disabled':''}>Accepter</button>
-            </div>
-          </div>
-        </div>
-        ${renderCalendarPane(c)}
-      </div>
-    </div>
-  `;
-}
-
-function renderEndModal() {
-  const win = STATE.endReason === 'victory';
-  const months = (STATE.week / 4.33).toFixed(1);
-  return `
-    <div class="modal-overlay">
-      <div class="modal">
-        <div class="seal">${win?'★':'⚱'}</div>
-        <h1 style="margin-top:8px;color:${win?'#2d6e3e':'#a83232'};">${win?'Victoire !':'Défaite'}</h1>
-        <p style="margin:14px 0;font-size:18px;font-style:italic;color:#6e5532;">
-          ${win
-            ? `Vous avez accumulé ${STATE.points} points en ${STATE.week} semaines (${months} mois).`
-            : `Vous avez tenu ${STATE.week} semaines (${months} mois) avant que les caisses ne soient vides.`}
-        </p>
-        <div style="display:flex;justify-content:center;gap:14px;margin:18px 0;flex-wrap:wrap;">
-          <div class="stat"><div class="label">Missions</div><div class="value">${STATE.completed.length}</div></div>
-          <div class="stat"><div class="label">Continents</div><div class="value">${STATE.continentsDone.size}/6</div></div>
-          <div class="stat"><div class="label">Succès</div><div class="value">${STATE.achievements.size}</div></div>
-          <div class="stat"><div class="label">Solde final</div><div class="value">${fmtMoney(STATE.balance)}</div></div>
-        </div>
-        <div class="row" style="justify-content:center;margin-top:14px;">
-          <button class="primary" onclick="resetGame();render();">Nouvelle partie</button>
-        </div>
-      </div>
-    </div>
-  `;
-}
-
 function toggleHelp() {
-  const h = document.getElementById('help-overlay');
-  h.style.display = h.style.display === 'none' ? 'flex' : 'none';
+  const help = document.getElementById('help-overlay');
+  help.style.display = help.style.display === 'none' ? 'flex' : 'none';
 }
 
 window.acceptCard = acceptCard;
@@ -1418,13 +2515,24 @@ window.nextTurn = nextTurn;
 window.startGame = startGame;
 window.continueGame = continueGame;
 window.resetGame = resetGame;
+window.returnToMenu = returnToMenu;
 window.toggleHelp = toggleHelp;
-window.togglePerk = togglePerk;
+window.cancelMission = cancelMission;
+window.acceptCardByCancellingOverlap = acceptCardByCancellingOverlap;
+window.acceptCardByCancellingNextMission = acceptCardByCancellingNextMission;
+window.minimizePendingCard = minimizePendingCard;
+window.reopenPendingCard = reopenPendingCard;
+window.selectPendingTransport = selectPendingTransport;
+window.togglePendingCancellable = togglePendingCancellable;
+window.updateMenuName = updateMenuName;
+window.chooseAvatar = chooseAvatar;
+window.generateOffer = generateOffer;
+window.buildMissionOffer = buildMissionOffer;
 window.STATE = STATE;
 window.render = render;
 
 if (loadGame() && STATE.phase !== 'menu') render();
-else { resetGame(); render(); }
+else render();
 </script>
 </body>
 </html>

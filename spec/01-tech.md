@@ -56,6 +56,7 @@ Même si tout est dans un seul fichier, le code est structuré par grandes zones
    - overlay d’aide
 3. `Constantes et données`
    - balance
+   - inflation / coût de vie
    - transports
    - villes
    - templates d’annonces
@@ -67,6 +68,7 @@ Même si tout est dans un seul fichier, le code est structuré par grandes zones
    - hasard pondéré
    - distance
    - calculs de dates / semaines
+   - coût de vie courant / moyen (`currentWeeklyFood`, `averageWeeklyFood`)
 5. `État global`
    - `STATE`
    - `buildDefaultState()`
@@ -109,20 +111,34 @@ Champs importants :
 - `currentCity`
 - `agenda`
 - `completed`
+- `petsSeen`
+- `petsSeenIndex`
 - `pendingCard`
 - `pendingCardMinimized`
 - `pendingCardTab`
+- `refusedCount`
+- `acceptedCount`
+- `endReason`
 - `activePerk`
 - `socialStarBlocked`
 - `offerFilter`
 - `atParents`
 - `reputationPenaltyUntil`
+- `typeCount`
+- `potesCount`
+- `nomadLastIncomeWeek`
+- `urssafYearMarked`
 - sets de progression :
   - `achievements`
   - `animalsDone`
   - `housingsDone`
   - `continentsDone`
   - `transportModesDone`
+
+Clés `localStorage` à connaître :
+
+- `petsitter_save_v2`
+- `petsitter_scores_v1`
 
 ## 5. Modèle de mission
 
@@ -151,6 +167,36 @@ Champs structurants :
 - `accessTo`
 
 C’est le cœur des cas compliqués du jeu.
+
+## 5.1. Album d’animaux
+
+Le jeu maintient aussi un mini “CRM animaux” dans `STATE.petsSeen`.
+
+Chaque entrée ressemble à :
+
+- `type`
+- `name`
+- `animal`
+- `firstCity`
+- `lastCity`
+- `firstWeek`
+- `lastWeek`
+- `count`
+
+Cette structure sert à trois choses :
+
+- afficher l’album dans la sidebar ;
+- permettre les opportunités “animal déjà gardé” ;
+- enrichir les stats de fin de partie.
+
+## 5.2. Tableau des scores
+
+Le menu garde un top 5 persistant via `recordScore()`.
+
+Tri actuel :
+
+- victoires d’abord, par durée croissante ;
+- puis défaites, par points décroissants.
 
 ## 6. Invariants métier importants
 
@@ -192,15 +238,20 @@ Il impacte :
 
 Pour un dev qui reprend le projet, les zones à lire en premier sont :
 
+- `currentWeeklyFood()`
+- `averageWeeklyFood()`
 - `generateRawMission()`
 - `buildMissionOffer()`
 - `refreshPendingMissionSelections()`
 - `refreshPendingHomeSelections()`
 - `recomputeAgenda()`
 - `nextTurn()`
+- `recordScore()`
 - `applyMissionCancellation()`
 - `renderCalendarPane()`
+- `renderPetsAlbum()`
 - `renderOpportunityPlanning()`
+- `renderEndModal()`
 - `renderPendingCardModal()`
 
 ## 8. Exécution locale

@@ -314,14 +314,17 @@ Le temps de transport apparaît :
 ### 8.1. Valeurs globales
 
 - solde initial : `1000 €`
-- coût de vie : `500 €/mois` au démarrage, **inflation de +1 €/semaine** (donc le coût hebdo augmente lentement, +52 €/an)
-- équivalent hebdo prélevé : `500 * 12 / 52`, soit environ `115,38 €`
+- coût de vie : `500 €/mois` au démarrage, avec **inflation linéaire de +1 €/semaine**
+- formule réelle : `currentWeeklyFood(week) = 500 * 12 / 52 + week`, soit environ `115,38 € + numéro de semaine`
+- ordre de grandeur : `~167 € / semaine` après 1 an, `~219 € / semaine` après 2 ans
 - victoire : `100 pts`
 
 ### 8.2. Paiement des missions
 
 Le paiement est versé **au démarrage** de la mission.  
 Les points, eux, sont gagnés **à la fin**.
+
+Le `bénéfice net estimé` affiché sur une opportunité tient compte de cette inflation via un coût moyen de nourriture sur la durée prévue du sitting, pour éviter de surévaluer les missions lointaines.
 
 Tarifs journaliers actuels :
 

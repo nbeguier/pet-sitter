@@ -10,7 +10,10 @@
 | Solde initial | `1000 €` |
 | Coût de vie mensuel (base) | `500 €` |
 | Inflation hebdo | `+1 €/semaine` (lente, cumulative) |
-| Coût de vie hebdo appliqué | `500 * 12 / 52` soit `≈ 115,38 €` |
+| Base hebdo | `500 * 12 / 52` soit `≈ 115,38 €` |
+| Formule réelle | `currentWeeklyFood(week) = 115,38 + week` |
+| Coût hebdo après 1 an | `≈ 167,38 €` |
+| Coût hebdo après 2 ans | `≈ 219,38 €` |
 | Chance d’opportunité par tour | `45 %` |
 | Chance de carte Chance | `2 %` |
 | Seuil de victoire | `100 pts` |
@@ -81,6 +84,16 @@ Exception actuelle :
 - et qu’elle démarre dans `2 semaines ou moins` ;
 - alors elle peut être rerollée.
 
+## 2.6. Animaux déjà connus
+
+Quand le joueur a déjà gardé des animaux, une opportunité non-`house sitting` peut aussi retomber sur un pensionnaire connu.
+
+Règle actuelle :
+
+- `30 %` de chance qu’un tirage du même type de mission retombe sur un animal déjà vu ;
+- la carte affiche alors un cœur `💛` ;
+- cette mécanique alimente surtout l’album, pas un bonus économique direct.
+
 ## 3. Paiements et points de mission
 
 ## 3.1. Paiements journaliers
@@ -116,6 +129,16 @@ Modificateurs :
 
 - l’argent est versé **au démarrage**
 - les points sont crédités **à la fin**
+
+## 3.4. Net estimé affiché au joueur
+
+Le net affiché dans la popup n’est plus calculé avec un coût fixe.
+
+Il retire :
+
+- le transport d’arrivée ;
+- les éventuels remboursements / coûts perdus ;
+- un coût nourriture estimé basé sur `averageWeeklyFood(startWeek, durationWeeks)`.
 
 ## 4. Transport
 
@@ -260,7 +283,7 @@ Règles actuelles :
 Commande exécutée le **28 avril 2026** :
 
 ```bash
-node spec/sim/current_balance_sim.js --n 500 --json
+node spec/sim/current_balance_sim.js --n 200 --json
 ```
 
 ### 9.2. Résultat
@@ -269,24 +292,24 @@ Résultats obtenus avec le bot `balanced_bot` :
 
 | Indicateur | Valeur |
 |---|---:|
-| `winRate` | `7,6 %` |
-| `defeatRate` | `92,2 %` |
-| `timeoutRate` | `0,2 %` |
-| `defeatRateFirst4Months` | `0,4 %` |
-| `medianWeekDefeat` | `29 semaines` |
-| `medianBalanceYear1Carry` | `-43,70 €` |
-| `medianBalanceWeek52Survivors` | `2135,02 €` |
-| `week52SurvivorRate` | `33,4 %` |
+| `winRate` | `0 %` |
+| `defeatRate` | `100 %` |
+| `timeoutRate` | `0 %` |
+| `defeatRateFirst4Months` | `73 %` |
+| `medianWeekDefeat` | `11 semaines` |
+| `medianBalanceYear1Carry` | `-83,46 €` |
+| `medianBalanceWeek52Survivors` | `1778,93 €` |
+| `week52SurvivorRate` | `5,5 %` |
 
 ### 9.3. Lecture
 
 En l’état :
 
-- le jeu reste assez exigeant ;
-- la majorité des runs bot meurent avant d’atteindre la victoire ;
-- la défaite arrive médianement vers la semaine `29`, donc avant la cible historique “1 an” ;
-- la mort très précoce est rare ;
-- les survivants à `S52` sont souvent redevenus confortables en cash.
+- le jeu est devenu très punitif dès le début ;
+- le bot de référence ne gagne plus du tout sur ce batch ;
+- la défaite arrive médianement vers la semaine `11`, donc très tôt ;
+- `73 %` des runs meurent dans les 4 premiers mois ;
+- les rares survivants à `S52` redeviennent souvent viables, mais ils sont très peu nombreux.
 
 ### 9.4. Limite importante
 
@@ -305,7 +328,7 @@ Si quelqu’un reprend l’équilibrage, les gros boutons utiles sont :
 
 1. `P_OPPORTUNITY`
 2. `INITIAL_BALANCE`
-3. `WEEKLY_FOOD`
+3. `WEEKLY_FOOD_BASE` / `WEEKLY_FOOD_INFLATION_PER_WEEK` / `currentWeeklyFood()`
 4. `PAY_RANGES`
 5. `POINT_RANGES`
 6. `FAR_BONUS`

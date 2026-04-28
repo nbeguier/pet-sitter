@@ -732,12 +732,21 @@ input[type=text] {
 }
 .chance-modal { max-width: 500px; }
 .chance-icon { font-size: 56px; margin-top: 8px; }
-.end-modal { max-width: 1040px; text-align: left; }
-.end-stats { display: flex; gap: 14px; margin: 16px 0 20px; flex-wrap: wrap; justify-content: center; }
-.end-layout { display: grid; grid-template-columns: 1.15fr 1fr; gap: 18px; align-items: start; }
+.end-modal {
+  max-width: 980px;
+  max-height: calc(100vh - 40px);
+  overflow-y: auto;
+  text-align: left;
+  padding: 20px 20px 18px;
+}
+.end-stats { display: flex; gap: 10px; margin: 12px 0 16px; flex-wrap: wrap; justify-content: center; }
+.end-layout { display: grid; grid-template-columns: 1.15fr 1fr; gap: 14px; align-items: start; }
 .summary-map-block { min-width: 0; }
 .summary-map {
-  margin-top: 8px; border: 1px solid #d4b896; background: #ead9b8; border-radius: 3px; overflow: hidden;
+  margin-top: 6px; border: 1px solid #d4b896; background: #ead9b8; border-radius: 3px; overflow: hidden;
+}
+.summary-map #map-svg {
+  max-height: 320px;
 }
 .summary-side { min-width: 0; }
 .recap-list {
@@ -773,6 +782,11 @@ input[type=text] {
 @media (max-width: 980px) {
   #game { grid-template-columns: 1fr; }
   #header-bar { grid-column: 1; }
+  .end-modal {
+    max-height: calc(100vh - 16px);
+    padding: 18px 14px 14px;
+  }
+  .end-stats { justify-content: flex-start; }
   .opportunity-modal { max-height: calc(100vh - 16px); }
   .opportunity-modal { height: calc(100vh - 16px); }
   .opportunity-topline { padding: 16px 14px 10px; }
@@ -1456,6 +1470,23 @@ function buildDefaultState() {
 const STATE = buildDefaultState();
 let _missionId = 1;
 const app = document.getElementById('app');
+const MUSIC_TRACKS = (() => {
+  if (typeof Audio === 'undefined') return { launch: null, ingame: null };
+  const launch = new Audio('../music/launch.mp3');
+  const ingame = new Audio('../music/ingame.mp3');
+  launch.loop = true;
+  ingame.loop = true;
+  launch.preload = 'auto';
+  ingame.preload = 'auto';
+  launch.volume = 0.42;
+  ingame.volume = 0.38;
+  return { launch, ingame };
+})();
+const MUSIC_STATE = {
+  currentKey: null,
+  retryNeeded: false,
+  listenersAttached: false,
+};
 
 function addFrenchNoBreakSpaces(text) {
   return String(text).replace(/ ([!?])/g, '\u00A0$1');
@@ -1490,6 +1521,56 @@ function clearSaves() {
 function log(text) {
   STATE.log.unshift({ week: STATE.week, text });
   if (STATE.log.length > 60) STATE.log.pop();
+}
+function getDesiredMusicKey() {
+  return STATE.phase === 'menu' ? 'launch' : 'ingame';
+}
+function stopMusicTrack(key) {
+  const track = MUSIC_TRACKS[key];
+  if (!track) return;
+  track.pause();
+  try {
+    track.currentTime = 0;
+  } catch (error) {}
+}
+function syncMusic(force = false) {
+  const desiredKey = getDesiredMusicKey();
+  const desiredTrack = MUSIC_TRACKS[desiredKey];
+  if (!desiredTrack) return;
+
+  if (!force && MUSIC_STATE.currentKey === desiredKey && !MUSIC_STATE.retryNeeded) return;
+
+  if (MUSIC_STATE.currentKey && MUSIC_STATE.currentKey !== desiredKey) {
+    stopMusicTrack(MUSIC_STATE.currentKey);
+    MUSIC_STATE.currentKey = null;
+  }
+  if (MUSIC_STATE.currentKey !== desiredKey) {
+    try {
+      desiredTrack.currentTime = 0;
+    } catch (error) {}
+  }
+
+  const playPromise = desiredTrack.play();
+  if (playPromise && typeof playPromise.then === 'function') {
+    playPromise.then(() => {
+      MUSIC_STATE.currentKey = desiredKey;
+      MUSIC_STATE.retryNeeded = false;
+    }).catch(() => {
+      MUSIC_STATE.retryNeeded = true;
+    });
+  } else {
+    MUSIC_STATE.currentKey = desiredKey;
+    MUSIC_STATE.retryNeeded = false;
+  }
+}
+function unlockMusicFromGesture() {
+  syncMusic(true);
+}
+function attachMusicUnlockListeners() {
+  if (MUSIC_STATE.listenersAttached || typeof document === 'undefined' || !document.addEventListener) return;
+  document.addEventListener('pointerdown', unlockMusicFromGesture, { once: true, passive: true });
+  document.addEventListener('keydown', unlockMusicFromGesture, { once: true });
+  MUSIC_STATE.listenersAttached = true;
 }
 function deriveCurrentCityFromState() {
   const active = STATE.agenda.find(mission => mission.startWeek <= STATE.week && mission.endWeek > STATE.week);
@@ -1698,13 +1779,16 @@ function resetGame() {
 }
 function returnToMenu() {
   STATE.phase = 'menu';
+  syncMusic(true);
   render();
 }
 function updateMenuName(value) {
   STATE.characterName = value;
+  syncMusic(true);
 }
 function chooseAvatar(icon) {
   STATE.characterIcon = icon;
+  syncMusic(true);
   render();
 }
 function startGame() {
@@ -1719,10 +1803,14 @@ function startGame() {
   STATE.achievements = new Set(['ecolo']);
   STATE.points = ACHIEVEMENT_POINTS.ecolo;
   log(`Partie commencée à ${STATE.startCity.name}.`);
+  syncMusic(true);
   render();
 }
 function continueGame() {
-  if (loadGame() && STATE.phase !== 'menu') render();
+  if (loadGame() && STATE.phase !== 'menu') {
+    syncMusic(true);
+    render();
+  }
   else resetGame();
 }
 
@@ -2713,7 +2801,6 @@ function renderOpportunityPresentation(card, subjectIcon) {
         <div class="listing-sidecopy">
           <div class="listing-kind">${subjectIcon} ${typeLabel}</div>
           <p>${HOUSING_ICONS[card.housing] || '🏠'} ${card.housing}${card.isRareHousing ? ' · logement rare ✦' : ''}</p>
-          <p>${card.type === 'house' ? 'Annonce posée, très “garde de logement”, avec peu de logistique sur place.' : 'Annonce de sitting publiée comme une vraie petite mission du quotidien.'}</p>
         </div>
       </div>
       <div class="listing-description">"${esc(card.blurb)}"</div>
@@ -3082,6 +3169,7 @@ function render() {
   else renderGame();
   applyFrenchPunctuation(app);
   applyFrenchPunctuation(document.getElementById('help-overlay'));
+  syncMusic();
   saveGame();
 }
 function toggleHelp() {
@@ -3112,6 +3200,7 @@ window.buildMissionOffer = buildMissionOffer;
 window.STATE = STATE;
 window.render = render;
 
+attachMusicUnlockListeners();
 if (loadGame() && STATE.phase !== 'menu') render();
 else render();
 </script>

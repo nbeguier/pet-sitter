@@ -2,7 +2,7 @@
 <html lang="fr">
 <head>
 <meta charset="UTF-8">
-<title>Pet Sitter — Le jeu</title>
+<title>Pet Sitter — Polaroid pop</title>
 <style>
 :root { color-scheme: light; }
 * { box-sizing: border-box; margin: 0; padding: 0; }
@@ -808,6 +808,148 @@ input[type=text] {
   .opportunity-side .calendar-pane { max-height: 260px; }
 }
 </style>
+<style id="theme-overrides">
+body {
+  font-family: "Avenir Next Condensed", "Gill Sans", "Trebuchet MS", sans-serif;
+  background: #f7efe7;
+  background-image:
+    radial-gradient(circle at 10% 12%, rgba(255, 121, 94, 0.22) 0, transparent 26%),
+    radial-gradient(circle at 85% 16%, rgba(56, 182, 163, 0.18) 0, transparent 24%),
+    radial-gradient(circle at 72% 82%, rgba(255, 201, 71, 0.20) 0, transparent 22%),
+    linear-gradient(180deg, rgba(255,255,255,0.30) 0%, rgba(240,227,212,0.30) 100%);
+  color: #2f2924;
+}
+h1, h2, h3 { color: #3c312a; letter-spacing: 0.05em; }
+button {
+  background: #fffdf9;
+  border-color: #313131;
+  color: #23211f;
+  border-radius: 14px;
+  box-shadow: 6px 6px 0 rgba(49, 49, 49, 0.12);
+}
+button:hover {
+  background: #313131;
+  color: #fff8ef;
+  transform: translate(1px, 1px);
+  box-shadow: 4px 4px 0 rgba(49, 49, 49, 0.12);
+}
+button.primary { background: #ff7a59; border-color: #ff7a59; color: #fff7f0; }
+button.primary:hover { background: #e96b4d; }
+button.danger { border-color: #e44d61; color: #e44d61; }
+button.danger:hover { background: #e44d61; color: #fff7f0; }
+input[type=text] {
+  font-family: inherit;
+  background: rgba(255,255,255,0.78);
+  border-bottom: 2px solid #313131;
+}
+.paper,
+.modal,
+.opportunity-modal {
+  background: #fffdf9;
+  border: 2px solid #2f2924;
+  border-radius: 22px;
+  box-shadow: 10px 10px 0 rgba(49, 49, 49, 0.10);
+}
+#menu {
+  background:
+    linear-gradient(180deg, rgba(255,255,255,0.98) 0%, rgba(249,240,229,0.98) 100%);
+}
+#menu h1 {
+  font-family: "Arial Rounded MT Bold", "Trebuchet MS", sans-serif;
+  letter-spacing: 0.08em;
+}
+#menu .subtitle { color: #75675a; }
+#header-bar,
+.opportunity-status-header {
+  background:
+    repeating-linear-gradient(90deg, rgba(255, 122, 89, 0.10) 0, rgba(255, 122, 89, 0.10) 16px, transparent 16px, transparent 32px),
+    linear-gradient(180deg, rgba(255,249,242,0.98) 0%, rgba(243,231,215,0.98) 100%);
+}
+#map-svg { background: #d8f1ef; }
+.continent-label { fill: rgba(56, 61, 71, 0.72); font-style: normal; }
+.city-dot { fill: #ff7a59; stroke: #fffdf9; }
+.city-dot.current { fill: #2bb7a3; }
+.city-dot.done { fill: #4543a6; }
+.city-dot.agenda { fill: #ffbe3d; }
+.travel-line { stroke: #ff7a59; stroke-width: 2; }
+.journey-line { stroke: #2bb7a3; stroke-width: 2.5; }
+.opportunity-hero-icon { color: #ff7a59; }
+.opportunity-tab {
+  background: rgba(233, 223, 210, 0.96);
+  color: #74665a;
+  border-color: rgba(47, 41, 36, 0.16);
+  border-radius: 14px 14px 0 0;
+  position: relative;
+  box-shadow: inset 0 -3px 0 rgba(47, 41, 36, 0.10);
+  transition: background 0.15s, color 0.15s, border-color 0.15s, transform 0.12s, box-shadow 0.12s;
+}
+.opportunity-tab:hover {
+  background: rgba(245, 238, 229, 0.96);
+  color: #2f2924;
+  box-shadow: inset 0 -4px 0 rgba(47, 41, 36, 0.16);
+  transform: translateY(-1px);
+}
+.opportunity-tab:active {
+  transform: translateY(1px);
+  box-shadow: inset 0 -1px 0 rgba(47, 41, 36, 0.12);
+}
+.opportunity-tab.active {
+  background: #fffdf9;
+  color: #2f2924;
+  border-color: rgba(47, 41, 36, 0.26);
+  box-shadow:
+    inset 0 4px 0 #ff7a59,
+    0 0 0 1px rgba(255,255,255,0.55);
+  font-weight: 700;
+  transform: none;
+  z-index: 2;
+}
+.listing-panel,
+.transport-panel,
+.calendar-pane,
+.planner-stat-card,
+.travel-info,
+.cancel-panel,
+.listing-spec,
+.cancel-note {
+  background: #fffefa;
+  border-width: 2px;
+  border-color: rgba(47, 41, 36, 0.16);
+  border-radius: 18px;
+}
+.listing-icon-tile {
+  background: linear-gradient(135deg, #ffd16b 0%, #ff8f6c 100%);
+  color: #2f2924;
+}
+.listing-kind {
+  background: rgba(43, 183, 163, 0.10);
+  border: 2px dashed rgba(43, 183, 163, 0.48);
+  color: #20786d;
+}
+.planner-stat-card {
+  box-shadow: 6px 6px 0 rgba(47, 41, 36, 0.08);
+}
+.planner-stat-card.net-positive {
+  background: linear-gradient(180deg, rgba(241,255,249,0.98) 0%, rgba(219,244,237,0.98) 100%);
+}
+.planner-stat-card.net-negative {
+  background: linear-gradient(180deg, rgba(255,245,245,0.98) 0%, rgba(252,226,226,0.98) 100%);
+}
+.transport-panel,
+.travel-info,
+.cancel-panel,
+.calendar-pane {
+  background:
+    linear-gradient(180deg, rgba(255,255,255,0.98) 0%, rgba(248,240,231,0.98) 100%);
+}
+.transport-option.selected {
+  background: #2bb7a3;
+  color: #fffaf4;
+  border-color: #2bb7a3;
+}
+.toggle-chip.on { background: #4543a6; border-color: #4543a6; }
+.opportunity-footer { background: rgba(255, 245, 234, 0.98); }
+</style>
 </head>
 <body>
 
@@ -1487,6 +1629,8 @@ const MUSIC_STATE = {
   retryNeeded: false,
   listenersAttached: false,
 };
+let LAST_PENDING_CALENDAR_FOCUS_TOKEN = '';
+let LAST_PENDING_CALENDAR_SCROLL = { cardId: null, scrollTop: null };
 
 function addFrenchNoBreakSpaces(text) {
   return String(text).replace(/ ([!?])/g, '\u00A0$1');
@@ -1571,6 +1715,57 @@ function attachMusicUnlockListeners() {
   document.addEventListener('pointerdown', unlockMusicFromGesture, { once: true, passive: true });
   document.addEventListener('keydown', unlockMusicFromGesture, { once: true });
   MUSIC_STATE.listenersAttached = true;
+}
+function capturePendingCalendarScroll() {
+  const card = STATE.pendingCard;
+  if (!card || card.kind !== 'mission' || STATE.pendingCardMinimized || typeof document === 'undefined' || !document.querySelector) {
+    LAST_PENDING_CALENDAR_SCROLL = { cardId: null, scrollTop: null };
+    return;
+  }
+  const pane = document.querySelector('.opportunity-side .calendar-pane');
+  if (!pane) return;
+  LAST_PENDING_CALENDAR_SCROLL = {
+    cardId: card.id,
+    scrollTop: pane.scrollTop,
+  };
+}
+function getPendingCalendarFocusWeek(card) {
+  if (!card || card.kind !== 'mission') return null;
+  const focusDay = card.selectedInbound && card.travelDays > 0.1 ? card.travelStartDay : card.startDay;
+  return Math.max(STATE.week, Math.floor(focusDay / 7));
+}
+function focusPendingCalendarPane() {
+  const card = STATE.pendingCard;
+  if (!card || card.kind !== 'mission' || STATE.pendingCardMinimized) {
+    LAST_PENDING_CALENDAR_FOCUS_TOKEN = '';
+    return;
+  }
+  const focusWeek = getPendingCalendarFocusWeek(card);
+  if (focusWeek == null) {
+    LAST_PENDING_CALENDAR_FOCUS_TOKEN = '';
+    return;
+  }
+  const token = `${card.id}:${focusWeek}`;
+
+  const run = () => {
+    const pane = document.querySelector('.opportunity-side .calendar-pane');
+    if (!pane) return;
+
+    if (LAST_PENDING_CALENDAR_SCROLL.cardId === card.id && LAST_PENDING_CALENDAR_SCROLL.scrollTop != null) {
+      pane.scrollTop = LAST_PENDING_CALENDAR_SCROLL.scrollTop;
+      LAST_PENDING_CALENDAR_FOCUS_TOKEN = token;
+      return;
+    }
+
+    if (token === LAST_PENDING_CALENDAR_FOCUS_TOKEN) return;
+    const target = document.querySelector(`.calendar-row[data-focus-week="${focusWeek}"]`);
+    if (!target) return;
+    pane.scrollTop = Math.max(0, target.offsetTop - Math.round(pane.clientHeight * 0.35));
+    LAST_PENDING_CALENDAR_FOCUS_TOKEN = token;
+  };
+
+  if (typeof requestAnimationFrame === 'function') requestAnimationFrame(run);
+  else setTimeout(run, 0);
 }
 function deriveCurrentCityFromState() {
   const active = STATE.agenda.find(mission => mission.startWeek <= STATE.week && mission.endWeek > STATE.week);
@@ -2644,6 +2839,7 @@ function renderCalendarPane(card) {
   const replacedTravelMissionId = candidate && candidate.selectedOutbound && candidateNextMission
     ? candidate.nextMissionId
     : null;
+  const focusWeek = candidate ? Math.min(endWeek - 1, getPendingCalendarFocusWeek(candidate)) : null;
 
   for (let week = startWeek; week < endWeek; week++) {
     const date = new Date(2026, 0, 1);
@@ -2682,7 +2878,7 @@ function renderCalendarPane(card) {
     else if (travel && Math.floor(travel.travelStartDay / 7) === week) label = travel.travelLabel;
 
     rows += `
-      <div class="calendar-row ${monthStart ? 'month-start' : ''}">
+      <div class="calendar-row ${monthStart ? 'month-start' : ''}"${focusWeek === week ? ` data-focus-week="${week}"` : ''}>
         <div class="cal-week-tag">S${week}</div>
         <div class="cal-date">${dateLabel}</div>
         <div class="cal-bar ${cls}">${label ? `<span class="cal-label">${label}</span>` : ''}</div>
@@ -3002,9 +3198,6 @@ function renderPendingCardModal() {
   return `
     <div class="modal-overlay" id="card-modal">
       <div class="opportunity-modal">
-        <div class="paper game-header-bar opportunity-status-header">
-          <div class="opportunity-hero-icon">${subjectIcon}</div>
-        </div>
         <div class="opportunity-shell">
           <div class="opportunity-topline">
             <div class="opportunity-title-line">
@@ -3095,7 +3288,7 @@ function renderMenu() {
   app.innerHTML = `
     <div id="menu" class="paper">
       <h1>Pet Sitter</h1>
-      <div class="subtitle">Carnet de voyages d'un sitter au long cours</div>
+      <div class="subtitle">Version Polaroid pop · collage, vive et plus ludique</div>
       <div class="col" style="gap:18px;align-items:center;">
         <div>
           <div style="font-size:13px;text-transform:uppercase;letter-spacing:0.1em;color:#6e5532;margin-bottom:8px;">Votre prénom</div>
@@ -3165,10 +3358,12 @@ function renderGame() {
   `;
 }
 function render() {
+  capturePendingCalendarScroll();
   if (STATE.phase === 'menu') renderMenu();
   else renderGame();
   applyFrenchPunctuation(app);
   applyFrenchPunctuation(document.getElementById('help-overlay'));
+  focusPendingCalendarPane();
   syncMusic();
   saveGame();
 }

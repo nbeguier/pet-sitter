@@ -56,7 +56,7 @@ Même si tout est dans un seul fichier, le code est structuré par grandes zones
    - overlay d’aide
 3. `Constantes et données`
    - balance
-   - inflation / coût de vie
+   - coût de vie
    - transports
    - villes
    - templates d’annonces
@@ -68,7 +68,7 @@ Même si tout est dans un seul fichier, le code est structuré par grandes zones
    - hasard pondéré
    - distance
    - calculs de dates / semaines
-   - coût de vie courant / moyen (`currentWeeklyFood`, `averageWeeklyFood`)
+   - coût de vie / estimation (`currentWeeklyFood`, `averageWeeklyFood`)
 5. `État global`
    - `STATE`
    - `buildDefaultState()`

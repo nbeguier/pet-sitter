@@ -9,11 +9,8 @@
 |---|---:|
 | Solde initial | `1000 €` |
 | Coût de vie mensuel (base) | `500 €` |
-| Inflation hebdo | `+1 €/semaine` (lente, cumulative) |
 | Base hebdo | `500 * 12 / 52` soit `≈ 115,38 €` |
-| Formule réelle | `currentWeeklyFood(week) = 115,38 + week` |
-| Coût hebdo après 1 an | `≈ 167,38 €` |
-| Coût hebdo après 2 ans | `≈ 219,38 €` |
+| Formule réelle | `currentWeeklyFood(week) = 115,38` |
 | Chance d’opportunité par tour | `45 %` |
 | Chance de carte Chance | `2 %` |
 | Seuil de victoire | `100 pts` |
@@ -38,7 +35,7 @@
 
 Effets de succès :
 
-- `Expert Chien` double le poids des dogs
+- `Expert Chien` augmente le poids des dogs de `+20 %`
 - `Ermite` double le poids des house sittings
 
 ## 2.2. Horizon temporel
@@ -139,6 +136,7 @@ Il retire :
 - le transport d’arrivée ;
 - les éventuels remboursements / coûts perdus ;
 - un coût nourriture estimé basé sur `averageWeeklyFood(startWeek, durationWeeks)`.
+  - aujourd’hui, comme le coût de vie est fixe, cette moyenne retombe simplement sur le coût hebdo standard.
 
 ## 4. Transport
 
@@ -355,7 +353,7 @@ Si quelqu’un reprend l’équilibrage, les gros boutons utiles sont :
 
 1. `P_OPPORTUNITY`
 2. `INITIAL_BALANCE`
-3. `WEEKLY_FOOD_BASE` / `WEEKLY_FOOD_INFLATION_PER_WEEK` / `currentWeeklyFood()`
+3. `WEEKLY_FOOD_BASE` / `currentWeeklyFood()`
 4. `PAY_RANGES`
 5. `POINT_RANGES`
 6. `FAR_BONUS`

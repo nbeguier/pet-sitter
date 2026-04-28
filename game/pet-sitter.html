@@ -1080,18 +1080,17 @@ input[type=text] {
 
 const INITIAL_BALANCE = 1000;
 const WEEKLY_FOOD_BASE = 500 * 12 / 52;
-const WEEKLY_FOOD_INFLATION_PER_WEEK = 1; // +1 €/semaine — inflation lente
+const EXPERT_DOG_MULTIPLIER = 1.2;
 const PET_SITTER_MENTOR_THRESHOLD = 10;
 const DIGITAL_NOMAD_THRESHOLD = 1000;
 const DIGITAL_NOMAD_STREAK_WEEKS = 13;
 const SOCIAL_STAR_MILESTONE_WEEK = 104;
 function currentWeeklyFood(week) {
-  return WEEKLY_FOOD_BASE + WEEKLY_FOOD_INFLATION_PER_WEEK * Math.max(0, week);
+  return WEEKLY_FOOD_BASE;
 }
 function averageWeeklyFood(startWeek, durationWeeks) {
-  // moyenne sur la période (pour estimer le net d'une mission future)
   if (durationWeeks <= 0) return currentWeeklyFood(startWeek);
-  return currentWeeklyFood(startWeek + (durationWeeks - 1) / 2);
+  return currentWeeklyFood(startWeek);
 }
 const P_OPPORTUNITY = 0.45;
 const P_LOCAL_CARD = 0.60;
@@ -2683,7 +2682,7 @@ function continueGame() {
 
 function generateRawMission() {
   const weights = { ...POOL_BASE };
-  if (STATE.achievements.has('expert_chien')) weights.dog *= 2;
+  if (STATE.achievements.has('expert_chien')) weights.dog *= EXPERT_DOG_MULTIPLIER;
   if (STATE.achievements.has('ermite')) weights.house *= 2;
   const types = Object.keys(weights);
   const type = weighted(types, types.map(key => weights[key]));

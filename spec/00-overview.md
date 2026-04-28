@@ -110,6 +110,14 @@ Perks actuels :
   - est perdue au premier avion
   - devient définitivement indisponible pour le reste de la partie après un avion
 
+Déblocages automatiques actuels :
+
+- après `10` pet sittings terminés, une proposition spéciale de `Un ami qui s’y connaît` apparaît ;
+- après `13 semaines` consécutives sous `1000 €`, une proposition spéciale de `Digital Nomad` apparaît ;
+- après `2 ans` de jeu (`104 semaines`), une proposition spéciale de `Star des réseaux` apparaît ;
+- ces cartes peuvent être refusées ;
+- elles respectent la même contrainte que les cartes Chance normales : pas de seconde carte si un perk est déjà actif.
+
 ### 4.3. Retour chez les parents
 
 Le bloc latéral `Retour chez les parents` permet de déclencher une carte spéciale.

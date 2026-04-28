@@ -1043,6 +1043,10 @@ input[type=text] {
 const INITIAL_BALANCE = 1000;
 const WEEKLY_FOOD_BASE = 500 * 12 / 52;
 const WEEKLY_FOOD_INFLATION_PER_WEEK = 1; // +1 €/semaine — inflation lente
+const PET_SITTER_MENTOR_THRESHOLD = 10;
+const DIGITAL_NOMAD_THRESHOLD = 1000;
+const DIGITAL_NOMAD_STREAK_WEEKS = 13;
+const SOCIAL_STAR_MILESTONE_WEEK = 104;
 function currentWeeklyFood(week) {
   return WEEKLY_FOOD_BASE + WEEKLY_FOOD_INFLATION_PER_WEEK * Math.max(0, week);
 }
@@ -1733,9 +1737,13 @@ function buildDefaultState() {
     tookPlane: false,
     activePerk: null,
     socialStarBlocked: false,
+    friendInsiderMilestoneResolved: false,
+    digitalNomadMilestoneResolved: false,
+    socialStarMilestoneResolved: false,
     offerFilter: 'anywhere',
     atParents: false,
     lastReturnHomeWeek: 0,
+    under1000StreakWeeks: 0,
     reputationPenaltyUntil: -1,
     nomadLastIncomeWeek: -1,
     urssafYearMarked: -1,
@@ -2454,6 +2462,10 @@ function normalizeLoadedState(snap) {
     else if (snap.perks.digitalNomad) STATE.activePerk = 'digitalNomad';
     else if (snap.perks.friendInsider) STATE.activePerk = 'friendInsider';
   }
+  STATE.friendInsiderMilestoneResolved = !!snap.friendInsiderMilestoneResolved;
+  STATE.digitalNomadMilestoneResolved = !!snap.digitalNomadMilestoneResolved;
+  STATE.socialStarMilestoneResolved = !!snap.socialStarMilestoneResolved;
+  STATE.under1000StreakWeeks = Number.isFinite(snap.under1000StreakWeeks) ? Math.max(0, snap.under1000StreakWeeks) : 0;
   STATE.socialStarBlocked = !!STATE.socialStarBlocked || !!STATE.tookPlane;
   STATE.currentCity = deriveCurrentCityFromState();
 
@@ -2468,6 +2480,9 @@ function normalizeLoadedState(snap) {
   if (STATE.activePerk === 'socialStar' && STATE.socialStarBlocked) {
     STATE.activePerk = null;
   }
+  if (STATE.activePerk === 'friendInsider') STATE.friendInsiderMilestoneResolved = true;
+  if (STATE.activePerk === 'digitalNomad') STATE.digitalNomadMilestoneResolved = true;
+  if (STATE.activePerk === 'socialStar' || STATE.socialStarBlocked) STATE.socialStarMilestoneResolved = true;
   STATE.offerFilter = STATE.offerFilter === 'nearby' ? 'nearby' : 'anywhere';
   STATE.atParents = !!STATE.atParents;
   if (typeof snap.lastReturnHomeWeek === 'number' && Number.isFinite(snap.lastReturnHomeWeek)) {
@@ -2862,6 +2877,50 @@ function generateChanceOffer() {
   const perkKey = rng(pool);
   return { kind: 'chance', perkKey };
 }
+function getCompletedPetSittings() {
+  return STATE.typeCount.dog + STATE.typeCount.cat + STATE.typeCount.bird;
+}
+function buildMilestoneChanceOffer(perkKey, milestoneReason) {
+  return { kind: 'chance', perkKey, forcedByMilestone: true, milestoneReason };
+}
+function generateMilestoneChanceOffer() {
+  if (STATE.activePerk === 'friendInsider') STATE.friendInsiderMilestoneResolved = true;
+  if (STATE.activePerk === 'digitalNomad') STATE.digitalNomadMilestoneResolved = true;
+  if (STATE.activePerk === 'socialStar' || STATE.socialStarBlocked) STATE.socialStarMilestoneResolved = true;
+
+  if (!STATE.friendInsiderMilestoneResolved && getCompletedPetSittings() >= PET_SITTER_MENTOR_THRESHOLD) {
+    if (STATE.activePerk) return null;
+    STATE.friendInsiderMilestoneResolved = true;
+    return buildMilestoneChanceOffer(
+      'friendInsider',
+      `Après ${PET_SITTER_MENTOR_THRESHOLD} pet sittings, tu sais enfin repérer les prix qui sentent l’arnaque ou le bon deal.`
+    );
+  }
+
+  if (!STATE.digitalNomadMilestoneResolved && STATE.under1000StreakWeeks >= DIGITAL_NOMAD_STREAK_WEEKS) {
+    if (STATE.activePerk) return null;
+    STATE.digitalNomadMilestoneResolved = true;
+    return buildMilestoneChanceOffer(
+      'digitalNomad',
+      `Après ${DIGITAL_NOMAD_STREAK_WEEKS} semaines sous ${fmtMoney(DIGITAL_NOMAD_THRESHOLD)}, tu te mets au freelance pour respirer un peu.`
+    );
+  }
+
+  if (!STATE.socialStarMilestoneResolved && STATE.week >= SOCIAL_STAR_MILESTONE_WEEK) {
+    if (STATE.socialStarBlocked) {
+      STATE.socialStarMilestoneResolved = true;
+      return null;
+    }
+    if (STATE.activePerk) return null;
+    STATE.socialStarMilestoneResolved = true;
+    return buildMilestoneChanceOffer(
+      'socialStar',
+      'Après deux ans sur les routes, ton nom commence à circuler et les collabs pointent le bout de leur nez.'
+    );
+  }
+
+  return null;
+}
 function generateOffer() {
   if (!STATE.activePerk && Math.random() < P_CHANCE_CARD) {
     const chance = generateChanceOffer();
@@ -3127,6 +3186,9 @@ function acceptCard() {
 
   if (card.kind === 'chance') {
     STATE.activePerk = card.perkKey;
+    if (card.perkKey === 'friendInsider') STATE.friendInsiderMilestoneResolved = true;
+    if (card.perkKey === 'digitalNomad') STATE.digitalNomadMilestoneResolved = true;
+    if (card.perkKey === 'socialStar') STATE.socialStarMilestoneResolved = true;
     STATE.pendingCard = null;
     STATE.pendingCardMinimized = false;
     STATE.pendingCardTab = 'presentation';
@@ -3371,6 +3433,8 @@ function nextTurn() {
   }
 
   if (!isShelteredAtParentsThisWeek()) STATE.balance -= currentWeeklyFood(STATE.week);
+  if (STATE.balance >= 0 && STATE.balance < DIGITAL_NOMAD_THRESHOLD) STATE.under1000StreakWeeks++;
+  else if (STATE.balance >= DIGITAL_NOMAD_THRESHOLD) STATE.under1000StreakWeeks = 0;
   checkAchievements();
 
   if (STATE.balance < 0) {
@@ -3395,7 +3459,13 @@ function nextTurn() {
   if (hasReputationPenalty()) pOpportunity -= 0.10;
   pOpportunity = Math.max(0.05, Math.min(0.95, pOpportunity));
 
-  if (Math.random() < pOpportunity) {
+  const forcedChance = generateMilestoneChanceOffer();
+  if (forcedChance) {
+    STATE.pendingCard = forcedChance;
+    STATE.pendingCardMinimized = false;
+    STATE.pendingCardTab = 'presentation';
+    log(`Carte Chance débloquée : ${PERK_DEFS[forcedChance.perkKey].name}.`);
+  } else if (Math.random() < pOpportunity) {
     const offer = generateOffer();
     if (offer) {
       STATE.pendingCard = offer;
@@ -4158,6 +4228,7 @@ function renderPendingCardModal() {
           <p class="chance-icon">${perk.icon}</p>
           <p style="font-size:22px;font-weight:600;">${perk.name}</p>
           <p style="margin-top:10px;line-height:1.5;color:#6e5532;">${perk.desc}</p>
+          ${card.milestoneReason ? `<p style="margin-top:10px;line-height:1.5;color:#8b6f47;font-size:14px;"><strong>Débloqué :</strong> ${card.milestoneReason}</p>` : ''}
           <p style="margin-top:14px;font-size:13px;color:#6e5532;">Tu peux la refuser. Une seule carte Chance peut rester active à la fois.</p>
           <div class="row" style="justify-content:center;margin-top:18px;">
             <button onclick="minimizePendingCard()">Réfléchir</button>

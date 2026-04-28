@@ -121,9 +121,13 @@ Champs importants :
 - `endReason`
 - `activePerk`
 - `socialStarBlocked`
+- `friendInsiderMilestoneResolved`
+- `digitalNomadMilestoneResolved`
+- `socialStarMilestoneResolved`
 - `offerFilter`
 - `atParents`
 - `lastReturnHomeWeek`
+- `under1000StreakWeeks`
 - `reputationPenaltyUntil`
 - `typeCount`
 - `potesCount`

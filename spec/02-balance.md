@@ -265,6 +265,12 @@ Contraintes :
 - une seule carte active à la fois
 - elle peut être refusée
 
+Déblocages automatiques garantis :
+
+- `Un ami qui s’y connaît` après `10` pet sittings terminés
+- `Digital Nomad` après `13 semaines` consécutives sous `1000 €`
+- `Star des réseaux` à partir de `104 semaines`, sauf si elle est déjà devenue impossible à cause d’un avion
+
 ## 8. Retour chez les parents
 
 Cette mécanique n’existait pas dans les anciennes specs, mais elle fait maintenant partie du vrai jeu.
@@ -304,27 +310,28 @@ Ce bot n’est plus un simple bot de survie pure :
 
 | Indicateur | Valeur |
 |---|---:|
-| `winRate` | `12,5 %` |
-| `defeatRate` | `74,5 %` |
-| `timeoutRate` | `13 %` |
+| `winRate` | `9,5 %` |
+| `defeatRate` | `70 %` |
+| `timeoutRate` | `20,5 %` |
 | `defeatRateFirst4Months` | `0 %` |
-| `medianWeekDefeat` | `100 semaines` |
-| `defeatsAfter52Count` | `119` |
-| `medianPointsAtDefeatAfter52` | `53 pts` |
-| `medianBalanceYear1Carry` | `1112,60 €` |
-| `medianBalanceWeek52Survivors` | `1384,53 €` |
-| `week52SurvivorRate` | `86 %` |
-| `avgHomeUses` | `5,22` |
-| `nearbyWeekRate` | `72,2 %` |
+| `medianWeekDefeat` | `112,5 semaines` |
+| `defeatsAfter52Count` | `105` |
+| `medianPointsAtDefeatAfter52` | `59 pts` |
+| `medianBalanceYear1Carry` | `1075,29 €` |
+| `medianBalanceWeek52Survivors` | `1374,93 €` |
+| `week52SurvivorRate` | `83,5 %` |
+| `avgHomeUses` | `5,63` |
+| `nearbyWeekRate` | `70,4 %` |
 
 ### 9.3. Lecture
 
 En l’état :
 
-- le bot gagne nettement plus souvent qu’avant, et ses victoires sont désormais très souvent corrélées à `Écolo`, `Bestiaire`, et parfois `Kiffeur` ;
-- malgré ça, il continue à mourir souvent, mais ses défaites tardives montent maintenant médianement à `53 pts`, donc il convertit mieux sa survie en progression réelle ;
+- le bot gagne encore peu, mais il survit désormais très souvent à la première année, notamment grâce aux boucles `Retour chez les parents` + `À proximité` ;
+- ses victoires restent fortement corrélées à `Écolo`, `Bestiaire`, et parfois `Kiffeur` ;
+- malgré un taux de défaite encore élevé, ses défaites tardives montent maintenant médianement à `59 pts`, donc il convertit mieux sa survie en progression réelle ;
 - la mécanique “maison” reste un levier énorme d’équilibrage ;
-- l’économie n’est plus le seul sujet : la capacité à convertir la survie en gros paquets de points devient centrale.
+- l’économie n’est plus le seul sujet : la capacité à convertir la survie en gros paquets de points devient centrale, et les cartes Chance garanties lissent davantage l’entrée dans certaines stratégies.
 
 ### 9.4. Limite importante
 

@@ -123,6 +123,7 @@ Champs importants :
 - `socialStarBlocked`
 - `offerFilter`
 - `atParents`
+- `lastReturnHomeWeek`
 - `reputationPenaltyUntil`
 - `typeCount`
 - `potesCount`

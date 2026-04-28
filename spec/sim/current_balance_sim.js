@@ -98,7 +98,7 @@ function makeContext(compiledGame, seed) {
 
   vm.createContext(sandbox);
   compiledGame.runInContext(sandbox);
-  sandbox.__simConsts = vm.runInContext('({ WEEKLY_FOOD_BASE, currentWeeklyFood, averageWeeklyFood, VICTORY_POINTS, ACHIEVEMENT_POINTS, PEKIN_EXPRESS_MODES, ANIMAL_ORDER, HOUSING_ORDER, CONTINENT_ORDER })', sandbox);
+  sandbox.__simConsts = vm.runInContext('({ WEEKLY_FOOD_BASE, currentWeeklyFood, averageWeeklyFood, VICTORY_POINTS, ACHIEVEMENT_POINTS, PEKIN_EXPRESS_MODES, ANIMAL_ORDER, HOUSING_ORDER, CONTINENT_ORDER, LOIN_DU_NID_WEEKS })', sandbox);
 
   sandbox.render = function renderNoop() {};
   sandbox.saveGame = function saveNoop() {};
@@ -146,7 +146,7 @@ function evaluateState(ctx, pointValue) {
     if (!sheltered) projectedFood += ctx.__simConsts.currentWeeklyFood(w);
   }
   const projectedCash = ctx.STATE.balance + futurePay - futureTravel - projectedFood;
-  const projectedAchievementState = buildProjectedAchievementState(ctx);
+  const projectedAchievementState = buildProjectedAchievementState(ctx, horizon);
   const currentAchievementPoints = sumAchievementPoints(ctx.__simConsts.ACHIEVEMENT_POINTS, ctx.STATE.achievements);
   const projectedAchievementPoints = sumAchievementPoints(ctx.__simConsts.ACHIEVEMENT_POINTS, projectedAchievementState.achieved);
   const projectedAchievementDelta = projectedAchievementPoints - currentAchievementPoints;
@@ -190,7 +190,7 @@ function sumAchievementPoints(pointsMap, achieved) {
   return total;
 }
 
-function buildProjectedAchievementState(ctx) {
+function buildProjectedAchievementState(ctx, horizon = ctx.STATE.week) {
   const week = ctx.STATE.week;
   const achieved = new Set(ctx.STATE.achievements);
   const typeCount = { ...ctx.STATE.typeCount };
@@ -201,6 +201,7 @@ function buildProjectedAchievementState(ctx) {
   let potesCount = ctx.STATE.potesCount;
   let ecoloActive = achieved.has('ecolo');
   let planeLegsPlanned = 0;
+  const weeksAwayFromHome = Math.max(0, horizon - (ctx.STATE.lastReturnHomeWeek || 0));
 
   const futureStarts = ctx.STATE.agenda
     .filter(mission => mission.startWeek > week)
@@ -236,6 +237,7 @@ function buildProjectedAchievementState(ctx) {
   if (ctx.__simConsts.PEKIN_EXPRESS_MODES.every(mode => transportModesDone.has(mode))) achieved.add('pekin_express');
   if (continentsDone.size >= ctx.__simConsts.CONTINENT_ORDER.length) achieved.add('globetrotter');
   if (potesCount >= 5) achieved.add('kiffeur');
+  if (weeksAwayFromHome >= ctx.__simConsts.LOIN_DU_NID_WEEKS) achieved.add('loin_du_nid');
 
   return {
     achieved,
@@ -246,6 +248,7 @@ function buildProjectedAchievementState(ctx) {
     transportModesDone,
     potesCount,
     planeLegsPlanned,
+    weeksAwayFromHome,
   };
 }
 
@@ -265,6 +268,7 @@ function getProjectedAchievementProgressEquivalent(ctx, projected) {
   addProgress(projected.achieved.has('pekin_express'), projected.transportModesDone.size, ctx.__simConsts.PEKIN_EXPRESS_MODES.length, pts.pekin_express, 0.35);
   addProgress(projected.achieved.has('globetrotter'), projected.continentsDone.size, ctx.__simConsts.CONTINENT_ORDER.length, pts.globetrotter, 0.25);
   addProgress(projected.achieved.has('kiffeur'), projected.potesCount, 5, pts.kiffeur, 1.25);
+  addProgress(projected.achieved.has('loin_du_nid'), projected.weeksAwayFromHome, ctx.__simConsts.LOIN_DU_NID_WEEKS, pts.loin_du_nid, 0.65);
   if (projected.achieved.has('ecolo')) equivalentPoints += pts.ecolo * 0.75;
 
   return equivalentPoints;

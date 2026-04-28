@@ -346,9 +346,15 @@ Succès actuels :
 - `Agent Immobilier` : tous les types de logement, `+20`
 - `Pékin Express` : tous les transports sauf avion, `+20`
 - `Kiffeur` : 5 missions avec `Potes invités`, `+20`
+- `Loin du nid` : `52 semaines` sans retour chez les parents, `+20`
 - `Écolo` : actif dès le départ, `+25`, perdu au premier avion
 - `Expert Chien` : 5 dog sittings, `+7`
 - `Ermite` : 5 house sittings, `+7`
+
+Précision :
+
+- utiliser `Retour chez les parents` remet la progression de `Loin du nid` à zéro ;
+- une fois débloqué, le succès reste acquis.
 
 Effets spéciaux associés :
 

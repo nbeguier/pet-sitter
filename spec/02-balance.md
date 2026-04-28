@@ -238,11 +238,17 @@ Le coût perdu inclut :
 | Agent Immobilier | tous les logements | `+20` |
 | Pékin Express | tous les transports sauf avion | `+20` |
 | Kiffeur | 5 missions `Potes invités` | `+20` |
+| Loin du nid | 52 semaines sans retour chez les parents | `+20` |
 | Écolo | actif au départ, perdu au 1er avion | `+25` |
 | Expert Chien | 5 dog sittings | `+7` |
 | Ermite | 5 house sittings | `+7` |
 
 Le succès `Expert Chat` n’existe plus.
+
+Note :
+
+- chaque `Retour chez les parents` remet la progression de `Loin du nid` à zéro ;
+- une fois débloqué, il n’est plus perdu.
 
 ## 7. Cartes Chance
 
@@ -298,25 +304,25 @@ Ce bot n’est plus un simple bot de survie pure :
 
 | Indicateur | Valeur |
 |---|---:|
-| `winRate` | `4,5 %` |
-| `defeatRate` | `65,5 %` |
-| `timeoutRate` | `30 %` |
+| `winRate` | `12,5 %` |
+| `defeatRate` | `74,5 %` |
+| `timeoutRate` | `13 %` |
 | `defeatRateFirst4Months` | `0 %` |
-| `medianWeekDefeat` | `125 semaines` |
-| `defeatsAfter52Count` | `112` |
-| `medianPointsAtDefeatAfter52` | `44 pts` |
-| `medianBalanceYear1Carry` | `1298,08 €` |
-| `medianBalanceWeek52Survivors` | `1431,41 €` |
-| `week52SurvivorRate` | `90,5 %` |
-| `avgHomeUses` | `5,99` |
-| `nearbyWeekRate` | `68,5 %` |
+| `medianWeekDefeat` | `100 semaines` |
+| `defeatsAfter52Count` | `119` |
+| `medianPointsAtDefeatAfter52` | `53 pts` |
+| `medianBalanceYear1Carry` | `1112,60 €` |
+| `medianBalanceWeek52Survivors` | `1384,53 €` |
+| `week52SurvivorRate` | `86 %` |
+| `avgHomeUses` | `5,22` |
+| `nearbyWeekRate` | `72,2 %` |
 
 ### 9.3. Lecture
 
 En l’état :
 
-- le bot gagne un peu plus souvent et ses victoires sont désormais très souvent corrélées à `Écolo`, `Bestiaire`, et parfois `Kiffeur` ;
-- malgré ça, il continue à mourir souvent, et quand il échoue tard il tombe médianement à seulement `44 pts` ;
+- le bot gagne nettement plus souvent qu’avant, et ses victoires sont désormais très souvent corrélées à `Écolo`, `Bestiaire`, et parfois `Kiffeur` ;
+- malgré ça, il continue à mourir souvent, mais ses défaites tardives montent maintenant médianement à `53 pts`, donc il convertit mieux sa survie en progression réelle ;
 - la mécanique “maison” reste un levier énorme d’équilibrage ;
 - l’économie n’est plus le seul sujet : la capacité à convertir la survie en gros paquets de points devient centrale.
 

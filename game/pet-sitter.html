@@ -1094,6 +1094,7 @@ const TRANSPORT = {
 const LAND_MODES = ['hitch','bus','train'];
 const SEA_MODES  = ['boatstop','plane','ferry'];
 const PEKIN_EXPRESS_MODES = ['hitch', 'boatstop', 'bus', 'train', 'ferry'];
+const LOIN_DU_NID_WEEKS = 52;
 
 const LAND_CONNECTED = new Set([
   'Europe|Asia', 'Asia|Europe',
@@ -1104,15 +1105,15 @@ const LAND_CONNECTED = new Set([
 
 const ACHIEVEMENT_POINTS = {
   expert_chien: 7, ermite: 7,
-  bestiaire: 20, agent_immo: 20, pekin_express: 20, globetrotter: 30, kiffeur: 20, ecolo: 25,
+  bestiaire: 20, agent_immo: 20, pekin_express: 20, globetrotter: 30, kiffeur: 20, loin_du_nid: 20, ecolo: 25,
 };
 const ACHIEVEMENT_LABEL = {
   expert_chien: 'Expert Chien', ermite: 'Ermite',
-  bestiaire: 'Bestiaire', agent_immo: 'Agent Immobilier', pekin_express: 'Pékin Express', globetrotter: 'Globe-trotter', kiffeur: 'Kiffeur', ecolo: 'Écolo',
+  bestiaire: 'Bestiaire', agent_immo: 'Agent Immobilier', pekin_express: 'Pékin Express', globetrotter: 'Globe-trotter', kiffeur: 'Kiffeur', loin_du_nid: 'Loin du nid', ecolo: 'Écolo',
 };
 const ACHIEVEMENT_ICON = {
   expert_chien: '🐕', ermite: '🏚️',
-  bestiaire: '📚', agent_immo: '🏘️', pekin_express: '🧭', globetrotter: '🌍', kiffeur: '🎉', ecolo: '🌱',
+  bestiaire: '📚', agent_immo: '🏘️', pekin_express: '🧭', globetrotter: '🌍', kiffeur: '🎉', loin_du_nid: '🪺', ecolo: '🌱',
 };
 
 const CITIES = [
@@ -1734,6 +1735,7 @@ function buildDefaultState() {
     socialStarBlocked: false,
     offerFilter: 'anywhere',
     atParents: false,
+    lastReturnHomeWeek: 0,
     reputationPenaltyUntil: -1,
     nomadLastIncomeWeek: -1,
     urssafYearMarked: -1,
@@ -2468,6 +2470,18 @@ function normalizeLoadedState(snap) {
   }
   STATE.offerFilter = STATE.offerFilter === 'nearby' ? 'nearby' : 'anywhere';
   STATE.atParents = !!STATE.atParents;
+  if (typeof snap.lastReturnHomeWeek === 'number' && Number.isFinite(snap.lastReturnHomeWeek)) {
+    STATE.lastReturnHomeWeek = Math.max(0, snap.lastReturnHomeWeek);
+  } else {
+    const lastHomeLogWeek = (Array.isArray(STATE.log) ? STATE.log : [])
+      .filter(entry => entry && typeof entry.week === 'number' && typeof entry.text === 'string' && entry.text.startsWith('↩ Retour chez les parents'))
+      .reduce((maxWeek, entry) => Math.max(maxWeek, entry.week), 0);
+    STATE.lastReturnHomeWeek = lastHomeLogWeek;
+  }
+  if (STATE.week - STATE.lastReturnHomeWeek >= LOIN_DU_NID_WEEKS && !STATE.achievements.has('loin_du_nid')) {
+    STATE.achievements.add('loin_du_nid');
+    STATE.points += ACHIEVEMENT_POINTS.loin_du_nid;
+  }
   recomputeAgenda(false);
   refreshPendingMissionFromAgenda();
 
@@ -3048,6 +3062,7 @@ function acceptHomeCard() {
   STATE.balance -= actualCost;
   STATE.currentCity = STATE.startCity;
   STATE.atParents = true;
+  STATE.lastReturnHomeWeek = STATE.week;
 
   if (nextMission && card.selectedOutbound) {
     if (card.outboundPlanType === 'catch-booked') {
@@ -3262,6 +3277,11 @@ function checkAchievements() {
     STATE.points += ACHIEVEMENT_POINTS.kiffeur;
     log(`★ Succès : Kiffeur (+${ACHIEVEMENT_POINTS.kiffeur} pts)`);
   }
+  if (STATE.week - STATE.lastReturnHomeWeek >= LOIN_DU_NID_WEEKS && !achieved.has('loin_du_nid')) {
+    achieved.add('loin_du_nid');
+    STATE.points += ACHIEVEMENT_POINTS.loin_du_nid;
+    log(`★ Succès : Loin du nid (+${ACHIEVEMENT_POINTS.loin_du_nid} pts)`);
+  }
 }
 function nextTurn() {
   if (STATE.phase !== 'playing') return;
@@ -3394,6 +3414,7 @@ function getAchievementProgress(key) {
   if (key === 'pekin_express') return { done: [...STATE.transportModesDone].filter(mode => PEKIN_EXPRESS_MODES.includes(mode)).length, total: PEKIN_EXPRESS_MODES.length };
   if (key === 'globetrotter') return { done: STATE.continentsDone.size, total: CONTINENT_ORDER.length };
   if (key === 'kiffeur') return { done: STATE.potesCount, total: 5 };
+  if (key === 'loin_du_nid') return { done: Math.min(LOIN_DU_NID_WEEKS, Math.max(0, STATE.week - STATE.lastReturnHomeWeek)), total: LOIN_DU_NID_WEEKS };
   if (key === 'expert_chien') return { done: STATE.typeCount.dog, total: 5 };
   if (key === 'ermite') return { done: STATE.typeCount.house, total: 5 };
   if (key === 'ecolo') return { done: STATE.achievements.has('ecolo') ? 1 : 0, total: 1 };
@@ -3408,7 +3429,7 @@ function renderIconTrail(items, isDoneFn) {
   }).join('')}</div>`;
 }
 function renderAchievements() {
-  const all = ['globetrotter', 'bestiaire', 'agent_immo', 'pekin_express', 'kiffeur', 'ecolo', 'expert_chien', 'ermite'];
+  const all = ['globetrotter', 'bestiaire', 'agent_immo', 'pekin_express', 'kiffeur', 'loin_du_nid', 'ecolo', 'expert_chien', 'ermite'];
   return `<div class="ach-grid">${all.map(key => {
     const unlocked = STATE.achievements.has(key);
     let icons = '';
@@ -3422,6 +3443,9 @@ function renderAchievements() {
       icons = renderIconTrail(PEKIN_EXPRESS_MODES.map(mode => ({ value: mode, icon: TRANSPORT[mode].icon, label: TRANSPORT[mode].name })), mode => STATE.transportModesDone.has(mode));
     } else if (key === 'kiffeur') {
       icons = renderIconTrail([0, 1, 2, 3, 4].map(value => ({ value, icon: '🎉', label: 'soirée' })), value => value < STATE.potesCount);
+    } else if (key === 'loin_du_nid') {
+      const weeksAway = Math.max(0, STATE.week - STATE.lastReturnHomeWeek);
+      icons = renderIconTrail([0, 1, 2, 3].map(value => ({ value, icon: '🧳', label: `${(value * 13) + 1}-${(value + 1) * 13} semaines loin du nid` })), value => weeksAway >= (value + 1) * 13);
     } else if (key === 'expert_chien') {
       icons = renderIconTrail([0, 1, 2, 3, 4].map(value => ({ value, icon: '🐕', label: 'chien' })), value => value < STATE.typeCount.dog);
     } else if (key === 'ermite') {
@@ -4237,7 +4261,7 @@ function renderPendingCardModal() {
   `;
 }
 function renderMissingAchievementRecap() {
-  const all = ['globetrotter', 'bestiaire', 'agent_immo', 'pekin_express', 'kiffeur', 'ecolo', 'expert_chien', 'ermite'];
+  const all = ['globetrotter', 'bestiaire', 'agent_immo', 'pekin_express', 'kiffeur', 'loin_du_nid', 'ecolo', 'expert_chien', 'ermite'];
   const missing = all.filter(key => !STATE.achievements.has(key));
   if (!missing.length) return '<div class="recap-empty">Tous les succès ont été débloqués.</div>';
   return `<div class="recap-list">${missing.map(key => {

@@ -1614,8 +1614,8 @@ let _missionId = 1;
 const app = document.getElementById('app');
 const MUSIC_TRACKS = (() => {
   if (typeof Audio === 'undefined') return { launch: null, ingame: null };
-  const launch = new Audio('../music/launch.mp3');
-  const ingame = new Audio('../music/ingame.mp3');
+  const launch = new Audio('music/launch.mp3');
+  const ingame = new Audio('music/ingame.mp3');
   launch.loop = true;
   ingame.loop = true;
   launch.preload = 'auto';
@@ -1782,6 +1782,13 @@ function getReputationStatusText() {
     ? `Malus réputation actif jusqu'au ${fmtDate(STATE.reputationPenaltyUntil)}`
     : 'Réputation intacte';
 }
+function getDisplayCharacterName() {
+  const name = (STATE.characterName || '').trim();
+  return name || 'Anonyme';
+}
+function getEditableCharacterName() {
+  return STATE.characterName === 'Anonyme' ? '' : (STATE.characterName || '');
+}
 function renderGameHeaderInner(actionHtml) {
   const currentCity = deriveCurrentCityFromState();
   const balanceClass = STATE.balance < 200 ? 'danger' : (STATE.balance > 2000 ? 'success' : '');
@@ -1790,7 +1797,7 @@ function renderGameHeaderInner(actionHtml) {
     <div class="row">
       <div style="font-size:32px">${STATE.characterIcon}</div>
       <div>
-        <div style="font-weight:600;font-size:18px;">${esc(STATE.characterName)}</div>
+        <div style="font-weight:600;font-size:18px;">${esc(getDisplayCharacterName())}</div>
         <div style="font-size:13px;color:#6e5532;font-style:italic;">à ${currentCity ? currentCity.name : 'quelque part'}, ${currentCity ? currentCity.continent : 'Monde'}</div>
       </div>
     </div>
@@ -1987,7 +1994,7 @@ function chooseAvatar(icon) {
   render();
 }
 function startGame() {
-  const chosenName = (STATE.characterName || 'Anonyme').trim() || 'Anonyme';
+  const chosenName = (STATE.characterName || '').trim();
   const chosenIcon = STATE.characterIcon || '🧳';
   Object.assign(STATE, buildDefaultState());
   STATE.characterName = chosenName;
@@ -3288,11 +3295,11 @@ function renderMenu() {
   app.innerHTML = `
     <div id="menu" class="paper">
       <h1>Pet Sitter</h1>
-      <div class="subtitle">Version Polaroid pop · collage, vive et plus ludique</div>
+      <div class="subtitle">Carnet de voyages d'un sitter au long cours</div>
       <div class="col" style="gap:18px;align-items:center;">
         <div>
           <div style="font-size:13px;text-transform:uppercase;letter-spacing:0.1em;color:#6e5532;margin-bottom:8px;">Votre prénom</div>
-          <input type="text" placeholder="ex : Lucile" maxlength="20" value="${esc(STATE.characterName)}" oninput="updateMenuName(this.value)" />
+          <input type="text" placeholder="ex : Lucile" maxlength="20" value="${esc(getEditableCharacterName())}" oninput="updateMenuName(this.value)" />
         </div>
         <div>
           <div style="font-size:13px;text-transform:uppercase;letter-spacing:0.1em;color:#6e5532;margin-bottom:8px;">Choisissez un avatar</div>

@@ -193,6 +193,26 @@ input[type=text] {
 .agenda-actions { margin-top: 8px; display: flex; justify-content: flex-end; }
 .agenda-friends { margin-top: 6px; font-size: 11px; color: #6e5532; }
 
+.scores-block { width: 100%; max-width: 520px; margin-top: 16px; padding-top: 16px; border-top: 1px solid #d4b896; }
+.scores-block h3 { text-align: center; margin-bottom: 10px; }
+.scores-list { display: flex; flex-direction: column; gap: 4px; }
+.score-row { display: flex; align-items: center; gap: 10px; padding: 6px 10px; background: rgba(110,85,50,0.06); border: 1px dashed #8b6f47; border-radius: 2px; font-size: 13px; }
+.score-rank { font-weight: 700; color: #6e5532; width: 22px; }
+.score-icon { font-size: 20px; width: 26px; text-align: center; }
+.score-name { flex: 1; font-weight: 600; min-width: 0; overflow: hidden; text-overflow: ellipsis; white-space: nowrap; text-align: left; }
+.score-detail { font-size: 11px; color: #6e5532; }
+.score-result { font-size: 11px; font-weight: 700; padding: 2px 8px; border-radius: 2px; }
+.score-result.win { background: rgba(45, 110, 62, 0.18); color: #1f4e2c; }
+.score-result.lose { background: rgba(168, 50, 50, 0.18); color: #6e2929; }
+.album-grid { display: flex; flex-direction: column; gap: 4px; max-height: 240px; overflow-y: auto; }
+.album-row { display: flex; gap: 8px; align-items: center; padding: 4px 0; border-top: 1px dotted #d4b896; }
+.album-row:first-child { border-top: none; }
+.album-icon { font-size: 22px; flex-shrink: 0; width: 28px; text-align: center; }
+.album-text { flex: 1; min-width: 0; }
+.album-name { font-weight: 600; font-size: 13px; }
+.album-sub { font-size: 11px; color: #6e5532; }
+.album-heart { font-size: 11px; vertical-align: middle; opacity: 0.95; }
+.repeat-pet-heart { font-size: 0.9em; vertical-align: baseline; }
 .ach-grid { display: grid; grid-template-columns: 1fr 1fr; gap: 6px; }
 .ach {
   background: rgba(110,85,50,0.08); border: 1px dashed #8b6f47;
@@ -1020,8 +1040,17 @@ input[type=text] {
 <script>
 'use strict';
 
-const INITIAL_BALANCE = 2000;
-const WEEKLY_FOOD = 500 * 12 / 52;
+const INITIAL_BALANCE = 1000;
+const WEEKLY_FOOD_BASE = 500 * 12 / 52;
+const WEEKLY_FOOD_INFLATION_PER_WEEK = 1; // +1 €/semaine — inflation lente
+function currentWeeklyFood(week) {
+  return WEEKLY_FOOD_BASE + WEEKLY_FOOD_INFLATION_PER_WEEK * Math.max(0, week);
+}
+function averageWeeklyFood(startWeek, durationWeeks) {
+  // moyenne sur la période (pour estimer le net d'une mission future)
+  if (durationWeeks <= 0) return currentWeeklyFood(startWeek);
+  return currentWeeklyFood(startWeek + (durationWeeks - 1) / 2);
+}
 const P_OPPORTUNITY = 0.45;
 const P_LOCAL_CARD = 0.60;
 const P_CHANCE_CARD = 0.02;
@@ -1475,6 +1504,42 @@ const HOUSING_ICONS = {
 };
 const SAVE_KEY = 'petsitter_save_v2';
 const LEGACY_SAVE_KEY = 'petsitter_save_v1';
+const SCORES_KEY = 'petsitter_scores_v1';
+const MAX_SCORES = 5;
+function loadScores() {
+  try {
+    const raw = localStorage.getItem(SCORES_KEY);
+    if (!raw) return [];
+    const arr = JSON.parse(raw);
+    return Array.isArray(arr) ? arr : [];
+  } catch (e) { return []; }
+}
+function recordScore() {
+  try {
+    const entry = {
+      name: STATE.characterName || 'Anonyme',
+      icon: STATE.characterIcon || '🧳',
+      points: STATE.points,
+      week: STATE.week,
+      months: +(STATE.week / 4.33).toFixed(1),
+      balance: Math.round(STATE.balance),
+      missions: STATE.completed.length,
+      result: STATE.endReason,
+      achievements: [...STATE.achievements],
+      date: new Date().toISOString(),
+    };
+    const scores = loadScores();
+    scores.push(entry);
+    // Tri : victoires d'abord (par moins de semaines), puis défaites par plus de points
+    scores.sort((a, b) => {
+      if (a.result !== b.result) return a.result === 'victory' ? -1 : 1;
+      if (a.result === 'victory') return a.week - b.week;
+      return b.points - a.points;
+    });
+    const top = scores.slice(0, MAX_SCORES);
+    localStorage.setItem(SCORES_KEY, JSON.stringify(top));
+  } catch (e) {}
+}
 
 function rng(arr) { return arr[Math.floor(Math.random() * arr.length)]; }
 function rint(min, max) { return Math.floor(Math.random() * (max - min + 1)) + min; }
@@ -1653,6 +1718,8 @@ function buildDefaultState() {
     housingsDone: new Set(),
     continentsDone: new Set(),
     transportModesDone: new Set(),
+    petsSeen: [], // historique : [{ name, type, animal, city, week }] pour l'album et la mécanique de retour
+    petsSeenIndex: {}, // map "type:name" -> count, pour O(1) checks
     typeCount: { dog: 0, cat: 0, house: 0, bird: 0 },
     potesCount: 0,
     pendingCard: null,
@@ -2364,6 +2431,7 @@ function normalizeLoadedState(snap) {
   STATE.housingsDone = new Set(snap.housingsDone || []);
   STATE.continentsDone = new Set(snap.continentsDone || []);
   STATE.transportModesDone = new Set(snap.transportModesDone || []);
+  STATE.petsSeen = Array.isArray(snap.petsSeen) ? snap.petsSeen : [];
   STATE.agenda = (snap.agenda || []).map(syncMissionShape);
   STATE.completed = (snap.completed || []).map(syncMissionShape);
   if (!STATE.housingsDone.size) {
@@ -2378,9 +2446,6 @@ function normalizeLoadedState(snap) {
         STATE.transportModesDone.add(mission.travelMode);
       }
     }
-  }
-  if (STATE.achievements.delete('expert_chat')) {
-    STATE.points -= 7;
   }
   if (!STATE.activePerk && snap.perks) {
     if (snap.perks.socialStar) STATE.activePerk = 'socialStar';
@@ -2542,9 +2607,28 @@ function generateRawMission() {
 
   let petName = null;
   let petType = null;
-  if (type === 'dog') { petName = rng(PET_NAMES.dog); petType = 'chien'; }
-  else if (type === 'cat') { petName = rng(PET_NAMES.cat); petType = 'chat'; }
-  else if (type === 'bird') { petName = rng(PET_NAMES.bird); petType = rng(BIRD_TYPES); }
+  // 30 % de chance de retomber sur un animal déjà sitté (du même type) si disponible
+  const P_REPEAT_PET = 0.30;
+  function pickRepeatOr(typeKey, freshGenerator) {
+    if (!STATE.petsSeen || !STATE.petsSeen.length) return freshGenerator();
+    const knownOfType = STATE.petsSeen.filter(p => p.type === typeKey);
+    if (knownOfType.length && Math.random() < P_REPEAT_PET) {
+      const repeat = rng(knownOfType);
+      return { name: repeat.name, animal: repeat.animal, isRepeat: true };
+    }
+    return freshGenerator();
+  }
+  let isRepeatPet = false;
+  if (type === 'dog') {
+    const r = pickRepeatOr('dog', () => ({ name: rng(PET_NAMES.dog), animal: 'chien', isRepeat: false }));
+    petName = r.name; petType = 'chien'; isRepeatPet = r.isRepeat;
+  } else if (type === 'cat') {
+    const r = pickRepeatOr('cat', () => ({ name: rng(PET_NAMES.cat), animal: 'chat', isRepeat: false }));
+    petName = r.name; petType = 'chat'; isRepeatPet = r.isRepeat;
+  } else if (type === 'bird') {
+    const r = pickRepeatOr('bird', () => ({ name: rng(PET_NAMES.bird), animal: rng(BIRD_TYPES), isRepeat: false }));
+    petName = r.name; petType = r.animal; isRepeatPet = r.isRepeat;
+  }
 
   const traitDog = rng(DOG_TRAITS);
   const traitCat = rng(CAT_TRAITS);
@@ -2574,6 +2658,7 @@ function generateRawMission() {
     petName,
     petType,
     animal: petType === 'chien' || petType === 'chat' ? petType : (type === 'bird' ? 'oiseau' : null),
+    isRepeatPet,
     housing,
     isRareHousing,
     hasPotes,
@@ -2811,7 +2896,7 @@ function refreshPendingMissionSelections(card) {
     ? getMissionCancellationCost(nextMission)
     : 0;
   card.refundCost = card.overlapRefundCost + card.nextMissionRefundCost;
-  card.netEstimate = card.payTotal - card.travelCost - card.refundCost - (WEEKLY_FOOD * card.durationWeeks);
+  card.netEstimate = card.payTotal - card.travelCost - card.refundCost - (averageWeeklyFood(card.startWeek, card.durationWeeks) * card.durationWeeks);
   card.feasibilityIssues = issues;
   card.feasible = issues.length === 0;
   const nonOverlapIssues = issues.filter(issue => !issue.startsWith('Chevauchement avec '));
@@ -2942,6 +3027,7 @@ function commitPendingMission(card) {
     STATE.phase = 'over';
     STATE.endReason = 'defeat';
     log('✗ DÉFAITE : solde épuisé.');
+    recordScore();
   }
 }
 function acceptHomeCard() {
@@ -2993,6 +3079,7 @@ function acceptHomeCard() {
     STATE.phase = 'over';
     STATE.endReason = 'defeat';
     log('✗ DÉFAITE : solde épuisé.');
+    recordScore();
   }
 }
 function acceptHomeCardByCancellingNextMission() {
@@ -3202,6 +3289,27 @@ function nextTurn() {
     if (mission.housing) STATE.housingsDone.add(mission.housing);
     STATE.continentsDone.add(mission.city.continent);
     if (mission.hasPotes) STATE.potesCount++;
+    if (mission.petName && mission.type !== 'house') {
+      // ajouter à l'album si pas encore présent (clé : type + name)
+      if (!STATE.petsSeen) STATE.petsSeen = [];
+      const known = STATE.petsSeen.find(p => p.type === mission.type && p.name === mission.petName);
+      if (known) {
+        known.count = (known.count || 1) + 1;
+        known.lastWeek = STATE.week;
+        known.lastCity = mission.city.name;
+      } else {
+        STATE.petsSeen.push({
+          type: mission.type,
+          name: mission.petName,
+          animal: mission.animal,
+          firstCity: mission.city.name,
+          lastCity: mission.city.name,
+          firstWeek: STATE.week,
+          lastWeek: STATE.week,
+          count: 1,
+        });
+      }
+    }
     log(`✓ Mission terminée à ${mission.city.name} : +${mission.points} pts`);
     checkAchievements();
   }
@@ -3242,13 +3350,14 @@ function nextTurn() {
     }
   }
 
-  if (!isShelteredAtParentsThisWeek()) STATE.balance -= WEEKLY_FOOD;
+  if (!isShelteredAtParentsThisWeek()) STATE.balance -= currentWeeklyFood(STATE.week);
   checkAchievements();
 
   if (STATE.balance < 0) {
     STATE.phase = 'over';
     STATE.endReason = 'defeat';
     log('✗ DÉFAITE : solde épuisé.');
+    recordScore();
     render();
     return;
   }
@@ -3256,6 +3365,7 @@ function nextTurn() {
     STATE.phase = 'over';
     STATE.endReason = 'victory';
     log(`★ VICTOIRE en semaine ${STATE.week} !`);
+    recordScore();
     render();
     return;
   }
@@ -3327,6 +3437,32 @@ function renderAchievements() {
         <div class="ach-name">${ACHIEVEMENT_LABEL[key]}</div>
         <div class="ach-prog">+${ACHIEVEMENT_POINTS[key]} · ${pct}%</div>
         ${icons}
+      </div>
+    </div>`;
+  }).join('')}</div>`;
+}
+function renderPetsAlbum() {
+  const pets = STATE.petsSeen || [];
+  if (!pets.length) {
+    return '<div style="font-style:italic;color:#6e5532;font-size:12px;padding:6px 0;">Pas encore d\'animal gardé. Vos pensionnaires apparaîtront ici au fil des missions.</div>';
+  }
+  // Trier : ceux avec count > 1 d'abord, puis par lastWeek décroissant
+  const sorted = [...pets].sort((a, b) => {
+    const ca = a.count || 1, cb = b.count || 1;
+    if (cb !== ca) return cb - ca;
+    return (b.lastWeek || 0) - (a.lastWeek || 0);
+  });
+  return `<div class="album-grid">${sorted.map(p => {
+    const icon = p.type === 'dog' ? '🐕' : p.type === 'cat' ? '🐈' : '🦜';
+    const heart = (p.count || 1) > 1 ? `<span class="album-heart" title="${p.count} fois">💛${p.count > 2 ? '×' + p.count : ''}</span>` : '';
+    const sub = p.count > 1
+      ? `${p.firstCity}${p.lastCity !== p.firstCity ? ' → ' + p.lastCity : ''}`
+      : p.firstCity;
+    return `<div class="album-row">
+      <span class="album-icon">${icon}</span>
+      <div class="album-text">
+        <div class="album-name">${esc(p.name)} ${heart}</div>
+        <div class="album-sub">${esc(p.animal || '')} · ${esc(sub)}</div>
       </div>
     </div>`;
   }).join('')}</div>`;
@@ -4069,7 +4205,7 @@ function renderPendingCardModal() {
         <div class="opportunity-shell">
           <div class="opportunity-topline">
             <div class="opportunity-title-line">
-              <strong>${esc(card.petName || 'Logement à garder')}</strong>, <span class="opportunity-city">${card.city.name}</span>, <strong class="opportunity-continent">${card.city.continent}</strong>, ${card.housing}${card.isRareHousing ? ' ✦' : ''}
+              <strong>${esc(card.petName || 'Logement à garder')}</strong>${card.isRepeatPet ? ' <span class="repeat-pet-heart" title="Vous avez déjà gardé cet animal">💛</span>' : ''}, <span class="opportunity-city">${card.city.name}</span>, <strong class="opportunity-continent">${card.city.continent}</strong>, ${card.housing}${card.isRareHousing ? ' ✦' : ''}
             </div>
           </div>
           <div class="opportunity-tabs">
@@ -4114,6 +4250,53 @@ function renderEndModal() {
   const win = STATE.endReason === 'victory';
   const months = (STATE.week / 4.33).toFixed(1);
   const currentCity = deriveCurrentCityFromState();
+
+  // Stats détaillées
+  const totalEarned = STATE.completed.reduce((s, m) => s + (m.payTotal || 0), 0);
+  const totalTravelSpent = STATE.completed.reduce((s, m) => s + (m.travelCost || 0) + (m.accessCost || 0), 0);
+  // Estimation nourriture cumulée (somme de currentWeeklyFood sur la durée)
+  let totalFood = 0;
+  for (let w = 0; w < STATE.week; w++) totalFood += currentWeeklyFood(w);
+  totalFood = Math.round(totalFood);
+
+  // Distance totale parcourue (haversine entre missions consécutives)
+  let totalKm = 0;
+  let prevCity = STATE.startCity;
+  for (const m of [...STATE.completed].sort((a, b) => a.startWeek - b.startWeek)) {
+    if (prevCity && m.city) totalKm += haversine(prevCity, m.city);
+    prevCity = m.city || prevCity;
+  }
+  totalKm = Math.round(totalKm);
+
+  // Mode de transport favori
+  const modeCount = {};
+  for (const m of STATE.completed) {
+    if (m.travelMode && m.travelMode !== 'none') modeCount[m.travelMode] = (modeCount[m.travelMode] || 0) + 1;
+  }
+  let topMode = null, topModeCount = 0;
+  for (const [mode, count] of Object.entries(modeCount)) {
+    if (count > topModeCount) { topMode = mode; topModeCount = count; }
+  }
+  const topModeLabel = topMode ? `${TRANSPORT[topMode].icon} ${TRANSPORT[topMode].name}` : '—';
+
+  // Ville la plus visitée
+  const cityCount = {};
+  for (const m of STATE.completed) {
+    if (m.city && m.city.name) cityCount[m.city.name] = (cityCount[m.city.name] || 0) + 1;
+  }
+  let topCity = null, topCityCount = 0;
+  for (const [city, count] of Object.entries(cityCount)) {
+    if (count > topCityCount) { topCity = city; topCityCount = count; }
+  }
+  const topCityLabel = topCity ? `${topCity}${topCityCount > 1 ? ' ×' + topCityCount : ''}` : '—';
+
+  // Animaux gardés
+  const petCount = (STATE.petsSeen || []).length;
+  const petRepeats = (STATE.petsSeen || []).filter(p => (p.count || 1) > 1).length;
+
+  // Refus
+  const refused = STATE.refusedCount || 0;
+
   return `
     <div class="modal-overlay">
       <div class="modal end-modal">
@@ -4126,9 +4309,19 @@ function renderEndModal() {
         </p>
         <div class="end-stats">
           <div class="stat"><div class="label">Missions</div><div class="value">${STATE.completed.length}</div></div>
+          <div class="stat"><div class="label">Refus</div><div class="value">${refused}</div></div>
           <div class="stat"><div class="label">Continents</div><div class="value">${STATE.continentsDone.size}/6</div></div>
           <div class="stat"><div class="label">Succès</div><div class="value">${STATE.achievements.size}</div></div>
           <div class="stat"><div class="label">Solde final</div><div class="value">${fmtMoney(STATE.balance)}</div></div>
+        </div>
+        <div class="end-stats" style="margin-top:8px;">
+          <div class="stat"><div class="label">Km parcourus</div><div class="value">${totalKm.toLocaleString('fr-FR')} km</div></div>
+          <div class="stat"><div class="label">Total gagné</div><div class="value">${fmtMoney(totalEarned)}</div></div>
+          <div class="stat"><div class="label">Transport</div><div class="value">${fmtMoney(totalTravelSpent)}</div></div>
+          <div class="stat"><div class="label">Nourriture</div><div class="value">${fmtMoney(totalFood)}</div></div>
+          <div class="stat"><div class="label">Mode favori</div><div class="value" style="font-size:14px;">${topModeLabel}</div></div>
+          <div class="stat"><div class="label">Ville préférée</div><div class="value" style="font-size:14px;">${topCityLabel}</div></div>
+          <div class="stat"><div class="label">Animaux</div><div class="value">${petCount}${petRepeats ? ` <span style="font-size:11px;color:#6e5532;">(${petRepeats} revus)</span>` : ''}</div></div>
         </div>
 
         <div class="end-layout">
@@ -4153,6 +4346,28 @@ function renderEndModal() {
   `;
 }
 function renderMenu() {
+  const scores = loadScores();
+  const scoresHtml = scores.length ? `
+    <div class="scores-block">
+      <h3>Tableau de scores</h3>
+      <div class="scores-list">
+        ${scores.map((s, idx) => {
+          const result = s.result === 'victory'
+            ? `<span class="score-result win">★ Victoire</span>`
+            : `<span class="score-result lose">⚱ Défaite</span>`;
+          const detail = s.result === 'victory'
+            ? `${s.week} sem · ${s.months} mois`
+            : `${s.points} pts · ${s.week} sem`;
+          return `<div class="score-row">
+            <span class="score-rank">${idx + 1}.</span>
+            <span class="score-icon">${s.icon}</span>
+            <span class="score-name">${esc(s.name)}</span>
+            <span class="score-detail">${detail}</span>
+            ${result}
+          </div>`;
+        }).join('')}
+      </div>
+    </div>` : '';
   app.innerHTML = `
     <div id="menu" class="paper">
       <h1>Pet Sitter</h1>
@@ -4173,6 +4388,7 @@ function renderMenu() {
         <button class="primary" style="font-size:18px;padding:12px 32px;margin-top:12px;" onclick="startGame()">Commencer la partie</button>
         <div style="font-size:13px;color:#6e5532;margin-top:8px;">Ville de départ : tirée au sort · Solde initial : ${fmtMoney(INITIAL_BALANCE)} · Écolo démarre déjà actif (+${ACHIEVEMENT_POINTS.ecolo} pts)</div>
         ${hasSaveAvailable() ? '<button onclick="continueGame()">Reprendre la partie sauvegardée</button>' : ''}
+        ${scoresHtml}
       </div>
     </div>
   `;
@@ -4226,6 +4442,10 @@ function renderGame() {
         <div class="paper">
           <h3>Retour chez les parents</h3>
           ${renderReturnHomePanel()}
+        </div>
+        <div class="paper">
+          <h3>Album (${(STATE.petsSeen || []).length})</h3>
+          ${renderPetsAlbum()}
         </div>
       </div>
     </div>

@@ -7,8 +7,9 @@
 
 | Élément | Valeur actuelle |
 |---|---:|
-| Solde initial | `2000 €` |
-| Coût de vie mensuel | `500 €` |
+| Solde initial | `1000 €` |
+| Coût de vie mensuel (base) | `500 €` |
+| Inflation hebdo | `+1 €/semaine` (lente, cumulative) |
 | Coût de vie hebdo appliqué | `500 * 12 / 52` soit `≈ 115,38 €` |
 | Chance d’opportunité par tour | `45 %` |
 | Chance de carte Chance | `2 %` |

@@ -95,7 +95,7 @@ function makeContext(compiledGame, seed) {
 
   vm.createContext(sandbox);
   compiledGame.runInContext(sandbox);
-  sandbox.__simConsts = vm.runInContext('({ WEEKLY_FOOD, VICTORY_POINTS })', sandbox);
+  sandbox.__simConsts = vm.runInContext('({ WEEKLY_FOOD_BASE, currentWeeklyFood, averageWeeklyFood, VICTORY_POINTS })', sandbox);
 
   sandbox.render = function renderNoop() {};
   sandbox.saveGame = function saveNoop() {};
@@ -136,7 +136,7 @@ function evaluateState(ctx, pointValue) {
   const futurePay = futureStarts.reduce((sum, mission) => sum + mission.payTotal, 0);
   const futureTravel = futureStarts.reduce((sum, mission) => sum + (mission.travelCost || 0), 0);
   const horizon = Math.max(week, ...pendingMissions.map(mission => mission.endWeek));
-  const projectedCash = ctx.STATE.balance + futurePay - futureTravel - (ctx.__simConsts.WEEKLY_FOOD * (horizon - week));
+  const projectedCash = ctx.STATE.balance + futurePay - futureTravel - (ctx.__simConsts.averageWeeklyFood(week, horizon - week) * (horizon - week));
   const projectedPoints = ctx.STATE.points + futurePoints;
 
   let score = projectedCash + (pointValue * projectedPoints);

@@ -68,7 +68,8 @@ Elle décrit une mission avec :
 - paiement total ;
 - points de satisfaction ;
 - texte d’annonce ;
-- parfois la mention `Potes invités`.
+- parfois la mention `Potes invités` ;
+- parfois un animal **déjà gardé** (cœur 💛 affiché à côté du nom). Probabilité fixe `30 %` qu'un tirage du même type retombe sur un pensionnaire connu.
 
 Le joueur peut :
 
@@ -312,8 +313,8 @@ Le temps de transport apparaît :
 
 ### 8.1. Valeurs globales
 
-- solde initial : `2000 €`
-- coût de vie : `500 €/mois`
+- solde initial : `1000 €`
+- coût de vie : `500 €/mois` au démarrage, **inflation de +1 €/semaine** (donc le coût hebdo augmente lentement, +52 €/an)
 - équivalent hebdo prélevé : `500 * 12 / 52`, soit environ `115,38 €`
 - victoire : `100 pts`
 
@@ -369,6 +370,7 @@ Affichage :
 - lancement de la partie
 - reprise de sauvegarde si présente
 - musique `launch.mp3`
+- **Tableau des 5 meilleures parties** (clé localStorage `petsitter_scores_v1`) — victoires d'abord, triées par durée la plus courte, puis défaites par points décroissants
 
 ## 10.2. Écran de jeu
 
@@ -384,6 +386,7 @@ Colonne droite :
 - `Succès`
 - `Carte Chance`
 - `Retour chez les parents`
+- `Album` — historique des animaux gardés, avec icône cœur 💛 et compteur quand un même pensionnaire a été gardé plusieurs fois
 
 ## 10.3. Opportunités
 
@@ -401,10 +404,13 @@ Le joueur peut :
 La modale de fin affiche :
 
 - victoire ou défaite
-- stats globales
+- stats globales (missions, refus, continents, succès, solde final)
+- stats détaillées (km parcourus, total gagné/transport/nourriture, mode de transport favori, ville préférée, animaux gardés dont nombre revus)
 - carte du voyage façon carnet / polarsteps
 - succès obtenus
 - pourcentage de progression des succès manquants
+
+Le score de la partie est automatiquement enregistré dans le tableau du menu (top 5).
 
 ## 11. Sauvegarde, audio, aide
 

@@ -64,7 +64,8 @@ input[type=text] {
 #menu .avatar:hover { transform: scale(1.05); }
 
 #game { display: grid; grid-template-columns: 1fr 320px; gap: 16px; max-width: 1400px; margin: 0 auto; }
-#header-bar { grid-column: 1 / 3; display: flex; justify-content: space-between; padding: 12px 18px; align-items: center; flex-wrap: wrap; gap: 12px; }
+#header-bar { grid-column: 1 / 3; }
+.game-header-bar { display: flex; justify-content: space-between; padding: 12px 18px; align-items: center; flex-wrap: wrap; gap: 12px; }
 .stat { display: flex; flex-direction: column; gap: 2px; }
 .stat .label { font-size: 11px; text-transform: uppercase; letter-spacing: 0.1em; color: #6e5532; }
 .stat .value { font-size: 22px; font-weight: 600; }
@@ -76,7 +77,9 @@ input[type=text] {
 
 #map-container { padding: 0; overflow: hidden; }
 #map-svg {
-  display: block; width: 100%; height: auto;
+  display: block; width: 100%;
+  height: auto;
+  aspect-ratio: 2 / 1;
   background: #daf0fd;
 }
 .map-base { pointer-events: none; }
@@ -227,12 +230,138 @@ input[type=text] {
 .modal-twocol { display: flex; gap: 16px; align-items: stretch; max-width: 820px; width: 100%; }
 .modal-twocol > .card { flex: 1 1 480px; }
 
-.calendar-pane {
-  flex: 0 0 280px; background: #f5e6c8;
-  border: 2px solid #6e5532; border-radius: 4px;
-  padding: 12px 14px; max-height: 520px; overflow-y: auto;
+.opportunity-modal {
+  width: min(1120px, 100%);
+  height: min(820px, calc(100vh - 40px));
+  max-height: calc(100vh - 40px);
+  display: flex;
+  flex-direction: column;
+  border: 2px solid #2b1f10;
+  border-radius: 20px;
+  overflow: hidden;
+  background: linear-gradient(180deg, #f9efd5 0%, #f4e4bf 100%);
+  box-shadow: 0 28px 60px rgba(43, 31, 16, 0.28);
 }
-.calendar-pane h3 { margin-bottom: 8px; }
+.opportunity-status-header {
+  border: none;
+  border-bottom: 1px solid rgba(110, 85, 50, 0.22);
+  border-radius: 0;
+  box-shadow: none;
+  background: linear-gradient(180deg, rgba(255,248,232,0.96) 0%, rgba(244,232,202,0.96) 100%);
+  justify-content: center;
+  min-height: 96px;
+}
+.opportunity-hero-icon {
+  font-size: 56px;
+  line-height: 1;
+}
+.opportunity-shell {
+  display: flex;
+  flex-direction: column;
+  flex: 1;
+  min-height: 0;
+  overflow: hidden;
+}
+.opportunity-topline {
+  display: block;
+  padding: 20px 24px 12px;
+  border-bottom: 1px solid rgba(110, 85, 50, 0.16);
+}
+.opportunity-title-line {
+  font-size: 28px;
+  line-height: 1.15;
+  color: #2b1f10;
+}
+.opportunity-title-line strong { font-weight: 700; }
+.opportunity-title-line .opportunity-city { font-weight: 400; }
+.opportunity-title-line .opportunity-continent { font-weight: 700; }
+.opportunity-type-badge {
+  flex-shrink: 0;
+  display: inline-flex;
+  align-items: center;
+  gap: 8px;
+  padding: 8px 14px;
+  border-radius: 999px;
+  background: #ead9b8;
+  border: 1px solid #b59567;
+  color: #6e5532;
+  font-size: 13px;
+  text-transform: uppercase;
+  letter-spacing: 0.08em;
+  font-weight: 700;
+}
+.opportunity-tabs {
+  display: flex;
+  gap: 10px;
+  flex-wrap: wrap;
+  padding: 14px 24px 0;
+}
+.opportunity-body {
+  flex: 1;
+  min-height: 0;
+  display: grid;
+  grid-template-columns: minmax(0, 1fr) 300px;
+  gap: 16px;
+  padding: 0 24px 24px;
+}
+.opportunity-main {
+  min-width: 0;
+  min-height: 0;
+  display: flex;
+  flex-direction: column;
+}
+.opportunity-side {
+  min-width: 0;
+  min-height: 0;
+}
+.opportunity-tab {
+  padding: 10px 16px;
+  border: 1px solid rgba(110, 85, 50, 0.20);
+  border-bottom: none;
+  border-radius: 14px 14px 0 0;
+  background: rgba(255, 249, 238, 0.55);
+  color: #6e5532;
+  font-size: 14px;
+  font-weight: 600;
+  letter-spacing: 0.03em;
+}
+.opportunity-tab:hover { background: rgba(255, 249, 238, 0.88); color: #2b1f10; }
+.opportunity-tab.active {
+  background: #fffaf0;
+  color: #2b1f10;
+  border-color: rgba(110, 85, 50, 0.28);
+}
+.opportunity-panel-wrap {
+  padding: 0;
+  overflow-y: auto;
+  min-height: 0;
+  flex: 1;
+}
+.opportunity-panel {
+  background: #fffaf0;
+  border: 1px solid rgba(110, 85, 50, 0.16);
+  border-radius: 0 18px 18px 18px;
+  padding: 22px;
+  min-height: 100%;
+}
+
+.calendar-pane {
+  flex: 0 0 280px;
+  background:
+    repeating-linear-gradient(180deg, rgba(139, 111, 71, 0.045) 0, rgba(139, 111, 71, 0.045) 1px, transparent 1px, transparent 34px),
+    linear-gradient(180deg, rgba(255,251,242,0.98) 0%, rgba(245,234,210,0.98) 100%);
+  border: 1px solid #d4b896;
+  border-radius: 18px;
+  padding: 14px 16px;
+  max-height: 520px;
+  overflow-y: auto;
+  box-shadow: 0 12px 24px rgba(110, 85, 50, 0.10), inset 0 1px 0 rgba(255,255,255,0.72);
+}
+.opportunity-side .calendar-pane {
+  height: 100%;
+  max-height: none;
+}
+.calendar-pane h3 { margin-bottom: 8px; color: #6e5532; }
 .calendar-row { display: flex; align-items: center; font-size: 12px; height: 22px; border-bottom: 1px dotted #d4b896; }
 .calendar-row:last-child { border-bottom: none; }
 .calendar-row.month-start { border-top: 1.5px solid #8b6f47; }
@@ -303,22 +432,38 @@ input[type=text] {
 }
 
 .transport-panel {
-  margin-top: 10px; padding: 10px; border: 1px solid #d4b896;
-  background: rgba(234, 217, 184, 0.4); border-radius: 3px;
+  margin-top: 10px;
+  padding: 14px;
+  border: 1px solid #d4b896;
+  background:
+    repeating-linear-gradient(180deg, rgba(139, 111, 71, 0.04) 0, rgba(139, 111, 71, 0.04) 1px, transparent 1px, transparent 32px),
+    linear-gradient(180deg, rgba(255,251,242,0.98) 0%, rgba(244,232,202,0.97) 100%);
+  border-radius: 16px;
+  box-shadow: 0 10px 22px rgba(110, 85, 50, 0.09), inset 0 1px 0 rgba(255,255,255,0.7);
 }
-.transport-title { font-weight: 700; font-size: 13px; }
-.transport-caption { font-size: 11px; color: #6e5532; margin-top: 2px; }
+.transport-title { font-weight: 700; font-size: 15px; color: #2b1f10; }
+.transport-caption { font-size: 12px; color: #6e5532; margin-top: 4px; }
 .transport-options { display: flex; flex-direction: column; gap: 6px; margin-top: 8px; }
 .transport-option {
   display: flex; justify-content: space-between; gap: 8px;
-  text-align: left; font-size: 13px; padding: 8px 10px;
+  text-align: left; font-size: 14px; padding: 10px 12px;
+  border-radius: 12px; border-color: rgba(110, 85, 50, 0.22); background: rgba(255,255,255,0.72);
 }
 .transport-option.selected {
-  background: #2b1f10; color: #f5e6c8; border-color: #2b1f10;
+  background: #6e5532; color: #f5e6c8; border-color: #6e5532;
 }
-.toggle-chip { margin-top: 8px; font-size: 12px; padding: 6px 10px; }
-.toggle-chip.on { background: #6e5532; color: #f5e6c8; }
-.transport-mini { margin-top: 8px; font-size: 11px; color: #6e5532; }
+.toggle-chip { margin-top: 10px; font-size: 12px; padding: 7px 12px; border-radius: 999px; }
+.toggle-chip.on { background: #2d6e3e; color: #f5e6c8; border-color: #2d6e3e; }
+.transport-mini { margin-top: 10px; font-size: 12px; color: #6e5532; }
+.transport-empty {
+  margin-top: 10px;
+  padding: 12px 14px;
+  border-radius: 12px;
+  background: rgba(168, 50, 50, 0.06);
+  border: 1px dashed rgba(168, 50, 50, 0.45);
+  color: #8d3434;
+  font-size: 13px;
+}
 .potes-pill {
   margin: 10px 0; padding: 7px 10px;
   border: 1px dashed #a83232; background: rgba(168, 50, 50, 0.08);
@@ -337,6 +482,240 @@ input[type=text] {
 .pending-strip-text { font-size: 16px; font-weight: 600; }
 .pending-strip-note { font-size: 12px; color: #6e5532; }
 .pending-strip-actions { display: flex; gap: 8px; flex-wrap: wrap; }
+
+.listing-panel {
+  background:
+    repeating-linear-gradient(180deg, rgba(139, 111, 71, 0.04) 0, rgba(139, 111, 71, 0.04) 1px, transparent 1px, transparent 34px),
+    linear-gradient(180deg, rgba(255,252,245,0.98) 0%, rgba(245,234,210,0.98) 100%);
+  border: 1px solid #d4b896;
+  border-radius: 18px;
+  padding: 18px;
+  box-shadow: 0 10px 22px rgba(110, 85, 50, 0.08), inset 0 1px 0 rgba(255,255,255,0.75);
+}
+.listing-hero {
+  display: flex;
+  gap: 16px;
+  align-items: center;
+  margin-bottom: 16px;
+}
+.listing-icon-tile {
+  width: 92px;
+  height: 92px;
+  flex-shrink: 0;
+  display: flex;
+  align-items: center;
+  justify-content: center;
+  border-radius: 24px;
+  background: linear-gradient(135deg, #edd9af 0%, #ccb483 100%);
+  border: 1px solid #b59567;
+  font-size: 46px;
+  color: #6e5532;
+}
+.listing-kind {
+  display: inline-flex;
+  align-items: center;
+  gap: 8px;
+  padding: 6px 12px;
+  border-radius: 999px;
+  background: rgba(110, 85, 50, 0.08);
+  border: 1px dashed rgba(110, 85, 50, 0.42);
+  color: #6e5532;
+  text-transform: uppercase;
+  letter-spacing: 0.08em;
+  font-size: 12px;
+  font-weight: 700;
+}
+.listing-sidecopy {
+  display: flex;
+  flex-direction: column;
+  gap: 10px;
+}
+.listing-sidecopy p {
+  color: #6e5532;
+  font-size: 14px;
+  line-height: 1.45;
+}
+.listing-description {
+  margin: 16px 0;
+  padding: 18px;
+  border-radius: 18px;
+  background: rgba(245, 230, 200, 0.45);
+  border: 1px solid rgba(110, 85, 50, 0.14);
+  font-size: 17px;
+  line-height: 1.55;
+  color: #3d2d1a;
+}
+.listing-grid {
+  display: grid;
+  grid-template-columns: repeat(4, minmax(0, 1fr));
+  gap: 12px;
+}
+.listing-spec {
+  padding: 14px;
+  border-radius: 16px;
+  background: rgba(255,255,255,0.72);
+  border: 1px solid rgba(110, 85, 50, 0.18);
+  box-shadow: 0 8px 20px rgba(110, 85, 50, 0.06);
+}
+.listing-spec-label {
+  font-size: 11px;
+  text-transform: uppercase;
+  letter-spacing: 0.11em;
+  color: #8b6f47;
+}
+.listing-spec-value {
+  margin-top: 6px;
+  font-size: 19px;
+  font-weight: 700;
+  color: #2b1f10;
+}
+.planner-view {
+  display: flex;
+  flex-direction: column;
+  gap: 14px;
+}
+.planner-summary {
+  display: grid;
+  grid-template-columns: repeat(3, minmax(0, 1fr));
+  gap: 12px;
+}
+.planner-stat-card {
+  padding: 14px 16px;
+  border-radius: 16px;
+  background:
+    repeating-linear-gradient(180deg, rgba(139, 111, 71, 0.035) 0, rgba(139, 111, 71, 0.035) 1px, transparent 1px, transparent 30px),
+    linear-gradient(180deg, rgba(255,251,242,0.98) 0%, rgba(244,232,202,0.97) 100%);
+  color: #2b1f10;
+  border: 1px solid rgba(110, 85, 50, 0.20);
+  box-shadow: 0 10px 20px rgba(110, 85, 50, 0.07);
+}
+.planner-stat-card.net-positive { border-color: rgba(45, 110, 62, 0.35); background: linear-gradient(180deg, rgba(246,252,244,0.98) 0%, rgba(227,242,225,0.98) 100%); }
+.planner-stat-card.net-negative { border-color: rgba(168, 50, 50, 0.28); background: linear-gradient(180deg, rgba(255,249,247,0.98) 0%, rgba(246,226,223,0.98) 100%); }
+.planner-stat-label {
+  font-size: 11px;
+  text-transform: uppercase;
+  letter-spacing: 0.10em;
+  color: #8b6f47;
+}
+.planner-stat-value {
+  margin-top: 6px;
+  font-size: 20px;
+  font-weight: 700;
+}
+.planner-stat-sub {
+  margin-top: 6px;
+  font-size: 12px;
+  color: #6e5532;
+}
+.travel-info {
+  font-size: 13px;
+  background:
+    repeating-linear-gradient(180deg, rgba(139, 111, 71, 0.035) 0, rgba(139, 111, 71, 0.035) 1px, transparent 1px, transparent 30px),
+    linear-gradient(180deg, rgba(255,251,242,0.98) 0%, rgba(245,234,210,0.98) 100%);
+  padding: 14px 16px;
+  border: 1px solid #d4b896;
+  border-left: 4px solid #8b6f47;
+  border-radius: 16px;
+  margin: 0;
+  color: #3d2d1a;
+}
+.travel-info strong { color: #2b1f10; }
+.travel-warnings {
+  margin-top: 10px;
+  display: flex;
+  flex-direction: column;
+  gap: 6px;
+  color: #8d3434;
+}
+.travel-warnings div {
+  padding: 8px 10px;
+  border-radius: 10px;
+  background: rgba(168, 50, 50, 0.08);
+  border: 1px dashed rgba(168, 50, 50, 0.42);
+}
+.planner-note {
+  font-size: 12px;
+  color: #6e5532;
+}
+.cancel-panel {
+  position: relative;
+  padding: 18px;
+  background:
+    repeating-linear-gradient(180deg, rgba(139, 111, 71, 0.04) 0, rgba(139, 111, 71, 0.04) 1px, transparent 1px, transparent 34px),
+    linear-gradient(180deg, rgba(255,252,245,0.98) 0%, rgba(245,234,210,0.98) 100%);
+  border-radius: 18px;
+  border: 1px solid #d4b896;
+  box-shadow: 0 10px 22px rgba(110, 85, 50, 0.08);
+  font-family: Georgia, 'Times New Roman', serif;
+}
+.cancel-panel::after {
+  content: none;
+}
+.cancel-title {
+  font-size: 24px;
+  font-weight: 700;
+  color: #2b1f10;
+}
+.cancel-reason {
+  margin-top: 8px;
+  font-size: 15px;
+  color: #6e5532;
+  line-height: 1.45;
+}
+.cancel-stack {
+  display: grid;
+  grid-template-columns: repeat(auto-fit, minmax(240px, 1fr));
+  gap: 14px;
+  margin-top: 16px;
+}
+.cancel-note {
+  background: rgba(255,255,255,0.68);
+  border: 1px solid rgba(110, 85, 50, 0.18);
+  border-radius: 14px;
+  padding: 14px;
+  box-shadow: 0 8px 18px rgba(110, 85, 50, 0.06);
+}
+.cancel-note:nth-child(even) { transform: none; }
+.cancel-note:nth-child(odd) { transform: none; }
+.cancel-note-title {
+  font-size: 20px;
+  font-weight: 700;
+  color: #2b1f10;
+}
+.cancel-note-date {
+  margin-top: 4px;
+  font-size: 14px;
+  color: #6e5532;
+}
+.cancel-note-metrics {
+  margin-top: 12px;
+  display: flex;
+  flex-direction: column;
+  gap: 6px;
+  font-size: 16px;
+  color: #4a3520;
+}
+.cancel-note-metrics strong { color: #2b1f10; }
+.cancel-note-cost strong { color: #8d3434; }
+.opportunity-footer {
+  display: flex;
+  justify-content: space-between;
+  align-items: center;
+  gap: 12px;
+  padding: 16px 24px 20px;
+  border-top: 1px solid rgba(110, 85, 50, 0.16);
+  background: rgba(249, 239, 213, 0.92);
+}
+.opportunity-footer-note {
+  font-size: 13px;
+  color: #6e5532;
+}
+.opportunity-footer-main {
+  display: flex;
+  gap: 10px;
+  justify-content: flex-end;
+  flex-wrap: wrap;
+}
 
 .modal {
   background: #f5e6c8; border: 2px solid #2b1f10;
@@ -387,10 +766,32 @@ input[type=text] {
   .modal-twocol { flex-direction: column; max-width: 540px; }
   .calendar-pane { max-height: 280px; }
   .end-layout { grid-template-columns: 1fr; }
+  .planner-summary { grid-template-columns: 1fr; }
+  .listing-grid { grid-template-columns: 1fr 1fr; }
+  .opportunity-body { grid-template-columns: minmax(0, 1fr) 280px; }
 }
 @media (max-width: 980px) {
   #game { grid-template-columns: 1fr; }
   #header-bar { grid-column: 1; }
+  .opportunity-modal { max-height: calc(100vh - 16px); }
+  .opportunity-modal { height: calc(100vh - 16px); }
+  .opportunity-topline { padding: 16px 14px 10px; }
+  .opportunity-tabs { padding: 12px 14px 0; }
+  .opportunity-body {
+    grid-template-columns: 1fr;
+    padding: 0 14px 14px;
+  }
+  .opportunity-panel { padding: 16px; }
+  .opportunity-footer {
+    padding: 14px;
+    flex-direction: column;
+    align-items: stretch;
+  }
+  .opportunity-footer-main { justify-content: stretch; }
+  .opportunity-footer-main button { width: 100%; }
+  .listing-hero { flex-direction: column; align-items: flex-start; }
+  .listing-grid { grid-template-columns: 1fr; }
+  .opportunity-side .calendar-pane { max-height: 260px; }
 }
 </style>
 </head>
@@ -1038,6 +1439,7 @@ function buildDefaultState() {
     potesCount: 0,
     pendingCard: null,
     pendingCardMinimized: false,
+    pendingCardTab: 'presentation',
     log: [],
     refusedCount: 0,
     acceptedCount: 0,
@@ -1098,6 +1500,30 @@ function deriveCurrentCityFromState() {
     return sorted[sorted.length - 1].city;
   }
   return STATE.startCity;
+}
+function getReputationStatusText() {
+  return hasReputationPenalty()
+    ? `Malus réputation actif jusqu'au ${fmtDate(STATE.reputationPenaltyUntil)}`
+    : 'Réputation intacte';
+}
+function renderGameHeaderInner(actionHtml) {
+  const currentCity = deriveCurrentCityFromState();
+  const balanceClass = STATE.balance < 200 ? 'danger' : (STATE.balance > 2000 ? 'success' : '');
+  const pointsClass = STATE.points >= VICTORY_POINTS ? 'success' : '';
+  return `
+    <div class="row">
+      <div style="font-size:32px">${STATE.characterIcon}</div>
+      <div>
+        <div style="font-weight:600;font-size:18px;">${esc(STATE.characterName)}</div>
+        <div style="font-size:13px;color:#6e5532;font-style:italic;">à ${currentCity ? currentCity.name : 'quelque part'}, ${currentCity ? currentCity.continent : 'Monde'}</div>
+      </div>
+    </div>
+    <div class="stat"><div class="label">Semaine</div><div class="value">${STATE.week} <span style="font-size:13px;font-weight:400;color:#6e5532;font-style:italic">· ${fmtDate(STATE.week)}</span></div></div>
+    <div class="stat"><div class="label">Solde</div><div class="value ${balanceClass}">${fmtMoney(STATE.balance)}</div></div>
+    <div class="stat"><div class="label">Points</div><div class="value ${pointsClass}">${STATE.points} / ${VICTORY_POINTS}</div></div>
+    <div class="stat"><div class="label">Réputation</div><div class="value" style="font-size:15px;">${getReputationStatusText()}</div></div>
+    ${actionHtml || ''}
+  `;
 }
 function syncMissionShape(mission) {
   mission.durationWeeks = mission.durationWeeks || Math.ceil((mission.durationDays || 7) / 7);
@@ -1653,6 +2079,7 @@ function commitPendingMission(card) {
   STATE.acceptedCount++;
   STATE.pendingCard = null;
   STATE.pendingCardMinimized = false;
+  STATE.pendingCardTab = 'presentation';
   recomputeAgenda(false);
   log(`Accepté : ${missionLabel(mission)} (${fmtDate(mission.startWeek)}).`);
   if (STATE.balance < 0) {
@@ -1669,6 +2096,7 @@ function acceptCard() {
     STATE.activePerk = card.perkKey;
     STATE.pendingCard = null;
     STATE.pendingCardMinimized = false;
+    STATE.pendingCardTab = 'presentation';
     log(`★ Carte Chance acceptée : ${PERK_DEFS[card.perkKey].name}.`);
     render();
     return;
@@ -1694,6 +2122,7 @@ function discardPendingCard(logText) {
   if (logText) log(logText);
   STATE.pendingCard = null;
   STATE.pendingCardMinimized = false;
+  STATE.pendingCardTab = 'presentation';
 }
 function acceptCardByCancellingOverlap() {
   const card = STATE.pendingCard;
@@ -1914,6 +2343,7 @@ function nextTurn() {
     if (offer) {
       STATE.pendingCard = offer;
       STATE.pendingCardMinimized = false;
+      STATE.pendingCardTab = 'presentation';
       if (offer.kind === 'chance') log(`Une carte Chance apparaît : ${PERK_DEFS[offer.perkKey].name}.`);
       else log(`Une opportunité ! ${TYPE_LABEL[offer.type]} à ${offer.city.name}.`);
     }
@@ -2105,7 +2535,7 @@ function renderMap(currentCity, options = {}) {
   }
 
   return `
-    <svg id="map-svg" viewBox="0 0 ${mapWidth} ${mapHeight}" preserveAspectRatio="xMidYMid meet">
+    <svg id="map-svg" xmlns="http://www.w3.org/2000/svg" viewBox="0 0 ${mapWidth} ${mapHeight}" preserveAspectRatio="xMidYMid meet">
       <image class="map-base" href="world_map_with_nations.svg" x="0" y="0" width="${mapWidth}" height="${mapHeight}" preserveAspectRatio="none"/>
       ${labels}
       ${lines}
@@ -2233,32 +2663,220 @@ function renderPendingCardStrip(card) {
     </div>
   `;
 }
-function renderOverlapComparison(card) {
+function getPendingCardCancellationData(card) {
+  if (!card || card.kind !== 'mission') return null;
   const overlapMissions = getCardOverlapMissions(card);
-  if (!overlapMissions.length) return '';
+  if (overlapMissions.length) {
+    return {
+      missions: overlapMissions,
+      reason: overlapMissions.length > 1
+        ? 'Ces missions se superposent à l’opportunité. Les accepter ensemble n’est pas possible.'
+        : 'Cette mission se superpose à l’opportunité. Il faudra trancher.',
+    };
+  }
+  const nextMission = card.canAcceptByCancellingNextMission && card.blockingNextMissionId
+    ? STATE.agenda.find(mission => mission.id === card.blockingNextMissionId)
+    : null;
+  if (nextMission) {
+    return {
+      missions: [nextMission],
+      reason: `Cette mission bloque le trajet après l’opportunité. En l’annulant, la route se libère.`,
+    };
+  }
+  return null;
+}
+function getPendingCardTabs(card) {
+  const tabs = [
+    { key: 'presentation', label: 'Présentation' },
+    { key: 'planning', label: 'Planification' },
+  ];
+  if (getPendingCardCancellationData(card)) tabs.push({ key: 'cancellation', label: '⚠ Mission à annuler' });
+  return tabs;
+}
+function getPendingCardActiveTab(card) {
+  const keys = getPendingCardTabs(card).map(tab => tab.key);
+  return keys.includes(STATE.pendingCardTab) ? STATE.pendingCardTab : 'presentation';
+}
+function setPendingCardTab(tab) {
+  const card = STATE.pendingCard;
+  if (!card || card.kind !== 'mission') return;
+  const keys = getPendingCardTabs(card).map(item => item.key);
+  STATE.pendingCardTab = keys.includes(tab) ? tab : 'presentation';
+  render();
+}
+function renderOpportunityPresentation(card, subjectIcon) {
+  const typeLabel = TYPE_LABEL[card.type];
   return `
-    <div class="overlap-compare">
-      <div class="overlap-compare-title">${overlapMissions.length > 1 ? 'Missions à annuler' : 'Mission à annuler'}</div>
-      ${overlapMissions.map(mission => {
-        const lostTicketCost = !mission.travelCancellable ? (mission.travelCost || 0) : 0;
-        return `
-          <div class="overlap-compare-card">
-            <div class="overlap-compare-head">
-              <strong>${missionTitle(mission)}</strong>
-              <span class="overlap-compare-date">${fmtDate(mission.startWeek)}</span>
-            </div>
-            <div class="overlap-compare-metrics">
-              <span>Paiement prévu : <strong>${fmtMoney(mission.payTotal)}</strong></span>
-              <span>Satisfaction : <strong>+${mission.points} pts</strong></span>
-              ${lostTicketCost > 0
-                ? `<span class="loss">Coût du trajet : <strong>−${fmtMoney(lostTicketCost)}</strong></span>`
-                : `<span>${isAutoCancellableMode(mission.travelMode) ? 'Trajet' : 'Billet'} : <strong>annulable sans frais</strong></span>`}
-            </div>
-          </div>
-        `;
-      }).join('')}
+    <div class="listing-panel">
+      <div class="listing-hero">
+        <div class="listing-icon-tile">${subjectIcon}</div>
+        <div class="listing-sidecopy">
+          <div class="listing-kind">${subjectIcon} ${typeLabel}</div>
+          <p>${HOUSING_ICONS[card.housing] || '🏠'} ${card.housing}${card.isRareHousing ? ' · logement rare ✦' : ''}</p>
+          <p>${card.type === 'house' ? 'Annonce posée, très “garde de logement”, avec peu de logistique sur place.' : 'Annonce de sitting publiée comme une vraie petite mission du quotidien.'}</p>
+        </div>
+      </div>
+      <div class="listing-description">"${esc(card.blurb)}"</div>
+      ${card.hasPotes ? `<div class="potes-pill"><strong>Potes invités</strong> · bonus immédiat de +${POTES_BONUS_POINTS} pt</div>` : ''}
+      ${hasPerk('friendInsider') ? (() => {
+        const quality = dealQuality(card);
+        return `<div class="deal-badge" style="border-color:${quality.color};color:${quality.color};">
+          <span class="deal-icon">🧐</span>
+          <span class="deal-label">${quality.label}</span>
+          <span class="deal-pct">(${quality.pct} vs moyenne)</span>
+          <span class="deal-hint">— ${quality.hint}</span>
+        </div>`;
+      })() : ''}
+      <div class="listing-grid">
+        <div class="listing-spec">
+          <div class="listing-spec-label">Démarrage</div>
+          <div class="listing-spec-value">${fmtDate(card.startWeek)}</div>
+        </div>
+        <div class="listing-spec">
+          <div class="listing-spec-label">Durée</div>
+          <div class="listing-spec-value">${card.durationDays} jours</div>
+        </div>
+        <div class="listing-spec">
+          <div class="listing-spec-label">Paiement</div>
+          <div class="listing-spec-value">${fmtMoney(card.payTotal)}</div>
+        </div>
+        <div class="listing-spec">
+          <div class="listing-spec-label">Satisfaction</div>
+          <div class="listing-spec-value">+${card.points} pts</div>
+        </div>
+      </div>
     </div>
   `;
+}
+function renderOpportunityPlanning(card, nextMission) {
+  const inboundValue = card.selectedInbound
+    ? `${card.selectedInbound.icon} ${card.selectedInbound.label}`
+    : 'Impossible';
+  const inboundSub = card.selectedInbound
+    ? `${fmtDays(card.travelDays)} · ${fmtMoney(card.travelCost)}`
+    : 'Aucune option réaliste';
+  const netClass = card.netEstimate >= 0 ? 'net-positive' : 'net-negative';
+  const nextValue = nextMission
+    ? (card.selectedOutbound ? `${card.selectedOutbound.icon} ${card.selectedOutbound.label}` : 'Bloqué')
+    : 'Libre';
+  const nextSub = nextMission
+    ? (card.selectedOutbound ? `Vers ${nextMission.city.name} · ${fmtMoney(card.selectedOutbound.cost)}` : card.outboundBlockedReason)
+    : 'Aucun sitting suivant réservé';
+  return `
+    <div class="planner-view">
+      <div class="planner-summary">
+        <div class="planner-stat-card">
+          <div class="planner-stat-label">Arrivée</div>
+          <div class="planner-stat-value">${inboundValue}</div>
+          <div class="planner-stat-sub">${inboundSub}</div>
+        </div>
+        <div class="planner-stat-card ${netClass}">
+          <div class="planner-stat-label">Net estimé</div>
+          <div class="planner-stat-value">${fmtMoney(card.netEstimate)}</div>
+          <div class="planner-stat-sub">Paiement − trajets − nourriture</div>
+        </div>
+        <div class="planner-stat-card">
+          <div class="planner-stat-label">${nextMission ? 'Après mission' : 'Agenda'}</div>
+          <div class="planner-stat-value">${nextValue}</div>
+          <div class="planner-stat-sub">${nextSub}</div>
+        </div>
+      </div>
+
+      ${renderTransportPlanner(
+        card,
+        'inbound',
+        `Trajet vers ${card.city.name}`,
+        card.inboundOptions,
+        card.selectedInboundMode,
+        card.selectedInboundCancellable,
+        `Depuis ${card.srcCity.name} · ${Math.round(card.distance)} km`
+      )}
+
+      ${nextMission ? renderTransportPlanner(
+        card,
+        'outbound',
+        `Puis vers ${nextMission.city.name}`,
+        card.outboundOptions,
+        card.selectedOutboundMode,
+        card.selectedOutboundCancellable,
+        `Remplace le trajet déjà réservé pour ${missionLabel(nextMission)}`
+      ) : ''}
+
+      <div class="travel-info">
+        ${card.selectedInbound ? `${card.travelIcon} <strong>${card.travelLabel}</strong> · ${fmtDays(card.travelDays)} · ${fmtMoney(card.travelCost)}` : '✖ <strong>Trajet d’arrivée impossible</strong>'}<br>
+        <span class="planner-note">Fenêtre de trajet : <strong>${fmtDayRange(card.travelStartDay, card.startDay)}</strong></span>
+        ${card.selectedOutbound ? `<br><span class="planner-note">Suite réservée : <strong>${fmtMoney(card.selectedOutbound.cost)}</strong> pour rejoindre ${nextMission.city.name}</span>` : ''}
+        ${card.refundCost > 0 ? `<br><span class="planner-note">Coût des trajets remplacés : <strong style="color:#a83232;">−${fmtMoney(card.refundCost)}</strong></span>` : ''}
+        ${card.feasibilityIssues.length ? `<div class="travel-warnings">${card.feasibilityIssues.map(issue => `<div>⚠ ${issue}</div>`).join('')}</div>` : ''}
+      </div>
+    </div>
+  `;
+}
+function renderOpportunityCancellation(card) {
+  const data = getPendingCardCancellationData(card);
+  if (!data) return '';
+  return `
+    <div class="cancel-panel">
+      <div class="cancel-title">Mission à annuler</div>
+      <div class="cancel-reason">${data.reason}</div>
+      <div class="cancel-stack">
+        ${data.missions.map(mission => {
+          const lostTicketCost = !mission.travelCancellable ? (mission.travelCost || 0) : 0;
+          return `
+            <div class="cancel-note">
+              <div class="cancel-note-title">${missionTitle(mission)}</div>
+              <div class="cancel-note-date">${fmtDate(mission.startWeek)}</div>
+              <div class="cancel-note-metrics">
+                <div>Paiement prévu : <strong>${fmtMoney(mission.payTotal)}</strong></div>
+                <div>Satisfaction : <strong>+${mission.points} pts</strong></div>
+                ${lostTicketCost > 0
+                  ? `<div class="cancel-note-cost">Coût du trajet : <strong>−${fmtMoney(lostTicketCost)}</strong></div>`
+                  : `<div>${isAutoCancellableMode(mission.travelMode) ? 'Trajet' : 'Billet'} : <strong>annulable sans frais</strong></div>`}
+              </div>
+            </div>
+          `;
+        }).join('')}
+      </div>
+    </div>
+  `;
+}
+function getPendingCardPrimaryAction(card) {
+  if (card.canAcceptByCancellingOverlap) {
+    return {
+      label: 'Accepter en annulant',
+      onclick: 'acceptCardByCancellingOverlap()',
+      disabled: false,
+      note: card.overlapRefundCost > 0
+        ? `L’annulation coûtera ${fmtMoney(card.overlapRefundCost)} de trajets non remboursables.`
+        : 'Les missions à annuler ont un trajet annulable sans frais.',
+    };
+  }
+  if (card.canAcceptByCancellingNextMission) {
+    return {
+      label: 'Accepter en annulant',
+      onclick: 'acceptCardByCancellingNextMission()',
+      disabled: false,
+      note: card.nextMissionCancellationRefundCost > 0
+        ? `L’annulation coûtera ${fmtMoney(card.nextMissionCancellationRefundCost)} de trajet déjà réservé.`
+        : 'La mission suivante peut être retirée sans coût de trajet.',
+    };
+  }
+  if (card.feasible) {
+    return {
+      label: 'Accepter',
+      onclick: 'acceptCard()',
+      disabled: false,
+      note: card.refundCost > 0
+        ? `Ce choix remplace des trajets déjà réservés pour ${fmtMoney(card.refundCost)}.`
+        : 'Tout passe avec la planification sélectionnée.',
+    };
+  }
+  return {
+    label: 'Accepter',
+    onclick: 'acceptCard()',
+    disabled: true,
+    note: 'Cette opportunité n’est pas faisable avec la configuration actuelle.',
+  };
 }
 function renderPendingCardModal() {
   const card = STATE.pendingCard;
@@ -2286,78 +2904,50 @@ function renderPendingCardModal() {
   }
 
   const subjectIcon = TYPE_ICON[card.type];
-  const stamp = card.type === 'house'
-    ? 'House sitting'
-    : (card.petType ? `${card.petType.charAt(0).toUpperCase() + card.petType.slice(1)}` : '');
   const nextMission = card.nextMissionId ? STATE.agenda.find(mission => mission.id === card.nextMissionId) : null;
+  const activeTab = getPendingCardActiveTab(card);
+  const primaryAction = getPendingCardPrimaryAction(card);
+  const tabs = getPendingCardTabs(card);
+  const tabPanel = activeTab === 'planning'
+    ? renderOpportunityPlanning(card, nextMission)
+    : (activeTab === 'cancellation' ? renderOpportunityCancellation(card) : renderOpportunityPresentation(card, subjectIcon));
 
   return `
     <div class="modal-overlay" id="card-modal">
-      <div class="modal-twocol">
-        <div class="card" style="background:#faf0d4;">
-          <div class="card-image">
-            ${subjectIcon}
-            <div class="stamp">${stamp}</div>
+      <div class="opportunity-modal">
+        <div class="paper game-header-bar opportunity-status-header">
+          <div class="opportunity-hero-icon">${subjectIcon}</div>
+        </div>
+        <div class="opportunity-shell">
+          <div class="opportunity-topline">
+            <div class="opportunity-title-line">
+              <strong>${esc(card.petName || 'Logement à garder')}</strong>, <span class="opportunity-city">${card.city.name}</span>, <strong class="opportunity-continent">${card.city.continent}</strong>, ${card.housing}${card.isRareHousing ? ' ✦' : ''}
+            </div>
           </div>
-          <div class="card-body">
-            <div class="card-title">${card.petName || 'Logement à garder'}</div>
-            <div class="card-loc">${card.city.name}, ${card.city.continent} · ${card.housing}${card.isRareHousing ? ' ✦' : ''}</div>
-            <div class="card-blurb">"${card.blurb}"</div>
-            ${card.hasPotes ? `<div class="potes-pill"><strong>Potes invités</strong> · bonus immédiat de +${POTES_BONUS_POINTS} pt</div>` : ''}
-            <div class="card-attrs">
-              <div><div class="attr-label">Démarrage</div><div class="attr-value">${fmtDate(card.startWeek)}</div></div>
-              <div><div class="attr-label">Durée</div><div class="attr-value">${card.durationDays} jours</div></div>
-              <div><div class="attr-label">Paiement</div><div class="attr-value">${fmtMoney(card.payTotal)}</div></div>
-              <div><div class="attr-label">Satisfaction</div><div class="attr-value">+${card.points} pts</div></div>
+          <div class="opportunity-tabs">
+            ${tabs.map(tab => `
+              <button class="opportunity-tab ${activeTab === tab.key ? 'active' : ''}" onclick="setPendingCardTab('${tab.key}')">${tab.label}</button>
+            `).join('')}
+          </div>
+          <div class="opportunity-body">
+            <div class="opportunity-main">
+              <div class="opportunity-panel-wrap">
+                <div class="opportunity-panel">${tabPanel}</div>
+              </div>
             </div>
-            ${hasPerk('friendInsider') ? (() => {
-              const quality = dealQuality(card);
-              return `<div class="deal-badge" style="border-color:${quality.color};color:${quality.color};">
-                <span class="deal-icon">🧐</span>
-                <span class="deal-label">${quality.label}</span>
-                <span class="deal-pct">(${quality.pct} vs moyenne)</span>
-                <span class="deal-hint">— ${quality.hint}</span>
-              </div>`;
-            })() : ''}
-
-            ${renderTransportPlanner(
-              card,
-              'inbound',
-              `Trajet vers ${card.city.name}`,
-              card.inboundOptions,
-              card.selectedInboundMode,
-              card.selectedInboundCancellable,
-              `Depuis ${card.srcCity.name} · ${Math.round(card.distance)} km`
-            )}
-
-            ${nextMission ? renderTransportPlanner(
-              card,
-              'outbound',
-              `Puis vers ${nextMission.city.name}`,
-              card.outboundOptions,
-              card.selectedOutboundMode,
-              card.selectedOutboundCancellable,
-              `Remplace le trajet déjà réservé pour ${missionLabel(nextMission)}`
-            ) : ''}
-
-            <div class="travel-info">
-              ${card.selectedInbound ? `${card.travelIcon} <strong>${card.travelLabel}</strong> · ${fmtDays(card.travelDays)} · ${fmtMoney(card.travelCost)}` : '✖ <strong>Trajet d’arrivée impossible</strong>'}<br>
-              <span style="font-size:12px;color:#6e5532;">Bénéfice net estimé de cette mission : <strong style="color:${card.netEstimate >= 0 ? '#2d6e3e' : '#a83232'}">${fmtMoney(card.netEstimate)}</strong></span>
-              ${card.selectedOutbound ? `<br><span style="font-size:12px;color:#6e5532;">Trajet vers le sitting suivant réservé à ${fmtMoney(card.selectedOutbound.cost)}.</span>` : ''}
-              ${card.refundCost > 0 ? `<br><span style="font-size:12px;color:#6e5532;">Billets non annulables perdus : <strong style="color:#a83232;">−${fmtMoney(card.refundCost)}</strong></span>` : ''}
-              ${card.feasibilityIssues.length ? `<div class="travel-warnings">${card.feasibilityIssues.map(issue => `<div>⚠ ${issue}</div>`).join('')}</div>` : ''}
-            </div>
-            ${renderOverlapComparison(card)}
-            <div class="card-actions">
-              <button onclick="minimizePendingCard()">Réfléchir</button>
-              <button class="danger" onclick="refuseCard()">Refuser</button>
-              ${card.canAcceptByCancellingOverlap ? `<button onclick="acceptCardByCancellingOverlap()">Accepter en annulant${card.refundCost > 0 ? ` (−${fmtMoney(card.refundCost)})` : ''}</button>` : ''}
-              ${card.canAcceptByCancellingNextMission ? `<button onclick="acceptCardByCancellingNextMission()">Accepter en annulant${card.nextMissionCancellationRefundCost > 0 ? ` (−${fmtMoney(card.nextMissionCancellationRefundCost)})` : ''}</button>` : ''}
-              <button class="primary" onclick="acceptCard()" ${!card.feasible ? 'disabled' : ''}>Accepter</button>
+            <div class="opportunity-side">
+              ${renderCalendarPane(card)}
             </div>
           </div>
         </div>
-        ${renderCalendarPane(card)}
+        <div class="opportunity-footer">
+          <div class="opportunity-footer-note">${primaryAction.note}</div>
+          <div class="opportunity-footer-main">
+            <button onclick="minimizePendingCard()">Réfléchir</button>
+            <button class="danger" onclick="refuseCard()">Refuser</button>
+            <button class="primary" onclick="${primaryAction.onclick}" ${primaryAction.disabled ? 'disabled' : ''}>${primaryAction.label}</button>
+          </div>
+        </div>
       </div>
     </div>
   `;
@@ -2441,32 +3031,18 @@ function renderMenu() {
 }
 function renderGame() {
   const currentCity = deriveCurrentCityFromState();
-  const balanceClass = STATE.balance < 200 ? 'danger' : (STATE.balance > 2000 ? 'success' : '');
-  const pointsClass = STATE.points >= VICTORY_POINTS ? 'success' : '';
-  const opportunityText = hasReputationPenalty()
-    ? `Malus réputation actif jusqu'au ${fmtDate(STATE.reputationPenaltyUntil)}`
-    : 'Réputation intacte';
   const pendingCardOpen = !!STATE.pendingCard && !STATE.pendingCardMinimized;
   const pendingCardHidden = !!STATE.pendingCard && STATE.pendingCardMinimized;
 
   app.innerHTML = `
     <div id="game">
-      <div id="header-bar" class="paper">
-        <div class="row">
-          <div style="font-size:32px">${STATE.characterIcon}</div>
-          <div>
-            <div style="font-weight:600;font-size:18px;">${esc(STATE.characterName)}</div>
-            <div style="font-size:13px;color:#6e5532;font-style:italic;">à ${currentCity ? currentCity.name : 'quelque part'}, ${currentCity ? currentCity.continent : 'Monde'}</div>
+      <div id="header-bar" class="paper game-header-bar">
+        ${renderGameHeaderInner(`
+          <div class="row">
+            <button onclick="returnToMenu()">Menu</button>
+            <button class="primary" onclick="nextTurn()" ${pendingCardOpen ? 'disabled' : ''} ${STATE.phase !== 'playing' ? 'disabled' : ''}>Tour suivant →</button>
           </div>
-        </div>
-        <div class="stat"><div class="label">Semaine</div><div class="value">${STATE.week} <span style="font-size:13px;font-weight:400;color:#6e5532;font-style:italic">· ${fmtDate(STATE.week)}</span></div></div>
-        <div class="stat"><div class="label">Solde</div><div class="value ${balanceClass}">${fmtMoney(STATE.balance)}</div></div>
-        <div class="stat"><div class="label">Points</div><div class="value ${pointsClass}">${STATE.points} / ${VICTORY_POINTS}</div></div>
-        <div class="stat"><div class="label">Réputation</div><div class="value" style="font-size:15px;">${opportunityText}</div></div>
-        <div class="row">
-          <button onclick="returnToMenu()">Menu</button>
-          <button class="primary" onclick="nextTurn()" ${pendingCardOpen ? 'disabled' : ''} ${STATE.phase !== 'playing' ? 'disabled' : ''}>Tour suivant →</button>
-        </div>
+        `)}
       </div>
 
       <div id="main-area">
@@ -2526,6 +3102,7 @@ window.acceptCardByCancellingOverlap = acceptCardByCancellingOverlap;
 window.acceptCardByCancellingNextMission = acceptCardByCancellingNextMission;
 window.minimizePendingCard = minimizePendingCard;
 window.reopenPendingCard = reopenPendingCard;
+window.setPendingCardTab = setPendingCardTab;
 window.selectPendingTransport = selectPendingTransport;
 window.togglePendingCancellable = togglePendingCancellable;
 window.updateMenuName = updateMenuName;

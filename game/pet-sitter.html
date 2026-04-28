@@ -437,7 +437,7 @@ input[type=text] {
 <script>
 'use strict';
 
-const INITIAL_BALANCE = 1500;
+const INITIAL_BALANCE = 2000;
 const WEEKLY_FOOD = 500 * 12 / 52;
 const P_OPPORTUNITY = 0.45;
 const P_LOCAL_CARD = 0.60;
@@ -461,7 +461,7 @@ const TYPE_ICON = { dog: '🐕', cat: '🐈', bird: '🦜', house: '🏠' };
 const TRANSPORT = {
   hitch:    { name: 'Auto-stop',  cost_km: 0.005, km_day:  60, trans_ocean: false, icon: '👍' },
   boatstop: { name: 'Bateau-stop',cost_km: 0.01,  km_day:  80, trans_ocean: true,  icon: '⛵' },
-  plane:    { name: 'Avion',      cost_km: 0.03,  km_day: 800, trans_ocean: true,  icon: '✈️' },
+  plane:    { name: 'Avion',      cost_km: 0.03,  km_day: 22000, trans_ocean: true,  icon: '✈️' },
   bus:      { name: 'Bus',        cost_km: 0.05,  km_day: 200, trans_ocean: false, icon: '🚌' },
   train:    { name: 'Train',      cost_km: 0.08,  km_day: 400, trans_ocean: false, icon: '🚆' },
   ferry:    { name: 'Ferry',      cost_km: 0.09,  km_day: 200, trans_ocean: true,  icon: '🚢' },
@@ -929,11 +929,12 @@ function fmtDay(day) {
   return `${date.getDate()} ${months[date.getMonth()]} ${date.getFullYear()}`;
 }
 function fmtDayRange(startDay, endDay) {
-  if (endDay - startDay < 0.5) return 'sur place';
+  if (endDay - startDay < 0.01) return 'sur place';
   return `${fmtDay(startDay)} → ${fmtDay(Math.max(startDay, endDay - 1))}`;
 }
 function fmtDays(days) {
   if (days < 0.1) return 'sur place';
+  if (days < 1) return `${Math.max(1, Math.ceil(days * 24))} h`;
   return `${Math.max(1, Math.ceil(days))} j`;
 }
 function weekOverlapsRange(week, startDay, endDay) {

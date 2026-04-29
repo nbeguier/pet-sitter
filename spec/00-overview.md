@@ -45,10 +45,11 @@ Ordre logique actuel :
    - débitent leurs coûts de transport au démarrage ;
    - déplacent la position courante.
 6. Les revenus / événements de perk éventuels se résolvent.
-7. Le coût de vie hebdomadaire est prélevé, sauf si le joueur est `chez les parents`.
-8. Si le solde passe sous `0`, la partie est perdue.
-9. Si les points atteignent `100`, la partie est gagnée.
-10. Avec `45 %` de chance de base, une nouvelle carte apparaît.
+7. Un souvenir narratif peut se déclencher après une semaine calme ou une fin de mission.
+8. Le coût de vie hebdomadaire est prélevé, sauf si le joueur est `chez les parents`.
+9. Si le solde passe sous `0`, la partie est perdue.
+10. Si les points atteignent `100`, la partie est gagnée.
+11. Avec `45 %` de chance de base, une nouvelle carte apparaît.
 
 ## 4. Types de cartes
 
@@ -106,7 +107,7 @@ Perks actuels :
   - revenu freelance aléatoire environ mensuel
   - risque de coup URSSAF en fin d’été / rentrée
 - `Comptable`
-  - affiche, dans les opportunités, une projection de solde et de points au `31 décembre`
+  - affiche, dans les opportunités, une projection de solde et de points sur les `12 prochains mois`
   - compare le planning actuel avec l’option d’acceptation choisie
 - `Star des réseaux`
   - `+20 points` de chance d’opportunité
@@ -150,6 +151,36 @@ Le retour maison peut :
 - recalculer le trajet du sitting suivant ;
 - remplacer le trajet déjà réservé du sitting suivant ;
 - nécessiter l’annulation d’un sitting qui tombe pendant le retour ou qui bloque le redépart.
+
+### 4.4. Souvenirs narratifs
+
+En plus des cartes de mission et de perk, le jeu peut déclencher de petits événements de carnet de voyage.
+
+Règles actuelles :
+
+- environ `12 %` de chance sur une fenêtre éligible ;
+- uniquement après une semaine calme ou une fin de mission ;
+- cooldown de `3 semaines` entre deux souvenirs ;
+- grande majorité d’événements positifs / feel good ;
+- certains sont purement narratifs ;
+- certains deviennent des souvenirs importants visibles dans le récap de fin.
+- tous les souvenirs déclenchent une petite popup dédiée quand ils surviennent ;
+- seuls les souvenirs marquants sont conservés dans le récap de fin.
+- hors fils `romance` / `amitié`, un même type de souvenir n’apparaît qu’une fois par partie.
+
+Exemples actuels :
+
+- `Colis de Noël`
+- `Leçon de surf`
+- `Tatouage souvenir`
+- `Romance locale`
+- `Promesse de lettres`
+
+Cas spécial :
+
+- le `8 juin 2027`, l’événement `Héritage` tombe automatiquement ;
+- il donne `+10 000 €` ;
+- il supprime définitivement la possibilité de `Retour chez les parents`.
 
 ## 5. Génération des missions
 
@@ -431,6 +462,7 @@ La modale de fin affiche :
 - carte du voyage façon carnet / polarsteps
 - succès obtenus
 - pourcentage de progression des succès manquants
+- souvenirs de route, limités aux souvenirs vraiment marquants
 
 Le score de la partie est automatiquement enregistré dans le tableau du menu (top 5).
 

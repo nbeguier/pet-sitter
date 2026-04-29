@@ -82,6 +82,7 @@ Même si tout est dans un seul fichier, le code est structuré par grandes zones
    - opportunités
    - cartes Chance
    - retour chez les parents
+   - souvenirs / événements narratifs
 8. `Actions`
    - accepter / refuser
    - annuler mission
@@ -134,6 +135,14 @@ Champs importants :
 - `potesCount`
 - `nomadLastIncomeWeek`
 - `urssafYearMarked`
+- `parentsHomeAvailable`
+- `inheritanceResolved`
+- `memories`
+- `memoryFlags`
+- `romanceThread`
+- `friendshipThread`
+- `narrativeEventCooldown`
+- `memorySpotlight`
 - sets de progression :
   - `achievements`
   - `animalsDone`
@@ -240,6 +249,18 @@ Il impacte :
 - le calendrier ;
 - la sortie de cet état, qui arrive au moment du prochain départ.
 
+### 6.4. Les souvenirs narratifs transportent aussi de l’état
+
+Même s’ils sont surtout là pour le ton, ils ne sont pas juste “cosmétiques”.
+
+Ils impactent :
+
+- le journal ;
+- le récap de fin de partie ;
+- certains flags persistants (`tatouage`, `surf`, etc.) ;
+- les fils `romance` et `amitié`, qui peuvent continuer au 2e puis au 3e retour dans leur ville ;
+- le cas spécial `Héritage`, qui désactive définitivement `Retour chez les parents`.
+
 ## 7. Fonctions sensibles à connaître
 
 Pour un dev qui reprend le projet, les zones à lire en premier sont :
@@ -252,6 +273,7 @@ Pour un dev qui reprend le projet, les zones à lire en premier sont :
 - `refreshPendingHomeSelections()`
 - `recomputeAgenda()`
 - `nextTurn()`
+- `maybeTriggerNarrativeEvent()`
 - `recordScore()`
 - `applyMissionCancellation()`
 - `renderCalendarPane()`

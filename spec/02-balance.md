@@ -21,6 +21,8 @@
 | Surcoût billet annulable | `+15 %` |
 | Fenêtre annulation sans malus | `8 semaines` |
 | Durée du malus réputation | `26 semaines` |
+| Chance de souvenir narratif | `12 %` |
+| Cooldown narratif | `3 semaines` |
 
 ## 2. Génération des opportunités
 
@@ -35,7 +37,7 @@
 
 Effets de succès :
 
-- `Expert Chien` augmente le poids des dogs de `+20 %`
+- `Expert Chien` empêche désormais les `Dog sitting` de tomber sous le prix moyen du marché
 - `Ermite` double le poids des house sittings
 
 ## 2.2. Horizon temporel
@@ -258,7 +260,7 @@ Perks actuels :
 |---|---|
 | Un ami qui s’y connaît | révèle la qualité relative d’une mission |
 | Digital Nomad | revenus freelance ponctuels + risque URSSAF |
-| Comptable | projection de solde et de points au `31 décembre` sur l’agenda connu |
+| Comptable | projection de solde et de points sur les `12 prochains mois` de l’agenda connu |
 | Star des réseaux | plus d’opportunités, plus de lointain, certains transports offerts |
 
 Contraintes :
@@ -273,7 +275,30 @@ Déblocages automatiques garantis :
 - `Comptable` au premier passage à `10 000 €` ou plus
 - `Star des réseaux` à partir de `104 semaines`, sauf si elle est déjà devenue impossible à cause d’un avion
 
-## 8. Retour chez les parents
+## 8. Souvenirs narratifs
+
+Le jeu contient aussi un petit pool d’événements “carnet de route”.
+
+Règles actuelles :
+
+- ils ne tombent que sur des fenêtres calmes ou après une fin de mission ;
+- chance de base : `12 %` ;
+- cooldown : `3 semaines` ;
+- ils sont majoritairement positifs et surtout cosmétiques ;
+- certains laissent un souvenir important visible dans l’écran de fin.
+
+Cas spéciaux :
+
+- `Leçon de surf` et `Tatouage souvenir` sont des souvenirs marquants ;
+- `Romance locale` et `Promesse de lettres` ouvrent chacune un fil narratif lié à une ville ;
+- si le joueur revient dans cette ville, il peut avoir une suite ;
+- au `3e` passage, le fil débouche sur un moment plus fort ;
+- les fils `romance` et `amitié` ne partagent jamais la même ville ;
+- le `8 juin 2027`, `Héritage` tombe à `100 %` :
+  - `+10 000 €`
+  - suppression définitive de `Retour chez les parents`
+
+## 9. Retour chez les parents
 
 Cette mécanique n’existait pas dans les anciennes specs, mais elle fait maintenant partie du vrai jeu.
 
@@ -290,9 +315,9 @@ Règles actuelles :
   - remplacer un trajet déjà prévu ;
   - imposer une annulation si le calendrier est trop serré
 
-## 9. Mesures de simulation
+## 10. Mesures de simulation
 
-### 9.1. Source
+### 10.1. Source
 
 Commande exécutée le **28 avril 2026** :
 
@@ -300,7 +325,7 @@ Commande exécutée le **28 avril 2026** :
 node spec/sim/current_balance_sim.js --n 200 --json
 ```
 
-### 9.2. Résultat
+### 10.2. Résultat
 
 Résultats obtenus avec le bot `ecolo_collection_bot` :
 
@@ -325,7 +350,7 @@ Ce bot n’est plus un simple bot de survie pure :
 | `avgHomeUses` | `5,63` |
 | `nearbyWeekRate` | `70,4 %` |
 
-### 9.3. Lecture
+### 10.3. Lecture
 
 En l’état :
 
@@ -335,7 +360,7 @@ En l’état :
 - la mécanique “maison” reste un levier énorme d’équilibrage ;
 - l’économie n’est plus le seul sujet : la capacité à convertir la survie en gros paquets de points devient centrale, et les cartes Chance garanties lissent davantage l’entrée dans certaines stratégies.
 
-### 9.4. Limite importante
+### 10.4. Limite importante
 
 Le simulateur actuel :
 
@@ -351,7 +376,7 @@ Sa limite principale a changé :
 - il sait mieux convertir certaines opportunités en progression de collection ;
 - malgré ça, il ne joue pas encore comme un humain opportuniste qui accepterait parfois un risque calculé pour verrouiller un très gros succès.
 
-## 10. Leviers d’équilibrage principaux
+## 11. Leviers d’équilibrage principaux
 
 Si quelqu’un reprend l’équilibrage, les gros boutons utiles sont :
 

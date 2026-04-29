@@ -669,6 +669,16 @@ input[type=text] {
   border-color: rgba(168, 50, 50, 0.28);
   background: linear-gradient(180deg, rgba(255,249,247,0.98) 0%, rgba(246,226,223,0.92) 100%);
 }
+.accountant-card.positive .accountant-value,
+.accountant-card.positive .accountant-sub,
+.accountant-card.positive .accountant-status {
+  color: #1f5830;
+}
+.accountant-card.negative .accountant-value,
+.accountant-card.negative .accountant-sub,
+.accountant-card.negative .accountant-status {
+  color: #8d3434;
+}
 .accountant-label {
   font-size: 11px;
   text-transform: uppercase;
@@ -1039,6 +1049,34 @@ input[type=text] {
 }
 .chance-modal { max-width: 500px; }
 .chance-icon { font-size: 56px; margin-top: 8px; }
+.memory-modal { max-width: 560px; }
+.memory-spotlight-kicker {
+  font-size: 12px;
+  text-transform: uppercase;
+  letter-spacing: 0.12em;
+  color: #8b6f47;
+}
+.memory-spotlight-title {
+  margin-top: 12px;
+  font-size: 30px;
+  font-weight: 700;
+  color: #2b1f10;
+}
+.memory-spotlight-meta {
+  margin-top: 10px;
+  font-size: 14px;
+  color: #6e5532;
+}
+.memory-spotlight-text {
+  margin-top: 16px;
+  padding: 18px 20px;
+  border-radius: 18px;
+  background: rgba(245, 230, 200, 0.5);
+  border: 1px solid rgba(110, 85, 50, 0.16);
+  font-size: 18px;
+  line-height: 1.6;
+  color: #3d2d1a;
+}
 .end-modal {
   max-width: 980px;
   max-height: calc(100vh - 40px);
@@ -1065,6 +1103,47 @@ input[type=text] {
   padding: 6px 8px; border-bottom: 1px dotted #d4b896;
 }
 .recap-empty { margin-top: 8px; font-style: italic; color: #6e5532; }
+.memory-list {
+  margin-top: 8px;
+  display: flex;
+  flex-direction: column;
+  gap: 8px;
+  max-height: 260px;
+  overflow-y: auto;
+}
+.memory-row {
+  padding: 10px 12px;
+  border: 1px solid rgba(110, 85, 50, 0.16);
+  border-radius: 12px;
+  background: rgba(255,255,255,0.74);
+}
+.memory-head {
+  display: flex;
+  justify-content: space-between;
+  gap: 12px;
+  align-items: baseline;
+}
+.memory-title {
+  font-size: 15px;
+  font-weight: 700;
+  color: #2b1f10;
+}
+.memory-date {
+  font-size: 11px;
+  color: #8b6f47;
+  white-space: nowrap;
+}
+.memory-meta {
+  margin-top: 2px;
+  font-size: 11px;
+  color: #8b6f47;
+}
+.memory-text {
+  margin-top: 6px;
+  font-size: 13px;
+  line-height: 1.45;
+  color: #4a3520;
+}
 
 .help-button {
   position: fixed; top: 16px; right: 16px;
@@ -1463,7 +1542,7 @@ input[type=text] {
       <li>2 % des tirages d'opportunité peuvent devenir une carte Chance.</li>
       <li><strong>Un ami qui s'y connaît</strong> : juge la qualité du paiement de chaque carte.</li>
       <li><strong>Digital Nomad</strong> : petits revenus freelance mensuels. Attention l'URSSAF en septembre.</li>
-      <li><strong>Comptable</strong> : affiche une projection argent / points au 31 décembre sur les opportunités.</li>
+      <li><strong>Comptable</strong> : affiche une projection argent / points sur les 12 prochains mois dans les opportunités.</li>
       <li><strong>Star des réseaux</strong> : +20 % d'opportunités, missions plus lointaines, 50 % de chance que train/bateau/bus soient offerts. Le premier avion fait perdre la carte.</li>
     </ul>
     <h2>Annuler une mission</h2>
@@ -1483,7 +1562,6 @@ input[type=text] {
 
 const INITIAL_BALANCE = 1000;
 const WEEKLY_FOOD_BASE = 500 * 12 / 52;
-const EXPERT_DOG_MULTIPLIER = 1.2;
 const PET_SITTER_MENTOR_THRESHOLD = 10;
 const DIGITAL_NOMAD_THRESHOLD = 1000;
 const DIGITAL_NOMAD_STREAK_WEEKS = 13;
@@ -1492,6 +1570,9 @@ const SOCIAL_STAR_MILESTONE_WEEK = 104;
 const REPEAT_PET_CHANCE = 0.15;
 const REPEAT_PET_BONUS_MIN = 1.10;
 const REPEAT_PET_BONUS_MAX = 1.20;
+const NARRATIVE_EVENT_CHANCE = 0.12;
+const NARRATIVE_EVENT_COOLDOWN_WEEKS = 3;
+const MAX_MEMORIES = 80;
 function currentWeeklyFood(week) {
   return WEEKLY_FOOD_BASE;
 }
@@ -1543,6 +1624,8 @@ const LAND_MODES = ['hitch','bus','train'];
 const SEA_MODES  = ['boatstop','plane','ferry'];
 const PEKIN_EXPRESS_MODES = ['hitch', 'boatstop', 'bus', 'train', 'ferry'];
 const LOIN_DU_NID_WEEKS = 52;
+const COASTAL_CITIES = new Set(['Lisbonne', 'Stockholm', 'Athènes', 'Le Cap', 'Dakar', 'Tel Aviv', 'Tokyo', 'Bangkok', 'Jakarta', 'Manille', 'Los Angeles', 'New York', 'Rio', 'Lima', 'Buenos Aires', 'Santiago', 'Montevideo', 'Sydney', 'Auckland', 'Melbourne']);
+const BIG_CITY_CITIES = new Set(['Paris', 'Berlin', 'Rome', 'Madrid', 'Vienne', 'Le Caire', 'Lagos', 'Tokyo', 'Bangkok', 'Mumbai', 'New Delhi', 'Pékin', 'Séoul', 'Singapour', 'New York', 'Los Angeles', 'Chicago', 'Houston', 'Mexico', 'Toronto', 'Buenos Aires', 'Rio', 'Lima', 'Bogota', 'Sydney', 'Melbourne']);
 
 const LAND_CONNECTED = new Set([
   'Europe|Asia', 'Asia|Europe',
@@ -1943,7 +2026,7 @@ const PERK_DEFS = {
   accountant: {
     name: 'Comptable',
     icon: '🧮',
-    desc: 'Projette, sur chaque opportunité, l’argent et les points attendus au 31 décembre avec le planning connu.',
+    desc: 'Projette, sur chaque opportunité, l’argent et les points attendus sur les 12 prochains mois avec le planning connu.',
   },
   socialStar: {
     name: 'Star des réseaux',
@@ -2140,6 +2223,416 @@ function rfloat(min, max) { return Math.random() * (max - min) + min; }
 function findCityByName(name) {
   return CITIES.find(city => city.name === name) || null;
 }
+function pickRandom(list) {
+  return list[Math.floor(Math.random() * list.length)];
+}
+function currentWeekDate() {
+  return dayToDate(weekToDay(STATE.week));
+}
+function isCoastalCity(city) {
+  return !!city && COASTAL_CITIES.has(city.name);
+}
+function isBigCity(city) {
+  return !!city && BIG_CITY_CITIES.has(city.name);
+}
+function addMemory({ title, text, city = null, tags = [], important = false, icon = '✦', dateLabel = null }) {
+  const targetCity = city || deriveCurrentCityFromState() || STATE.currentCity || STATE.startCity || null;
+  const entry = {
+    week: STATE.week,
+    dateLabel: dateLabel || fmtDate(STATE.week),
+    title,
+    text,
+    cityName: targetCity ? targetCity.name : null,
+    continent: targetCity ? targetCity.continent : null,
+    tags,
+    important,
+    icon,
+  };
+  STATE.memories.unshift(entry);
+  if (STATE.memories.length > MAX_MEMORIES) STATE.memories.pop();
+  log(`${icon} ${text}`);
+  if (STATE.phase === 'playing' && !STATE.tutorialRun) STATE.memorySpotlight = entry;
+  return entry;
+}
+function weightedPick(items) {
+  const total = items.reduce((sum, item) => sum + (item.weight || 1), 0);
+  let roll = Math.random() * total;
+  for (const item of items) {
+    roll -= item.weight || 1;
+    if (roll <= 0) return item;
+  }
+  return items[items.length - 1] || null;
+}
+function triggerInheritanceMemory() {
+  if (STATE.inheritanceResolved || STATE.week < INHERITANCE_EVENT_WEEK) return false;
+  STATE.inheritanceResolved = true;
+  STATE.parentsHomeAvailable = false;
+  STATE.atParents = false;
+  STATE.balance += 10000;
+  addMemory({
+    title: 'Héritage',
+    text: 'Tes parents sont morts. Tu reçois un héritage de 10 000 €. Tu comprends aussi, d’un coup, qu’il n’y a plus de maison où rentrer.',
+    city: deriveCurrentCityFromState(),
+    tags: ['famille', 'tournant'],
+    important: true,
+    icon: '🕯️',
+    dateLabel: fmtDay(INHERITANCE_EVENT_DAY),
+  });
+  return true;
+}
+function canStartRomanceInCity(city) {
+  return city && !STATE.romanceThread && (!STATE.friendshipThread || STATE.friendshipThread.cityName !== city.name);
+}
+function canStartFriendshipInCity(city) {
+  return city && !STATE.friendshipThread && (!STATE.romanceThread || STATE.romanceThread.cityName !== city.name);
+}
+function maybeAdvanceThread(threadKey, city) {
+  const thread = STATE[threadKey];
+  if (!thread || !city || thread.cityName !== city.name || thread.stage >= 3 || thread.lastTriggerWeek === STATE.week) return false;
+  const isRomance = threadKey === 'romanceThread';
+  const stage = thread.stage + 1;
+  const variants = isRomance
+    ? [
+      null,
+      {
+        title: 'Suite de romance',
+        text: `Tu es retombé sur cette histoire à ${city.name}. Cette fois, vous avez arrêté de faire semblant que ce n’était qu’un joli hasard.`,
+        tags: ['romance', 'suite'],
+        icon: '💌',
+      },
+      {
+        title: 'Troisième rendez-vous',
+        text: `À force de revenir à ${city.name}, cette romance est devenue un vrai chapitre de ta vie. Vous avez fini par avoir vos habitudes, comme si la ville vous attendait.`,
+        tags: ['romance', 'chapitre'],
+        icon: '❤️',
+      },
+    ]
+    : [
+      null,
+      {
+        title: 'Des nouvelles par lettre',
+        text: `À ${city.name}, tu as retrouvé cette amie avec qui tu t’étais promis d’échanger des lettres. Vous aviez l’impression de reprendre une conversation jamais vraiment interrompue.`,
+        tags: ['amitié', 'suite'],
+        icon: '💌',
+      },
+      {
+        title: 'Une amitié qui tient',
+        text: `En revenant à ${city.name}, tu t’es rendu compte que cette amitié avait pris racine pour de bon. Certaines personnes finissent par compter, même quand on vit entre deux gares.`,
+        tags: ['amitié', 'chapitre'],
+        icon: '🤝',
+      },
+    ];
+  thread.stage = stage;
+  thread.lastTriggerWeek = STATE.week;
+  const payload = variants[stage - 1];
+  if (!payload) return false;
+  addMemory({ ...payload, city, important: stage >= 3 });
+  return true;
+}
+function buildNarrativeEventCandidates(context) {
+  const city = context.city;
+  const candidates = [];
+  if (!city) return candidates;
+  const month = currentWeekDate().getMonth();
+  const day = currentWeekDate().getDate();
+
+  if (month === 11 && day >= 20 && !STATE.memoryFlags.christmas_package && STATE.parentsHomeAvailable) {
+    candidates.push({
+      key: 'christmas_package',
+      weight: 1.8,
+      run: () => addMemory({
+        title: 'Colis de Noël',
+        text: 'Tu as reçu un colis de tes parents. Il y avait des biscuits, un pull un peu moche, et un mot qui t’a fait sourire malgré toi.',
+        city,
+        tags: ['famille', 'hiver'],
+        important: true,
+        icon: '🎁',
+      }),
+    });
+  }
+
+  if (context.hasPotes) {
+    candidates.push({
+      key: 'party_all_night',
+      weight: 1.4,
+      run: () => addMemory({
+        title: 'Nuit blanche',
+        text: 'Vous avez dansé et chanté toute la nuit. Le salon a survécu, miraculeusement.',
+        city,
+        tags: ['fête', 'potes'],
+        icon: '🪩',
+      }),
+    });
+    if ((month === 5 || month === 11)) {
+      candidates.push({
+        key: 'solstice_fire',
+        weight: 1.2,
+        run: () => addMemory({
+          title: 'Solstice',
+          text: 'Vous avez fêté le solstice en dansant autour d’un feu, avec cette impression rare que tout était à sa place.',
+          city,
+          tags: ['fête', 'feu'],
+          important: true,
+          icon: '🔥',
+        }),
+      });
+    }
+  }
+
+  if (isCoastalCity(city)) {
+    if (!STATE.memoryFlags.learned_surf) {
+      candidates.push({
+        key: 'learned_surf',
+        weight: 1.5,
+        run: () => addMemory({
+          title: 'Leçon de surf',
+          text: 'Tu as appris à surfer. Tu t’es surtout beaucoup vautré, mais tu en gardes une fierté étrange.',
+          city,
+          tags: ['mer', 'souvenir'],
+          important: true,
+          icon: '🏄',
+        }),
+      });
+    }
+    candidates.push({
+      key: 'dawn_swim',
+      weight: 1.1,
+      run: () => addMemory({
+        title: 'Lever du jour',
+        text: 'Tu t’es baigné au lever du jour. L’eau était glacée, mais tu t’en souviendras longtemps.',
+        city,
+        tags: ['mer'],
+        icon: '🌅',
+      }),
+    });
+    candidates.push({
+      key: 'grilled_fish',
+      weight: 1.0,
+      run: () => addMemory({
+        title: 'Poisson grillé',
+        text: 'Tu as mangé du poisson grillé face au vent, les pieds encore pleins de sable.',
+        city,
+        tags: ['mer', 'table'],
+        icon: '🐟',
+      }),
+    });
+  }
+
+  if (isBigCity(city)) {
+    candidates.push({
+      key: 'night_walk',
+      weight: 1.0,
+      run: () => addMemory({
+        title: 'Errance nocturne',
+        text: 'Tu as passé la nuit à marcher sans but, juste pour regarder les vitrines, les néons et les gens.',
+        city,
+        tags: ['ville'],
+        icon: '🌃',
+      }),
+    });
+    candidates.push({
+      key: 'free_concert',
+      weight: 0.9,
+      run: () => addMemory({
+        title: 'Concert gratuit',
+        text: 'Tu es tombé sur un petit concert gratuit. Tu ne connaissais personne, mais tu as chanté quand même.',
+        city,
+        tags: ['ville', 'musique'],
+        icon: '🎶',
+      }),
+    });
+  }
+
+  if (city.continent === 'Europe' && !STATE.memoryFlags.castle_day) {
+    candidates.push({
+      key: 'castle_day',
+      weight: 0.9,
+      run: () => addMemory({
+        title: 'Vieux château',
+        text: 'Tu as visité un vieux château et tu t’es inventé une autre vie pendant toute l’après-midi.',
+        city,
+        tags: ['europe', 'imaginaire'],
+        icon: '🏰',
+      }),
+    });
+  }
+  if (city.continent === 'Africa') {
+    candidates.push({
+      key: 'shared_meal',
+      weight: 1.0,
+      run: () => addMemory({
+        title: 'Table généreuse',
+        text: 'Tu as partagé un repas qu’on t’a servi avec une générosité qui t’a un peu bouleversé.',
+        city,
+        tags: ['afrique', 'table'],
+        icon: '🍲',
+      }),
+    });
+    candidates.push({
+      key: 'night_street',
+      weight: 0.9,
+      run: () => addMemory({
+        title: 'Soirée dehors',
+        text: 'Tu as passé la soirée dehors, à écouter les voix, la musique et les scooters jusqu’à très tard.',
+        city,
+        tags: ['afrique', 'ville'],
+        icon: '🌙',
+      }),
+    });
+  }
+  if (city.continent === 'Asia') {
+    candidates.push({
+      key: 'city_at_dawn',
+      weight: 1.0,
+      run: () => addMemory({
+        title: 'Ville à l’aube',
+        text: 'Tu t’es levé avant l’aube pour voir la ville s’éveiller. Tu avais l’impression d’être au bon endroit.',
+        city,
+        tags: ['asie', 'aube'],
+        icon: '🌄',
+      }),
+    });
+    candidates.push({
+      key: 'street_food',
+      weight: 1.0,
+      run: () => addMemory({
+        title: 'Rue improbable',
+        text: 'Tu as mangé un truc incroyable dans une rue où tu n’aurais jamais pensé t’arrêter.',
+        city,
+        tags: ['asie', 'table'],
+        icon: '🥢',
+      }),
+    });
+  }
+  if (city.continent === 'N.America') {
+    candidates.push({
+      key: 'big_coffee',
+      weight: 0.9,
+      run: () => addMemory({
+        title: 'Café immense',
+        text: 'Tu as pris un café immense et tu t’es senti ridiculement heureux pour un truc aussi simple.',
+        city,
+        tags: ['amerique', 'ville'],
+        icon: '☕',
+      }),
+    });
+  }
+  if (city.continent === 'S.America') {
+    candidates.push({
+      key: 'improvised_party',
+      weight: 1.0,
+      run: () => addMemory({
+        title: 'Fête improvisée',
+        text: 'Tu as fini dans une fête où tu ne connaissais personne, et tu es rentré au lever du jour.',
+        city,
+        tags: ['amerique', 'fête'],
+        icon: '💃',
+      }),
+    });
+  }
+  if (city.continent === 'Oceania') {
+    candidates.push({
+      key: 'long_light',
+      weight: 0.9,
+      run: () => addMemory({
+        title: 'Lumière longue',
+        text: 'Tu as passé l’après-midi dehors sans regarder l’heure, juste parce que la lumière était belle.',
+        city,
+        tags: ['oceanie'],
+        icon: '🌞',
+      }),
+    });
+  }
+
+  if (!STATE.memoryFlags.tattoo) {
+    candidates.push({
+      key: 'tattoo',
+      weight: 0.7,
+      run: () => addMemory({
+        title: 'Tatouage souvenir',
+        text: 'Tu t’es fait tatouer un souvenir de cette vie nomade. Minuscule, discret, mais impossible à oublier.',
+        city,
+        tags: ['souvenir', 'corps'],
+        important: true,
+        icon: '🖋️',
+      }),
+    });
+  }
+  if (canStartRomanceInCity(city)) {
+    candidates.push({
+      key: null,
+      weight: 0.8,
+      run: () => {
+        STATE.romanceThread = { cityName: city.name, continent: city.continent, stage: 1, lastTriggerWeek: STATE.week };
+        addMemory({
+          title: 'Romance locale',
+          text: `Tu as pécho un local à ${city.name}. Pendant quelques jours, la ville n’avait plus tout à fait la même lumière.`,
+          city,
+          tags: ['romance', 'rencontre'],
+          important: true,
+          icon: '💘',
+        });
+      },
+    });
+  }
+  if (canStartFriendshipInCity(city)) {
+    candidates.push({
+      key: null,
+      weight: 0.8,
+      run: () => {
+        STATE.friendshipThread = { cityName: city.name, continent: city.continent, stage: 1, lastTriggerWeek: STATE.week };
+        addMemory({
+          title: 'Promesse de lettres',
+          text: `Tu t’es fait une amie à ${city.name}. Vous vous êtes promis de vous écrire, pour de vrai, sur du papier.`,
+          city,
+          tags: ['amitié', 'lettres'],
+          important: true,
+          icon: '🤝',
+        });
+      },
+    });
+  }
+  candidates.push({
+    key: 'market_trinket',
+    weight: 0.8,
+    run: () => addMemory({
+      title: 'Petit marché',
+      text: 'Tu as trouvé un petit objet sur un marché et tu t’es convaincu qu’il t’accompagnerait longtemps.',
+      city,
+      tags: ['souvenir'],
+      icon: '🧿',
+    }),
+  });
+  return candidates.filter(candidate => !candidate.key || !STATE.memoryFlags[candidate.key]);
+}
+function maybeTriggerNarrativeEvent(context) {
+  if (STATE.tutorialRun) return false;
+  if (triggerInheritanceMemory()) return true;
+  if (!context.city) return false;
+  if (context.arrived && maybeAdvanceThread('romanceThread', context.city)) {
+    STATE.narrativeEventCooldown = NARRATIVE_EVENT_COOLDOWN_WEEKS;
+    return true;
+  }
+  if (context.arrived && maybeAdvanceThread('friendshipThread', context.city)) {
+    STATE.narrativeEventCooldown = NARRATIVE_EVENT_COOLDOWN_WEEKS;
+    return true;
+  }
+  if (!context.eventWindow) return false;
+  if (STATE.narrativeEventCooldown > 0) {
+    STATE.narrativeEventCooldown--;
+    return false;
+  }
+  if (Math.random() >= NARRATIVE_EVENT_CHANCE) return false;
+
+  const candidates = buildNarrativeEventCandidates(context);
+  if (!candidates.length) return false;
+  const chosen = weightedPick(candidates);
+  if (!chosen) return false;
+  chosen.run();
+  if (chosen.key) STATE.memoryFlags[chosen.key] = true;
+  STATE.narrativeEventCooldown = NARRATIVE_EVENT_COOLDOWN_WEEKS;
+  return true;
+}
 function weighted(items, weights) {
   let total = weights.reduce((a, b) => a + b, 0);
   let r = Math.random() * total;
@@ -2172,9 +2665,7 @@ function esc(value) {
 }
 function weekToDay(week) { return week * 7; }
 function dayToDate(day) {
-  const date = new Date(2026, 0, 1);
-  date.setDate(date.getDate() + Math.floor(day));
-  return date;
+  return new Date(Date.UTC(2026, 0, 1 + Math.floor(day)));
 }
 function fmtMoney(n) { return `${Math.round(n)} €`; }
 function fmtDate(week) {
@@ -2186,9 +2677,12 @@ function fmtDay(day) {
   return `${date.getDate()} ${months[date.getMonth()]} ${date.getFullYear()}`;
 }
 function dateToDay(date) {
-  const base = new Date(2026, 0, 1);
-  return Math.floor((new Date(date.getFullYear(), date.getMonth(), date.getDate()) - base) / 86400000);
+  const base = Date.UTC(2026, 0, 1);
+  const target = Date.UTC(date.getFullYear(), date.getMonth(), date.getDate());
+  return Math.floor((target - base) / 86400000);
 }
+const INHERITANCE_EVENT_DAY = dateToDay(new Date(2027, 5, 8));
+const INHERITANCE_EVENT_WEEK = Math.floor(INHERITANCE_EVENT_DAY / 7);
 function fmtDayRange(startDay, endDay) {
   if (endDay - startDay < 0.01) return 'sur place';
   return `${fmtDay(startDay)} → ${fmtDay(Math.max(startDay, endDay - 1))}`;
@@ -2413,6 +2907,14 @@ function buildDefaultState() {
     urssafYearMarked: -1,
     tutorialRun: false,
     tutorialStep: 0,
+    parentsHomeAvailable: true,
+    inheritanceResolved: false,
+    memories: [],
+    memoryFlags: {},
+    romanceThread: null,
+    friendshipThread: null,
+    narrativeEventCooldown: 0,
+    memorySpotlight: null,
   };
 }
 
@@ -2880,18 +3382,19 @@ function canFutureAgendaFitFrom(originCity, availableDay, excludedMissionIds = n
   return true;
 }
 function getParentsDepartureWeek() {
-  if (!STATE.atParents) return null;
+  if (!STATE.atParents || !STATE.parentsHomeAvailable) return null;
   const upcoming = getUpcomingAgenda();
   if (!upcoming.length) return null;
   const nextDepartureDay = Math.min(...upcoming.map(mission => getMissionDepartureDay(mission)));
   return Math.floor(nextDepartureDay / 7);
 }
 function isShelteredAtParentsThisWeek() {
-  if (!STATE.atParents) return false;
+  if (!STATE.atParents || !STATE.parentsHomeAvailable) return false;
   const departureWeek = getParentsDepartureWeek();
   return departureWeek == null || STATE.week < departureWeek;
 }
 function buildHomeReturnOffer() {
+  if (!STATE.parentsHomeAvailable) return null;
   const homeCity = STATE.startCity;
   const currentCity = deriveCurrentCityFromState();
   if (!homeCity || !currentCity) return null;
@@ -3293,6 +3796,14 @@ function normalizeLoadedState(snap) {
   STATE.editCard = null;
   STATE.editCardTab = 'presentation';
   STATE.offerFilter = STATE.offerFilter === 'nearby' ? 'nearby' : 'anywhere';
+  STATE.parentsHomeAvailable = snap.parentsHomeAvailable !== false;
+  STATE.inheritanceResolved = !!snap.inheritanceResolved;
+  STATE.memories = Array.isArray(snap.memories) ? snap.memories : [];
+  STATE.memoryFlags = snap.memoryFlags && typeof snap.memoryFlags === 'object' ? snap.memoryFlags : {};
+  STATE.romanceThread = snap.romanceThread && typeof snap.romanceThread === 'object' ? snap.romanceThread : null;
+  STATE.friendshipThread = snap.friendshipThread && typeof snap.friendshipThread === 'object' ? snap.friendshipThread : null;
+  STATE.narrativeEventCooldown = Number.isFinite(snap.narrativeEventCooldown) ? Math.max(0, snap.narrativeEventCooldown) : 0;
+  STATE.memorySpotlight = null;
   STATE.atParents = !!STATE.atParents;
   if (typeof snap.lastReturnHomeWeek === 'number' && Number.isFinite(snap.lastReturnHomeWeek)) {
     STATE.lastReturnHomeWeek = Math.max(0, snap.lastReturnHomeWeek);
@@ -3375,6 +3886,7 @@ function offerReturnHome() {
     render();
     return;
   }
+  if (!STATE.parentsHomeAvailable) return;
   if (STATE.phase !== 'playing' || STATE.pendingCard || STATE.editCard || getActiveMission() || STATE.atParents) return;
   const card = buildHomeReturnOffer();
   if (!card) return;
@@ -3555,7 +4067,6 @@ function rebuildPetsSeenFromCompleted(completed, fallbackPets = []) {
 
 function generateRawMission() {
   const weights = { ...POOL_BASE };
-  if (STATE.achievements.has('expert_chien')) weights.dog *= EXPERT_DOG_MULTIPLIER;
   if (STATE.achievements.has('ermite')) weights.house *= 2;
   const types = Object.keys(weights);
   const type = weighted(types, types.map(key => weights[key]));
@@ -3572,6 +4083,10 @@ function generateRawMission() {
 
   const [payLo, payHi] = PAY_RANGES[type];
   let payPerDay = rfloat(payLo, payHi);
+  if (type === 'dog' && STATE.achievements.has('expert_chien')) {
+    const marketFloor = (payLo + payHi) / 2;
+    payPerDay = Math.max(payPerDay, marketFloor);
+  }
   const [ptsLo, ptsHi] = POINT_RANGES[type];
   let points = rint(ptsLo, ptsHi);
   let isRareHousing = Math.random() < P_RARE_HOUSING;
@@ -3884,11 +4399,15 @@ function cloneProjectionState(source = STATE) {
     urssafYearMarked: source.urssafYearMarked,
   };
 }
-function getCurrentYearProjectionTarget(week = STATE.week) {
-  const currentDate = dayToDate(weekToDay(week));
-  const year = currentDate.getFullYear();
-  const endDay = dateToDay(new Date(year, 11, 31));
-  return { year, endDay, endWeek: Math.floor(endDay / 7), label: fmtDay(endDay) };
+function getRollingYearProjectionTarget(week = STATE.week) {
+  const endWeek = week + 52;
+  const endDay = weekToDay(endWeek);
+  return {
+    endWeek,
+    endDay,
+    label: fmtDay(endDay),
+    windowLabel: '12 mois glissants',
+  };
 }
 function recomputeAgendaForProjection(simState) {
   const backup = {
@@ -4091,7 +4610,7 @@ function getProjectionSummary(simState, target) {
       ? `Défaite prévue le ${fmtDate(finalState.week)}.`
       : `Victoire prévue le ${fmtDate(finalState.week)}.`;
   } else {
-    status = `Toujours en jeu au ${target.label}.`;
+    status = `Toujours en jeu à l’horizon ${target.windowLabel.toLowerCase()} (${target.label}).`;
   }
   return {
     balance: finalState.balance,
@@ -4102,16 +4621,46 @@ function getProjectionSummary(simState, target) {
     status,
   };
 }
+function getAccountantImpactWeek(card) {
+  if (!card) return null;
+  const weeks = [];
+  if (card.canAcceptByCancellingOverlap || card.canAcceptByCancellingNextMission || (card.refundCost || 0) > 0) {
+    weeks.push(STATE.week);
+  }
+  if (typeof card.travelStartDay === 'number') weeks.push(Math.floor(card.travelStartDay / 7));
+  if (typeof card.startWeek === 'number') weeks.push(card.startWeek);
+  if (typeof card.nextTravelStartDay === 'number') weeks.push(Math.floor(card.nextTravelStartDay / 7));
+  return weeks.length ? Math.min(...weeks) : null;
+}
 function getOpportunityAccountantProjection(card) {
   if (!hasPerk('accountant') || !card || card.kind !== 'mission') return null;
-  const target = getCurrentYearProjectionTarget(STATE.week);
+  const target = getRollingYearProjectionTarget(STATE.week);
   const baseline = getProjectionSummary(cloneProjectionState(), target);
   const acceptedState = buildAcceptedOpportunityProjectionState(card);
   const accepted = acceptedState ? getProjectionSummary(acceptedState, target) : null;
+  const sameOutcome = !!accepted
+    && Math.abs(accepted.balance - baseline.balance) < 0.01
+    && accepted.points === baseline.points
+    && accepted.week === baseline.week
+    && accepted.endReason === baseline.endReason;
+  const impactWeek = getAccountantImpactWeek(card);
+  let note = '';
+  if (sameOutcome) {
+    if (baseline.stoppedEarly && impactWeek != null && baseline.week <= impactWeek) {
+      note = baseline.endReason === 'victory'
+        ? 'Ton planning actuel prévoit déjà une victoire avant que cette mission n’ait un effet comptable.'
+        : 'Ton planning actuel prévoit déjà une défaite avant que cette mission n’ait un effet comptable.';
+    } else if (impactWeek != null && impactWeek > target.endWeek) {
+      note = 'Cette mission ne commence qu’après l’horizon des 12 mois glissants.';
+    } else {
+      note = 'À cet horizon, cette variation de plan ne change pas ta trajectoire comptable.';
+    }
+  }
   return {
     target,
     baseline,
     accepted,
+    note,
     acceptLabel: (card.canAcceptByCancellingOverlap || card.canAcceptByCancellingNextMission)
       ? 'Si tu acceptes en annulant'
       : 'Si tu acceptes',
@@ -4925,6 +5474,7 @@ function nextTurn() {
     render();
     return;
   }
+  if (STATE.memorySpotlight) return;
   if (STATE.editCard) return;
   if (STATE.pendingCard && !STATE.pendingCardMinimized) return;
   const brokenMission = getNextBrokenMission();
@@ -5027,6 +5577,19 @@ function nextTurn() {
   if (STATE.balance >= 0 && STATE.balance < DIGITAL_NOMAD_THRESHOLD) STATE.under1000StreakWeeks++;
   else if (STATE.balance >= DIGITAL_NOMAD_THRESHOLD) STATE.under1000StreakWeeks = 0;
   checkAchievements();
+
+  const currentCity = deriveCurrentCityFromState();
+  const arrivedThisWeek = !!currentCity && (
+    starting.some(mission => mission.city && mission.city.name === currentCity.name)
+    || ending.some(mission => mission.city && mission.city.name === currentCity.name)
+  );
+  const activeMission = getActiveMission();
+  maybeTriggerNarrativeEvent({
+    city: currentCity,
+    arrived: arrivedThisWeek,
+    hasPotes: !!(activeMission && activeMission.hasPotes) || starting.some(mission => mission.hasPotes) || ending.some(mission => mission.hasPotes),
+    eventWindow: ending.length > 0 || (starting.length === 0 && !activeMission),
+  });
 
   if (STATE.balance < 0) {
     STATE.phase = 'over';
@@ -5224,6 +5787,13 @@ function renderReturnHomePanel() {
       </div>
     `;
   }
+  if (!STATE.parentsHomeAvailable) {
+    return `
+      <div class="offer-filter-panel">
+        <div class="offer-filter-note">Il n’y a plus de maison où rentrer. Depuis l’héritage, ce bouton n’existe plus que comme un souvenir un peu brutal.</div>
+      </div>
+    `;
+  }
   const activeMission = getActiveMission();
   const disabled = STATE.atParents || !!STATE.pendingCard || !!STATE.editCard || !!activeMission;
   const text = STATE.atParents
@@ -5335,7 +5905,7 @@ function renderMap(currentCity, options = {}) {
   }
   if (STATE.startCity) {
     const point = proj(STATE.startCity.lat, STATE.startCity.lng);
-    markers += `<text class="home-marker" x="${(point.x + 11).toFixed(2)}" y="${(point.y - 10).toFixed(2)}">🏠</text>`;
+    if (STATE.parentsHomeAvailable) markers += `<text class="home-marker" x="${(point.x + 11).toFixed(2)}" y="${(point.y - 10).toFixed(2)}">🏠</text>`;
   }
   if (currentCity) {
     const point = proj(currentCity.lat, currentCity.lng);
@@ -5888,7 +6458,7 @@ function renderOpportunityAccountant(card) {
     : '';
   return `
     <div class="accountant-panel">
-      <div class="accountant-title">🧮 Comptable · projection au ${projection.target.label}</div>
+      <div class="accountant-title">🧮 Comptable · ${projection.target.windowLabel} · jusqu’au ${projection.target.label}</div>
       <div class="accountant-grid">
         <div class="accountant-card">
           <div class="accountant-label">Sans cette mission</div>
@@ -5919,7 +6489,8 @@ function renderOpportunityAccountant(card) {
           `}
         </div>
       </div>
-      <div class="accountant-footnote">Prévision sur l’agenda connu uniquement. Les futures annonces et aléas Digital Nomad ne sont pas inclus.</div>
+      ${projection.note ? `<div class="accountant-footnote" style="margin-top:10px;">${projection.note}</div>` : ''}
+      <div class="accountant-footnote">Prévision glissante sur les 12 prochains mois, basée sur l’agenda connu uniquement. Les futures annonces et aléas Digital Nomad ne sont pas inclus.</div>
     </div>
   `;
 }
@@ -6263,6 +6834,32 @@ function renderPendingCardModal() {
     </div>
   `;
 }
+function dismissMemorySpotlight() {
+  if (!STATE.memorySpotlight) return;
+  STATE.memorySpotlight = null;
+  render();
+}
+function renderMemorySpotlightModal() {
+  const memory = STATE.memorySpotlight;
+  if (!memory) return '';
+  const place = memory.cityName
+    ? `${memory.cityName}${memory.continent ? ` · ${CONTINENT_LABEL_FR[memory.continent] || memory.continent}` : ''}`
+    : 'En route';
+  return `
+    <div class="modal-overlay" id="memory-modal">
+      <div class="modal memory-modal">
+        <div class="seal">${memory.icon || '✦'}</div>
+        <div class="memory-spotlight-kicker">Souvenir de route</div>
+        <div class="memory-spotlight-title">${esc(memory.title)}</div>
+        <div class="memory-spotlight-meta">${esc(memory.dateLabel || fmtDate(memory.week || 0))} · ${esc(place)}</div>
+        <div class="memory-spotlight-text">${esc(memory.text)}</div>
+        <div class="row" style="justify-content:center;margin-top:18px;">
+          <button class="primary" onclick="dismissMemorySpotlight()">Continuer</button>
+        </div>
+      </div>
+    </div>
+  `;
+}
 function renderMissingAchievementRecap() {
   const all = ['globetrotter', 'bestiaire', 'agent_immo', 'pekin_express', 'kiffeur', 'loin_du_nid', 'ecolo', 'expert_chien', 'ermite'];
   const missing = all.filter(key => !STATE.achievements.has(key));
@@ -6272,6 +6869,21 @@ function renderMissingAchievementRecap() {
     const pct = Math.round((progress.done / progress.total) * 100);
     return `<div class="recap-row"><span>${ACHIEVEMENT_LABEL[key]}</span><strong>${pct}%</strong></div>`;
   }).join('')}</div>`;
+}
+function renderMemoriesRecap() {
+  const source = Array.isArray(STATE.memories) ? STATE.memories : [];
+  const memories = source.filter(memory => memory && memory.important).slice(0, 10);
+  if (!memories.length) return '<div class="recap-empty">Aucun souvenir marquant noté sur cette partie.</div>';
+  return `<div class="memory-list">${memories.map(memory => `
+    <div class="memory-row">
+      <div class="memory-head">
+        <div class="memory-title">${memory.icon || '✦'} ${esc(memory.title)}</div>
+        <div class="memory-date">${esc(memory.dateLabel || fmtDate(memory.week || 0))}</div>
+      </div>
+      <div class="memory-meta">${memory.cityName ? esc(memory.cityName) : 'En route'}${memory.continent ? ` · ${esc(CONTINENT_LABEL_FR[memory.continent] || memory.continent)}` : ''}</div>
+      <div class="memory-text">${esc(memory.text)}</div>
+    </div>
+  `).join('')}</div>`;
 }
 function renderEndModal() {
   const win = STATE.endReason === 'victory';
@@ -6359,6 +6971,8 @@ function renderEndModal() {
           <div class="summary-side">
             <h2>Mes cartes</h2>
             ${renderAchievements()}
+            <h2 style="margin-top:14px;">Souvenirs de route</h2>
+            ${renderMemoriesRecap()}
             <h2 style="margin-top:14px;">Encore à gratter</h2>
             ${renderMissingAchievementRecap()}
           </div>
@@ -6581,6 +7195,7 @@ function renderGame() {
   const pendingCardOpen = !!STATE.pendingCard && !STATE.pendingCardMinimized;
   const editCardOpen = !!STATE.editCard;
   const pendingCardHidden = !!STATE.pendingCard && STATE.pendingCardMinimized;
+  const memorySpotlightOpen = STATE.phase === 'playing' && !!STATE.memorySpotlight;
 
   app.innerHTML = `
     <div id="game">
@@ -6588,7 +7203,7 @@ function renderGame() {
         ${renderGameHeaderInner(`
           <div class="row">
             <button onclick="returnToMenu()">Menu</button>
-            <button class="primary" onclick="nextTurn()" ${pendingCardOpen || editCardOpen ? 'disabled' : ''} ${STATE.phase !== 'playing' ? 'disabled' : ''}>Tour suivant →</button>
+            <button class="primary" onclick="nextTurn()" ${pendingCardOpen || editCardOpen || memorySpotlightOpen ? 'disabled' : ''} ${STATE.phase !== 'playing' ? 'disabled' : ''}>Tour suivant →</button>
           </div>
         `)}
       </div>
@@ -6636,6 +7251,7 @@ function renderGame() {
     </div>
     ${editCardOpen ? renderEditMissionModal() : ''}
     ${pendingCardOpen ? renderPendingCardModal() : ''}
+    ${memorySpotlightOpen ? renderMemorySpotlightModal() : ''}
     ${STATE.phase === 'over' ? renderEndModal() : ''}
   `;
 }
@@ -6733,6 +7349,7 @@ window.setOfferFilter = setOfferFilter;
 window.offerReturnHome = offerReturnHome;
 window.generateOffer = generateOffer;
 window.buildMissionOffer = buildMissionOffer;
+window.dismissMemorySpotlight = dismissMemorySpotlight;
 window.STATE = STATE;
 window.render = render;
 

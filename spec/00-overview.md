@@ -69,7 +69,9 @@ Elle décrit une mission avec :
 - points de satisfaction ;
 - texte d’annonce ;
 - parfois la mention `Potes invités` ;
-- parfois un animal **déjà gardé** (cœur 💛 affiché à côté du nom). Probabilité fixe `30 %` qu'un tirage du même type retombe sur un pensionnaire connu.
+- parfois un animal **déjà gardé** (cœur 💛 affiché à côté du nom). Probabilité fixe `15 %` qu'un tirage du même type retombe sur un pensionnaire connu.
+  - dans ce cas, il réapparaît uniquement dans sa **ville d’origine** et le **même type de logement**
+  - le tarif est majoré de `+10 %` à `+20 %`
 
 Le joueur peut :
 
@@ -103,6 +105,9 @@ Perks actuels :
 - `Digital Nomad`
   - revenu freelance aléatoire environ mensuel
   - risque de coup URSSAF en fin d’été / rentrée
+- `Comptable`
+  - affiche, dans les opportunités, une projection de solde et de points au `31 décembre`
+  - compare le planning actuel avec l’option d’acceptation choisie
 - `Star des réseaux`
   - `+20 points` de chance d’opportunité
   - cartes plus lointaines
@@ -114,6 +119,7 @@ Déblocages automatiques actuels :
 
 - après `10` pet sittings terminés, une proposition spéciale de `Un ami qui s’y connaît` apparaît ;
 - après `13 semaines` consécutives sous `1000 €`, une proposition spéciale de `Digital Nomad` apparaît ;
+- au premier passage à `10 000 €` ou plus, une proposition spéciale de `Comptable` apparaît ;
 - après `2 ans` de jeu (`104 semaines`), une proposition spéciale de `Star des réseaux` apparaît ;
 - ces cartes peuvent être refusées ;
 - elles respectent la même contrainte que les cartes Chance normales : pas de seconde carte si un perk est déjà actif.
@@ -402,7 +408,7 @@ Colonne droite :
 - `Succès`
 - `Carte Chance`
 - `Retour chez les parents`
-- `Album` — historique des animaux gardés, avec icône cœur 💛 et compteur quand un même pensionnaire a été gardé plusieurs fois
+- `Album` — historique des animaux gardés, avec ville/logement d’origine, icône cœur 💛 et compteur quand un même pensionnaire a été gardé plusieurs fois
 
 ## 10.3. Opportunités
 

@@ -89,7 +89,7 @@ input[type=text] {
 }
 .city-dot { fill: #6e5532; stroke: #f5e6c8; stroke-width: 1.2; }
 .city-dot.current { fill: #a83232; stroke-width: 2; }
-.city-dot.done { fill: #4a8bc2; stroke: #f5e6c8; stroke-width: 1.4; }
+.city-dot.done { fill: #57a85a; stroke: #f5e6c8; stroke-width: 1.4; }
 .city-dot.agenda { fill: #2d6e3e; }
 .city-label {
   fill: #2b1f10; font-size: 11px; pointer-events: none;
@@ -97,6 +97,10 @@ input[type=text] {
 }
 .travel-line { stroke: #a83232; stroke-width: 1.5; stroke-dasharray: 4 4; fill: none; opacity: 0.75; }
 .journey-line { stroke: #4a8bc2; stroke-width: 2.2; fill: none; opacity: 0.82; }
+.home-marker {
+  font-size: 18px; text-anchor: middle; dominant-baseline: middle; pointer-events: none;
+  paint-order: stroke; stroke: rgba(245,230,200,0.96); stroke-width: 2px;
+}
 .current-avatar {
   font-size: 22px; text-anchor: middle; dominant-baseline: middle;
   paint-order: stroke; stroke: #f5e6c8; stroke-width: 2px;
@@ -192,6 +196,14 @@ input[type=text] {
 }
 .agenda-actions { margin-top: 8px; display: flex; justify-content: flex-end; }
 .agenda-friends { margin-top: 6px; font-size: 11px; color: #6e5532; }
+.agenda-warning {
+  margin-top: 7px;
+  padding: 7px 9px;
+  font-size: 11px;
+  color: #8d3434;
+  background: rgba(168, 50, 50, 0.08);
+  border-left: 3px solid #a83232;
+}
 
 .scores-block { width: 100%; max-width: 520px; margin-top: 16px; padding-top: 16px; border-top: 1px solid #d4b896; }
 .scores-block h3 { text-align: center; margin-bottom: 10px; }
@@ -476,6 +488,74 @@ input[type=text] {
   border-top: 1px dotted #d4b896;
   line-height: 1.35;
 }
+.accountant-toggle-row {
+  display: flex;
+  flex-direction: column;
+  gap: 8px;
+  padding-top: 2px;
+}
+.accountant-panel {
+  margin-top: 14px;
+  padding: 14px;
+  border-radius: 16px;
+  border: 1px dashed rgba(110, 85, 50, 0.34);
+  background: rgba(255, 251, 242, 0.86);
+}
+.accountant-title {
+  font-size: 13px;
+  font-weight: 700;
+  letter-spacing: 0.03em;
+  color: #2b1f10;
+}
+.accountant-grid {
+  display: grid;
+  grid-template-columns: repeat(3, minmax(0, 1fr));
+  gap: 10px;
+  margin-top: 12px;
+}
+.accountant-card {
+  padding: 12px;
+  border-radius: 14px;
+  background: rgba(255,255,255,0.84);
+  border: 1px solid rgba(110, 85, 50, 0.16);
+}
+.accountant-card.positive {
+  border-color: rgba(45, 110, 62, 0.32);
+  background: linear-gradient(180deg, rgba(246,252,244,0.98) 0%, rgba(227,242,225,0.92) 100%);
+}
+.accountant-card.negative {
+  border-color: rgba(168, 50, 50, 0.28);
+  background: linear-gradient(180deg, rgba(255,249,247,0.98) 0%, rgba(246,226,223,0.92) 100%);
+}
+.accountant-label {
+  font-size: 11px;
+  text-transform: uppercase;
+  letter-spacing: 0.09em;
+  color: #8b6f47;
+}
+.accountant-value {
+  margin-top: 7px;
+  font-size: 22px;
+  font-weight: 700;
+  color: #2b1f10;
+}
+.accountant-sub {
+  margin-top: 4px;
+  font-size: 13px;
+  color: #6e5532;
+}
+.accountant-status {
+  margin-top: 8px;
+  font-size: 12px;
+  line-height: 1.35;
+  color: #6e5532;
+}
+.accountant-footnote {
+  margin-top: 10px;
+  font-size: 12px;
+  line-height: 1.45;
+  color: #6e5532;
+}
 
 .transport-panel {
   margin-top: 10px;
@@ -544,7 +624,14 @@ input[type=text] {
 }
 .potes-pill {
   margin: 10px 0; padding: 7px 10px;
-  border: 1px dashed #a83232; background: rgba(168, 50, 50, 0.08);
+  border: 1px dashed #4a8c56; background: rgba(74, 140, 86, 0.12);
+  color: #1f5830;
+  font-size: 12px;
+}
+.repeat-pet-pill {
+  margin: 10px 0; padding: 7px 10px;
+  border: 1px dashed #3f8f51; background: rgba(63, 143, 81, 0.12);
+  color: #205730;
   font-size: 12px;
 }
 .pending-strip {
@@ -854,6 +941,7 @@ input[type=text] {
   .calendar-pane { max-height: 280px; }
   .end-layout { grid-template-columns: 1fr; }
   .planner-summary { grid-template-columns: 1fr; }
+  .accountant-grid { grid-template-columns: 1fr; }
   .listing-grid { grid-template-columns: 1fr 1fr; }
   .opportunity-body { grid-template-columns: minmax(0, 1fr) 280px; }
 }
@@ -947,7 +1035,7 @@ input[type=text] {
 .continent-label { fill: rgba(56, 61, 71, 0.72); font-style: normal; }
 .city-dot { fill: #ff7a59; stroke: #fffdf9; }
 .city-dot.current { fill: #2bb7a3; }
-.city-dot.done { fill: #4543a6; }
+.city-dot.done { fill: #57a85a; }
 .city-dot.agenda { fill: #ffbe3d; }
 .travel-line { stroke: #ff7a59; stroke-width: 2; }
 .journey-line { stroke: #2bb7a3; stroke-width: 2.5; }
@@ -1065,6 +1153,7 @@ input[type=text] {
       <li>2 % des tirages d'opportunité peuvent devenir une carte Chance.</li>
       <li><strong>Un ami qui s'y connaît</strong> : juge la qualité du paiement de chaque carte.</li>
       <li><strong>Digital Nomad</strong> : petits revenus freelance mensuels. Attention l'URSSAF en septembre.</li>
+      <li><strong>Comptable</strong> : affiche une projection argent / points au 31 décembre sur les opportunités.</li>
       <li><strong>Star des réseaux</strong> : +20 % d'opportunités, missions plus lointaines, 50 % de chance que train/bateau/bus soient offerts. Le premier avion fait perdre la carte.</li>
     </ul>
     <h2>Annuler une mission</h2>
@@ -1084,7 +1173,11 @@ const EXPERT_DOG_MULTIPLIER = 1.2;
 const PET_SITTER_MENTOR_THRESHOLD = 10;
 const DIGITAL_NOMAD_THRESHOLD = 1000;
 const DIGITAL_NOMAD_STREAK_WEEKS = 13;
+const ACCOUNTANT_BALANCE_THRESHOLD = 10000;
 const SOCIAL_STAR_MILESTONE_WEEK = 104;
+const REPEAT_PET_CHANCE = 0.15;
+const REPEAT_PET_BONUS_MIN = 1.10;
+const REPEAT_PET_BONUS_MAX = 1.20;
 function currentWeeklyFood(week) {
   return WEEKLY_FOOD_BASE;
 }
@@ -1166,27 +1259,49 @@ const CITIES = [
   { name: "Madrid",      continent: "Europe",    lat: 40.42, lng:  -3.70 },
   { name: "Vienne",      continent: "Europe",    lat: 48.21, lng:  16.37 },
   { name: "Athènes",     continent: "Europe",    lat: 37.98, lng:  23.73 },
+  { name: "Bischoffsheim", continent: "Europe",  lat: 48.49, lng:   7.49 },
+  { name: "Lussant",     continent: "Europe",    lat: 45.96, lng:  -0.82 },
+  { name: "Trogen",      continent: "Europe",    lat: 47.41, lng:   9.46 },
   { name: "Le Caire",    continent: "Africa",    lat: 30.04, lng:  31.24 },
   { name: "Le Cap",      continent: "Africa",    lat: -33.92, lng: 18.42 },
   { name: "Marrakech",   continent: "Africa",    lat: 31.63, lng:  -8.00 },
+  { name: "Tunis",       continent: "Africa",    lat: 36.81, lng:  10.18 },
   { name: "Nairobi",     continent: "Africa",    lat: -1.29, lng:  36.82 },
+  { name: "Addis-Abeba", continent: "Africa",    lat:  9.03, lng:  38.74 },
   { name: "Dakar",       continent: "Africa",    lat: 14.72, lng: -17.47 },
+  { name: "Accra",       continent: "Africa",    lat:  5.56, lng:  -0.20 },
+  { name: "Abuja",       continent: "Africa",    lat:  9.08, lng:   7.40 },
   { name: "Lagos",       continent: "Africa",    lat:  6.46, lng:   3.39 },
+  { name: "Kinshasa",    continent: "Africa",    lat: -4.32, lng:  15.31 },
   { name: "Tokyo",       continent: "Asia",      lat: 35.68, lng: 139.76 },
   { name: "Bangkok",     continent: "Asia",      lat: 13.75, lng: 100.50 },
   { name: "Mumbai",      continent: "Asia",      lat: 19.08, lng:  72.88 },
+  { name: "Bangalore",   continent: "Asia",      lat: 12.97, lng:  77.59 },
+  { name: "New Delhi",   continent: "Asia",      lat: 28.61, lng:  77.21 },
   { name: "Pékin",       continent: "Asia",      lat: 39.90, lng: 116.41 },
   { name: "Istanbul",    continent: "Asia",      lat: 41.00, lng:  28.98 },
+  { name: "Tel Aviv",    continent: "Asia",      lat: 32.09, lng:  34.78 },
   { name: "Séoul",       continent: "Asia",      lat: 37.57, lng: 126.98 },
   { name: "Singapour",   continent: "Asia",      lat:  1.35, lng: 103.82 },
+  { name: "Colombo",     continent: "Asia",      lat:  6.93, lng:  79.86 },
+  { name: "Hanoï",       continent: "Asia",      lat: 21.03, lng: 105.85 },
+  { name: "Jakarta",     continent: "Asia",      lat: -6.21, lng: 106.85 },
+  { name: "Manille",     continent: "Asia",      lat: 14.60, lng: 120.98 },
   { name: "New York",    continent: "N.America", lat: 40.71, lng: -74.00 },
   { name: "Los Angeles", continent: "N.America", lat: 34.05, lng:-118.24 },
+  { name: "Chicago",     continent: "N.America", lat: 41.88, lng: -87.63 },
+  { name: "Houston",     continent: "N.America", lat: 29.76, lng: -95.37 },
+  { name: "Phoenix",     continent: "N.America", lat: 33.45, lng:-112.07 },
   { name: "Mexico",      continent: "N.America", lat: 19.43, lng: -99.13 },
   { name: "Toronto",     continent: "N.America", lat: 43.65, lng: -79.38 },
   { name: "Buenos Aires",continent: "S.America", lat:-34.61, lng: -58.38 },
+  { name: "Brasilia",    continent: "S.America", lat:-15.79, lng: -47.88 },
   { name: "Rio",         continent: "S.America", lat:-22.91, lng: -43.17 },
   { name: "Lima",        continent: "S.America", lat:-12.05, lng: -77.04 },
   { name: "Bogota",      continent: "S.America", lat:  4.71, lng: -74.07 },
+  { name: "Quito",       continent: "S.America", lat: -0.18, lng: -78.47 },
+  { name: "Santiago",    continent: "S.America", lat:-33.45, lng: -70.67 },
+  { name: "Montevideo",  continent: "S.America", lat:-34.90, lng: -56.16 },
   { name: "Sydney",      continent: "Oceania",   lat:-33.87, lng: 151.21 },
   { name: "Auckland",    continent: "Oceania",   lat:-36.85, lng: 174.76 },
   { name: "Melbourne",   continent: "Oceania",   lat:-37.81, lng: 144.96 },
@@ -1511,6 +1626,11 @@ const PERK_DEFS = {
     icon: '💻',
     desc: 'Petit revenu freelance aléatoire chaque mois, avec le risque de l\'URSSAF à la rentrée.',
   },
+  accountant: {
+    name: 'Comptable',
+    icon: '🧮',
+    desc: 'Projette, sur chaque opportunité, l’argent et les points attendus au 31 décembre avec le planning connu.',
+  },
   socialStar: {
     name: 'Star des réseaux',
     icon: '📸',
@@ -1631,6 +1751,10 @@ function fmtDay(day) {
   const months = ['janv', 'fév', 'mars', 'avr', 'mai', 'juin', 'juil', 'août', 'sept', 'oct', 'nov', 'déc'];
   return `${date.getDate()} ${months[date.getMonth()]} ${date.getFullYear()}`;
 }
+function dateToDay(date) {
+  const base = new Date(2026, 0, 1);
+  return Math.floor((new Date(date.getFullYear(), date.getMonth(), date.getDate()) - base) / 86400000);
+}
 function fmtDayRange(startDay, endDay) {
   if (endDay - startDay < 0.01) return 'sur place';
   return `${fmtDay(startDay)} → ${fmtDay(Math.max(startDay, endDay - 1))}`;
@@ -1639,6 +1763,16 @@ function fmtDays(days) {
   if (days < 0.1) return 'sur place';
   if (days < 1) return `${Math.max(1, Math.ceil(days * 24))} h`;
   return `${Math.max(1, Math.ceil(days))} j`;
+}
+function fmtSignedMoney(value) {
+  const rounded = Math.round(value);
+  if (rounded === 0) return '0 €';
+  return `${rounded > 0 ? '+' : '−'}${fmtMoney(Math.abs(rounded))}`;
+}
+function fmtSignedPoints(value) {
+  const rounded = Math.round(value);
+  if (rounded === 0) return '0 pt';
+  return `${rounded > 0 ? '+' : '−'}${Math.abs(rounded)} pt${Math.abs(rounded) > 1 ? 's' : ''}`;
 }
 function weekOverlapsRange(week, startDay, endDay) {
   return startDay < weekToDay(week + 1) && endDay > weekToDay(week);
@@ -1661,6 +1795,33 @@ function hasReputationPenalty() {
 function getTransportModes(srcContinent, dstContinent) {
   return needsPlane(srcContinent, dstContinent) ? SEA_MODES : LAND_MODES;
 }
+function isSocialStarFreeEligibleMode(mode) {
+  return ['train', 'ferry', 'boatstop', 'bus'].includes(mode);
+}
+function isSponsoredTransport(mode, cost) {
+  return isSocialStarFreeEligibleMode(mode) && Math.abs(cost || 0) < 0.001;
+}
+function stableChanceFromKey(key) {
+  let hash = 2166136261;
+  const text = String(key || '');
+  for (let i = 0; i < text.length; i++) {
+    hash ^= text.charCodeAt(i);
+    hash = Math.imul(hash, 16777619);
+  }
+  return (hash >>> 0) / 4294967295;
+}
+function isCollabTransportOffered(distanceKm, daysAvailable, srcContinent, dstContinent, mode) {
+  if (!hasPerk('socialStar') || STATE.socialStarBlocked || !isSocialStarFreeEligibleMode(mode)) return false;
+  const seed = [
+    STATE.week,
+    srcContinent,
+    dstContinent,
+    Math.round(distanceKm),
+    Math.round(daysAvailable * 10),
+    mode,
+  ].join('|');
+  return stableChanceFromKey(seed) < SOCIAL_STAR_FREE_CHANCE;
+}
 function getTransportOptions(distanceKm, daysAvailable, srcContinent, dstContinent) {
   if (distanceKm < 1) {
     return [{
@@ -1677,25 +1838,33 @@ function getTransportOptions(distanceKm, daysAvailable, srcContinent, dstContine
   return modes.map(mode => {
     const spec = TRANSPORT[mode];
     const days = distanceKm / spec.km_day;
+    const baseCost = distanceKm * spec.cost_km;
+    const offeredByCollab = isCollabTransportOffered(distanceKm, daysAvailable, srcContinent, dstContinent, mode);
     return {
       mode,
-      baseCost: distanceKm * spec.cost_km,
-      cost: distanceKm * spec.cost_km,
+      baseCost,
+      cost: offeredByCollab ? 0 : baseCost,
       days,
       label: spec.name,
       icon: spec.icon,
+      offeredByCollab,
     };
   }).filter(option => option.days <= daysAvailable + 0.001);
 }
 function isAutoCancellableMode(mode) {
   return mode === 'hitch' || mode === 'boatstop' || mode === 'none';
 }
+function isAutoCancellableTransport(option) {
+  return !!option && (isAutoCancellableMode(option.mode) || !!option.offeredByCollab || isSponsoredTransport(option.mode, option.cost));
+}
 function applyCancellable(option, cancellable) {
-  const autoCancellable = isAutoCancellableMode(option.mode);
+  const autoCancellable = isAutoCancellableTransport(option);
   return {
     ...option,
     cancellable: autoCancellable || cancellable,
-    cost: option.baseCost * (!autoCancellable && cancellable ? CANCELLABLE_MULTIPLIER : 1),
+    cost: autoCancellable
+      ? (option.offeredByCollab ? 0 : option.cost)
+      : option.baseCost * (cancellable ? CANCELLABLE_MULTIPLIER : 1),
   };
 }
 function getSelectedTransport(options, mode, cancellable) {
@@ -1703,11 +1872,31 @@ function getSelectedTransport(options, mode, cancellable) {
   const base = options.find(option => option.mode === mode) || options[0];
   return applyCancellable(base, cancellable);
 }
+function getSelectedTransportExact(options, mode, cancellable) {
+  if (!options || !options.length || !mode) return null;
+  const base = options.find(option => option.mode === mode);
+  return base ? applyCancellable(base, cancellable) : null;
+}
+function formatTransportCostLabel(option) {
+  if (!option) return '';
+  return `${fmtMoney(option.cost)}${option.offeredByCollab ? ' · offert par collab' : ''}`;
+}
+function getTransportAutoCancellableText(option) {
+  if (!option) return '';
+  if (option.offeredByCollab || isSponsoredTransport(option.mode, option.cost)) return 'Offert par collab, annulable sans frais.';
+  if (isAutoCancellableMode(option.mode)) return 'Annulable d\'office, sans surcoût.';
+  return '';
+}
 function dealQuality(card) {
-  const meanPerDay = (PAY_RANGES[card.type][0] + PAY_RANGES[card.type][1]) / 2;
-  const far = card.srcCity && card.srcCity.continent !== card.city.continent;
-  const expected = meanPerDay * card.durationDays * (far ? FAR_BONUS : 1.0);
-  const ratio = card.payTotal / expected;
+  let ratio;
+  if (card.isRepeatPet && card.repeatPayBonusPct) {
+    ratio = 1 + card.repeatPayBonusPct;
+  } else {
+    const meanPerDay = (PAY_RANGES[card.type][0] + PAY_RANGES[card.type][1]) / 2;
+    const far = card.srcCity && card.srcCity.continent !== card.city.continent;
+    const expected = meanPerDay * card.durationDays * (far ? FAR_BONUS : 1.0);
+    ratio = card.payTotal / expected;
+  }
   let label;
   let color;
   let hint;
@@ -1715,6 +1904,11 @@ function dealQuality(card) {
   else if (ratio < 1.05) { label = 'Moyen'; color = '#8b6f47'; hint = 'Tarif standard.'; }
   else if (ratio < 1.20) { label = 'Bon deal'; color = '#2d6e3e'; hint = 'Au-dessus de la moyenne.'; }
   else { label = 'Excellent !'; color = '#1f4e2c'; hint = 'Très bien payé pour ce type de mission.'; }
+  if (card.isRepeatPet && card.repeatPayBonusPct) {
+    if (ratio < 1.05) hint = 'Tarif standard pour un animal déjà connu.';
+    else if (ratio < 1.20) hint = 'Au-dessus du tarif normal grâce au re-sitting.';
+    else hint = 'Très gros bonus fidélité sur ce re-sitting.';
+  }
   const pct = Math.round((ratio - 1) * 100);
   const sign = pct >= 0 ? '+' : '';
   return { label, color, hint, pct: `${sign}${pct}%` };
@@ -1755,22 +1949,26 @@ function buildDefaultState() {
     housingsDone: new Set(),
     continentsDone: new Set(),
     transportModesDone: new Set(),
-    petsSeen: [], // historique : [{ name, type, animal, city, week }] pour l'album et la mécanique de retour
+    petsSeen: [], // historique agrégé des animaux vus, pour l'album et les re-sittings
     petsSeenIndex: {}, // map "type:name" -> count, pour O(1) checks
     typeCount: { dog: 0, cat: 0, house: 0, bird: 0 },
     potesCount: 0,
     pendingCard: null,
     pendingCardMinimized: false,
     pendingCardTab: 'presentation',
+    editCard: null,
+    editCardTab: 'presentation',
     log: [],
     refusedCount: 0,
     acceptedCount: 0,
     endReason: null,
+    endlessMode: false,
     tookPlane: false,
     activePerk: null,
     socialStarBlocked: false,
     friendInsiderMilestoneResolved: false,
     digitalNomadMilestoneResolved: false,
+    accountantMilestoneResolved: false,
     socialStarMilestoneResolved: false,
     offerFilter: 'anywhere',
     atParents: false,
@@ -1889,9 +2087,17 @@ function attachMusicUnlockListeners() {
   document.addEventListener('keydown', unlockMusicFromGesture, { once: true });
   MUSIC_STATE.listenersAttached = true;
 }
+function getOpenModalCard() {
+  if (STATE.editCard) return STATE.editCard;
+  if (STATE.pendingCard && !STATE.pendingCardMinimized) return STATE.pendingCard;
+  return null;
+}
+function isCalendarModalCard(card) {
+  return !!card && (card.kind === 'mission' || card.kind === 'home' || card.kind === 'edit');
+}
 function capturePendingCalendarScroll() {
-  const card = STATE.pendingCard;
-  if (!card || (card.kind !== 'mission' && card.kind !== 'home') || STATE.pendingCardMinimized || typeof document === 'undefined' || !document.querySelector) {
+  const card = getOpenModalCard();
+  if (!isCalendarModalCard(card) || typeof document === 'undefined' || !document.querySelector) {
     LAST_PENDING_CALENDAR_SCROLL = { cardId: null, scrollTop: null };
     return;
   }
@@ -1903,13 +2109,13 @@ function capturePendingCalendarScroll() {
   };
 }
 function getPendingCalendarFocusWeek(card) {
-  if (!card || (card.kind !== 'mission' && card.kind !== 'home')) return null;
+  if (!isCalendarModalCard(card)) return null;
   const focusDay = card.selectedInbound && card.travelDays > 0.1 ? card.travelStartDay : card.startDay;
   return Math.max(STATE.week, Math.floor(focusDay / 7));
 }
 function focusPendingCalendarPane() {
-  const card = STATE.pendingCard;
-  if (!card || (card.kind !== 'mission' && card.kind !== 'home') || STATE.pendingCardMinimized) {
+  const card = getOpenModalCard();
+  if (!isCalendarModalCard(card)) {
     LAST_PENDING_CALENDAR_FOCUS_TOKEN = '';
     return;
   }
@@ -1997,14 +2203,18 @@ function syncMissionShape(mission) {
   mission.startDay = typeof mission.startDay === 'number' ? mission.startDay : weekToDay(mission.startWeek);
   mission.endDay = typeof mission.endDay === 'number' ? mission.endDay : weekToDay(mission.endWeek);
   mission.travelMode = mission.travelMode || (mission.travelDistance && mission.travelDistance > 1 ? 'bus' : 'none');
-  mission.travelCancellable = isAutoCancellableMode(mission.travelMode) || !!mission.travelCancellable;
+  mission.travelCancellable = isAutoCancellableMode(mission.travelMode)
+    || isSponsoredTransport(mission.travelMode, mission.travelCost)
+    || !!mission.travelCancellable;
   mission.travelDays = typeof mission.travelDays === 'number' ? mission.travelDays : 0;
   mission.travelCost = typeof mission.travelCost === 'number' ? mission.travelCost : 0;
   mission.travelBaseCost = typeof mission.travelBaseCost === 'number' ? mission.travelBaseCost : mission.travelCost;
   mission.travelStartDay = typeof mission.travelStartDay === 'number' ? mission.travelStartDay : mission.startDay;
   mission.travelLocked = mission.travelDays > 0.1 ? mission.travelLocked !== false : false;
   mission.accessMode = mission.accessMode || null;
-  mission.accessCancellable = isAutoCancellableMode(mission.accessMode) || !!mission.accessCancellable;
+  mission.accessCancellable = isAutoCancellableMode(mission.accessMode)
+    || isSponsoredTransport(mission.accessMode, mission.accessCost)
+    || !!mission.accessCancellable;
   mission.accessDays = typeof mission.accessDays === 'number' ? mission.accessDays : 0;
   mission.accessCost = typeof mission.accessCost === 'number' ? mission.accessCost : 0;
   mission.accessBaseCost = typeof mission.accessBaseCost === 'number' ? mission.accessBaseCost : mission.accessCost;
@@ -2015,6 +2225,8 @@ function syncMissionShape(mission) {
   mission.accessIcon = mission.accessIcon || (mission.accessMode && TRANSPORT[mission.accessMode] ? TRANSPORT[mission.accessMode].icon : '');
   mission.isRareHousing = !!mission.isRareHousing;
   mission.hasPotes = !!mission.hasPotes;
+  mission.scheduleBroken = !!mission.scheduleBroken;
+  mission.scheduleBrokenReason = mission.scheduleBrokenReason || '';
   return mission;
 }
 function getMissionDepartureDay(mission) {
@@ -2037,6 +2249,14 @@ function clearMissionAccess(mission) {
   mission.accessFrom = null;
   mission.accessTo = null;
 }
+function clearMissionScheduleBroken(mission) {
+  mission.scheduleBroken = false;
+  mission.scheduleBrokenReason = '';
+}
+function setMissionScheduleBroken(mission, reason) {
+  mission.scheduleBroken = true;
+  mission.scheduleBrokenReason = reason || 'Trajet à revalider manuellement.';
+}
 function getSortedAgenda() {
   return [...STATE.agenda].sort((a, b) => {
     if (a.startWeek !== b.startWeek) return a.startWeek - b.startWeek;
@@ -2056,7 +2276,7 @@ function applyTransportToMission(mission, previousCity, selectedTransport) {
   mission.travelFrom = previousCity;
   mission.travelLocked = mission.travelDays > 0.1;
   clearMissionAccess(mission);
-  mission.scheduleBroken = false;
+  clearMissionScheduleBroken(mission);
 }
 function applyAccessToMission(mission, previousCity, selectedTransport) {
   mission.accessMode = selectedTransport.mode;
@@ -2085,6 +2305,7 @@ function getMissionTravelLegs(mission) {
       icon: mission.accessIcon,
       cost: mission.accessCost || 0,
       cancellable: !!mission.accessCancellable,
+      offeredByCollab: isSponsoredTransport(mission.accessMode, mission.accessCost),
       startDay: mission.accessStartDay,
       endDay: mission.travelStartDay,
     });
@@ -2096,6 +2317,7 @@ function getMissionTravelLegs(mission) {
       icon: '·',
       cost: 0,
       cancellable: true,
+      offeredByCollab: false,
       startDay: mission.startDay,
       endDay: mission.startDay,
     });
@@ -2106,6 +2328,7 @@ function getMissionTravelLegs(mission) {
       icon: mission.travelIcon || (TRANSPORT[mission.travelMode] ? TRANSPORT[mission.travelMode].icon : '·'),
       cost: mission.travelCost || 0,
       cancellable: !!mission.travelCancellable,
+      offeredByCollab: isSponsoredTransport(mission.travelMode, mission.travelCost),
       startDay: mission.travelStartDay,
       endDay: mission.startDay,
     });
@@ -2118,7 +2341,7 @@ function getTravelLegDays(leg) {
 }
 function formatTravelLegText(leg) {
   if (!leg || leg.mode === 'none' || getTravelLegDays(leg) < 0.1) return 'Sur place';
-  return `${leg.icon} ${leg.label} · ${fmtDays(getTravelLegDays(leg))} · ${fmtDayRange(leg.startDay, leg.endDay)}${leg.cancellable ? ' · annulable' : ''}`;
+  return `${leg.icon} ${leg.label} · ${fmtDays(getTravelLegDays(leg))} · ${fmtDayRange(leg.startDay, leg.endDay)}${leg.offeredByCollab ? ' · offert par collab' : ''}${leg.cancellable ? ' · annulable' : ''}`;
 }
 function getMissionTravelSegmentForWeek(mission, week) {
   if (mission.accessDays > 0.1 && weekOverlapsRange(week, mission.accessStartDay, mission.travelStartDay)) {
@@ -2365,7 +2588,7 @@ function refreshPendingHomeSelections(card) {
     card.selectedOutboundMode = (outboundPlanType === 'replace-booked'
       ? (outboundOptions.find(option => option.mode === nextMission.travelMode) || outboundOptions[0])
       : outboundOptions[0]).mode;
-    card.selectedOutboundCancellable = outboundPlanType === 'replace-booked' ? !!nextMission.travelCancellable : false;
+    card.selectedOutboundCancellable = false;
   }
   card.selectedOutbound = nextMission
     ? getSelectedTransport(card.outboundOptions, card.selectedOutboundMode, card.selectedOutboundCancellable)
@@ -2428,8 +2651,7 @@ function resolveTravelLegDeparture(leg) {
       log(`💢 Badbuzz ! L'avion fait hurler tes abonnés. −${fmtMoney(loss)}`);
     }
     blockSocialStar();
-  } else if (hasPerk('socialStar') && ['train', 'ferry', 'boatstop', 'bus'].includes(leg.mode) && Math.random() < SOCIAL_STAR_FREE_CHANCE) {
-    actualCost = 0;
+  } else if (leg.offeredByCollab || isSponsoredTransport(leg.mode, actualCost)) {
     costNote = ' (offert par collab)';
   }
 
@@ -2440,88 +2662,102 @@ function resolveTravelLegDeparture(leg) {
   return { actualCost, costNote };
 }
 function recomputeAgenda(logChanges) {
-  let guard = 0;
-  while (guard < 20) {
-    guard++;
-    const sorted = getSortedAgenda();
-    let previousCity = deriveCurrentCityFromState();
-    let availableDay = weekToDay(STATE.week);
-    const brokenIds = [];
+  const sorted = getSortedAgenda();
+  let previousCity = deriveCurrentCityFromState();
+  let availableDay = weekToDay(STATE.week);
 
-    for (const mission of sorted) {
-      syncMissionShape(mission);
-      if (mission.startWeek <= STATE.week) {
-        previousCity = mission.city;
-        availableDay = mission.endDay;
-        continue;
+  for (const mission of sorted) {
+    syncMissionShape(mission);
+    const wasBroken = !!mission.scheduleBroken;
+    const previousReason = mission.scheduleBrokenReason || '';
+    const markBroken = reason => {
+      setMissionScheduleBroken(mission, reason);
+      if (logChanges && (!wasBroken || previousReason !== mission.scheduleBrokenReason)) {
+        log(`⚠ ${missionLabel(mission)} : ${mission.scheduleBrokenReason}`);
       }
+    };
+    const clearBroken = () => {
+      if (wasBroken && logChanges) {
+        log(`✓ Trajet revalidé pour ${missionLabel(mission)}.`);
+      }
+      clearMissionScheduleBroken(mission);
+    };
 
-      if (!previousCity) previousCity = STATE.startCity;
-      if (mission.travelLocked && mission.travelDays > 0.1 && mission.travelFrom && !mission.travelCancellable) {
-        if (availableDay > mission.travelStartDay + 0.001) {
-          mission.scheduleBroken = true;
-          brokenIds.push(mission.id);
-          continue;
-        }
-        if (!sameCity(previousCity, mission.travelFrom)) {
-          const accessOptions = getTransportOptions(
-            haversine(previousCity, mission.travelFrom),
-            mission.travelStartDay - availableDay,
-            previousCity.continent,
-            mission.travelFrom.continent
-          );
-          if (!accessOptions.length) {
-            mission.scheduleBroken = true;
-            brokenIds.push(mission.id);
-            continue;
-          }
-          const beforeAccessMode = mission.accessMode;
-          const selectedAccess = getSelectedTransport(accessOptions, mission.accessMode, mission.accessCancellable)
-            || getSelectedTransport(accessOptions, accessOptions[0].mode, mission.accessCancellable);
-          applyAccessToMission(mission, previousCity, selectedAccess);
-          if (logChanges && beforeAccessMode && selectedAccess.mode !== beforeAccessMode) {
-            log(`↺ Trajet d'approche réajusté pour ${mission.city.name} : ${selectedAccess.label}.`);
-          }
-        } else {
-          clearMissionAccess(mission);
-        }
-        previousCity = mission.city;
-        availableDay = mission.endDay;
-        continue;
-      }
-
-      clearMissionAccess(mission);
-      const distance = haversine(previousCity, mission.city);
-      const options = getTransportOptions(distance, mission.startDay - availableDay, previousCity.continent, mission.city.continent);
-      if (!options.length) {
-        mission.scheduleBroken = true;
-        brokenIds.push(mission.id);
-        continue;
-      }
-
-      const beforeMode = mission.travelMode;
-      const selected = getSelectedTransport(options, mission.travelMode, mission.travelCancellable)
-        || getSelectedTransport(options, options[0].mode, mission.travelCancellable);
-      applyTransportToMission(mission, previousCity, selected);
-      if (logChanges && beforeMode && selected.mode !== beforeMode) {
-        log(`↺ Trajet réajusté pour ${mission.city.name} : ${selected.label}.`);
-      }
+    if (mission.startWeek <= STATE.week) {
+      clearMissionScheduleBroken(mission);
       previousCity = mission.city;
       availableDay = mission.endDay;
+      continue;
     }
 
-    if (!brokenIds.length) {
-      STATE.agenda = sorted;
-      return true;
+    if (!previousCity) previousCity = STATE.startCity;
+    if (!previousCity) {
+      markBroken('Ville de départ introuvable. Ouvre Modifier.');
+      previousCity = mission.city;
+      availableDay = mission.endDay;
+      continue;
     }
 
-    STATE.agenda = STATE.agenda.filter(mission => {
-      if (!brokenIds.includes(mission.id)) return true;
-      if (logChanges) log(`✗ ${missionLabel(mission)} a sauté : plus assez de temps pour y aller.`);
-      return false;
-    });
+    const hasBookedTravel = !!(mission.travelLocked && mission.travelDays > 0.1 && mission.travelFrom);
+    if (hasBookedTravel && sameCity(previousCity, mission.travelFrom)) {
+      clearMissionAccess(mission);
+      clearBroken();
+      previousCity = mission.city;
+      availableDay = mission.endDay;
+      continue;
+    }
+
+    if (hasBookedTravel && !mission.travelCancellable) {
+      if (availableDay > mission.travelStartDay + 0.001) {
+        markBroken(`Impossible de rejoindre ${mission.travelFrom.name} à temps pour conserver ${mission.travelLabel}. Ouvre Modifier.`);
+        previousCity = mission.city;
+        availableDay = mission.endDay;
+        continue;
+      }
+      const accessOptions = getTransportOptions(
+        haversine(previousCity, mission.travelFrom),
+        mission.travelStartDay - availableDay,
+        previousCity.continent,
+        mission.travelFrom.continent
+      );
+      const preferredAccessMode = mission.accessMode || null;
+      const selectedAccess = getSelectedTransportExact(accessOptions, preferredAccessMode, mission.accessCancellable)
+        || (!preferredAccessMode && accessOptions[0] ? getSelectedTransportExact(accessOptions, accessOptions[0].mode, mission.accessCancellable) : null);
+      if (!selectedAccess) {
+        markBroken(`Impossible de rejoindre ${mission.travelFrom.name} pour conserver ${mission.travelLabel}. Ouvre Modifier.`);
+        previousCity = mission.city;
+        availableDay = mission.endDay;
+        continue;
+      }
+      applyAccessToMission(mission, previousCity, selectedAccess);
+      clearBroken();
+      previousCity = mission.city;
+      availableDay = mission.endDay;
+      continue;
+    }
+
+    clearMissionAccess(mission);
+    const distance = haversine(previousCity, mission.city);
+    const options = getTransportOptions(distance, mission.startDay - availableDay, previousCity.continent, mission.city.continent);
+    const selected = getSelectedTransportExact(options, mission.travelMode, mission.travelCancellable)
+      || (!mission.travelMode && options[0] ? getSelectedTransportExact(options, options[0].mode, mission.travelCancellable) : null);
+
+    if (!selected) {
+      const currentLabel = mission.travelLabel || (TRANSPORT[mission.travelMode] ? TRANSPORT[mission.travelMode].name : 'ce trajet');
+      markBroken(`${currentLabel} réservé ne peut plus être maintenu automatiquement depuis ${previousCity.name}. Ouvre Modifier.`);
+      previousCity = mission.city;
+      availableDay = mission.endDay;
+      continue;
+    }
+
+    applyTransportToMission(mission, previousCity, selected);
+    clearBroken();
+    previousCity = mission.city;
+    availableDay = mission.endDay;
   }
-  return false;
+
+  STATE.agenda = sorted;
+  return !sorted.some(mission => mission.scheduleBroken);
 }
 function normalizeLoadedState(snap) {
   STATE.achievements = new Set(snap.achievements || []);
@@ -2529,9 +2765,9 @@ function normalizeLoadedState(snap) {
   STATE.housingsDone = new Set(snap.housingsDone || []);
   STATE.continentsDone = new Set(snap.continentsDone || []);
   STATE.transportModesDone = new Set(snap.transportModesDone || []);
-  STATE.petsSeen = Array.isArray(snap.petsSeen) ? snap.petsSeen : [];
   STATE.agenda = (snap.agenda || []).map(syncMissionShape);
   STATE.completed = (snap.completed || []).map(syncMissionShape);
+  STATE.petsSeen = rebuildPetsSeenFromCompleted(STATE.completed, Array.isArray(snap.petsSeen) ? snap.petsSeen : []);
   if (!STATE.housingsDone.size) {
     for (const mission of STATE.completed) STATE.housingsDone.add(mission.housing);
   }
@@ -2552,6 +2788,7 @@ function normalizeLoadedState(snap) {
   }
   STATE.friendInsiderMilestoneResolved = !!snap.friendInsiderMilestoneResolved;
   STATE.digitalNomadMilestoneResolved = !!snap.digitalNomadMilestoneResolved;
+  STATE.accountantMilestoneResolved = !!snap.accountantMilestoneResolved;
   STATE.socialStarMilestoneResolved = !!snap.socialStarMilestoneResolved;
   STATE.under1000StreakWeeks = Number.isFinite(snap.under1000StreakWeeks) ? Math.max(0, snap.under1000StreakWeeks) : 0;
   STATE.socialStarBlocked = !!STATE.socialStarBlocked || !!STATE.tookPlane;
@@ -2570,7 +2807,11 @@ function normalizeLoadedState(snap) {
   }
   if (STATE.activePerk === 'friendInsider') STATE.friendInsiderMilestoneResolved = true;
   if (STATE.activePerk === 'digitalNomad') STATE.digitalNomadMilestoneResolved = true;
+  if (STATE.activePerk === 'accountant') STATE.accountantMilestoneResolved = true;
   if (STATE.activePerk === 'socialStar' || STATE.socialStarBlocked) STATE.socialStarMilestoneResolved = true;
+  STATE.endlessMode = !!snap.endlessMode;
+  STATE.editCard = null;
+  STATE.editCardTab = 'presentation';
   STATE.offerFilter = STATE.offerFilter === 'nearby' ? 'nearby' : 'anywhere';
   STATE.atParents = !!STATE.atParents;
   if (typeof snap.lastReturnHomeWeek === 'number' && Number.isFinite(snap.lastReturnHomeWeek)) {
@@ -2639,7 +2880,7 @@ function setOfferFilter(mode) {
   render();
 }
 function offerReturnHome() {
-  if (STATE.phase !== 'playing' || STATE.pendingCard || getActiveMission() || STATE.atParents) return;
+  if (STATE.phase !== 'playing' || STATE.pendingCard || STATE.editCard || getActiveMission() || STATE.atParents) return;
   const card = buildHomeReturnOffer();
   if (!card) return;
   STATE.pendingCard = card;
@@ -2679,6 +2920,70 @@ function continueGame() {
   }
   else resetGame();
 }
+function continueAfterVictory() {
+  if (STATE.phase !== 'over' || STATE.endReason !== 'victory') return;
+  STATE.phase = 'playing';
+  STATE.endReason = null;
+  STATE.endlessMode = true;
+  log('∞ La partie continue au-delà de la victoire.');
+  render();
+}
+function findCityFromPetRecord(record, which = 'first') {
+  if (!record) return null;
+  const name = which === 'last' ? (record.lastCity || record.firstCity) : record.firstCity;
+  const continent = which === 'last'
+    ? (record.lastContinent || record.firstContinent)
+    : record.firstContinent;
+  if (!name) return null;
+  return CITIES.find(city => city.name === name && (!continent || city.continent === continent))
+    || CITIES.find(city => city.name === name)
+    || null;
+}
+function rebuildPetsSeenFromCompleted(completed, fallbackPets = []) {
+  const byKey = new Map();
+  const sorted = [...(completed || [])]
+    .filter(mission => mission && mission.petName && mission.type !== 'house')
+    .sort((a, b) => {
+      if (a.endWeek !== b.endWeek) return a.endWeek - b.endWeek;
+      return (a.id || 0) - (b.id || 0);
+    });
+
+  for (const mission of sorted) {
+    const key = `${mission.type}::${mission.petName}`;
+    const known = byKey.get(key);
+    if (known) {
+      known.count = (known.count || 1) + 1;
+      known.lastWeek = mission.endWeek;
+      known.lastCity = mission.city.name;
+      known.lastContinent = mission.city.continent;
+      known.lastHousing = mission.housing || known.lastHousing || known.firstHousing || null;
+    } else {
+      byKey.set(key, {
+        type: mission.type,
+        name: mission.petName,
+        animal: mission.animal,
+        firstCity: mission.city.name,
+        firstContinent: mission.city.continent,
+        lastCity: mission.city.name,
+        lastContinent: mission.city.continent,
+        firstHousing: mission.housing || null,
+        lastHousing: mission.housing || null,
+        firstWeek: mission.endWeek,
+        lastWeek: mission.endWeek,
+        count: 1,
+      });
+    }
+  }
+
+  if (byKey.size) return [...byKey.values()];
+  return (fallbackPets || []).map(pet => ({
+    ...pet,
+    firstHousing: pet.firstHousing || pet.lastHousing || null,
+    lastHousing: pet.lastHousing || pet.firstHousing || null,
+    firstContinent: pet.firstContinent || pet.lastContinent || null,
+    lastContinent: pet.lastContinent || pet.firstContinent || null,
+  }));
+}
 
 function generateRawMission() {
   const weights = { ...POOL_BASE };
@@ -2688,7 +2993,7 @@ function generateRawMission() {
   const type = weighted(types, types.map(key => weights[key]));
 
   const currentCity = deriveCurrentCityFromState();
-  const city = pickOpportunityCity(currentCity);
+  let city = pickOpportunityCity(currentCity);
 
   const bucket = weighted(['short', 'medium', 'long', 'tiny'], [0.60, 0.25, 0.10, 0.05]);
   let durationDays;
@@ -2698,13 +3003,11 @@ function generateRawMission() {
   else durationDays = rint(5, 6);
 
   const [payLo, payHi] = PAY_RANGES[type];
-  const payPerDay = rfloat(payLo, payHi);
+  let payPerDay = rfloat(payLo, payHi);
   const [ptsLo, ptsHi] = POINT_RANGES[type];
   let points = rint(ptsLo, ptsHi);
-
-  const isRareHousing = Math.random() < P_RARE_HOUSING;
-  if (isRareHousing) points += 2;
-  const housing = isRareHousing ? rng(HOUSING_TYPES.rare) : rng(HOUSING_TYPES.common);
+  let isRareHousing = Math.random() < P_RARE_HOUSING;
+  let housing = isRareHousing ? rng(HOUSING_TYPES.rare) : rng(HOUSING_TYPES.common);
 
   const hasPotes = Math.random() < P_POTES;
   if (hasPotes) points += POTES_BONUS_POINTS;
@@ -2724,27 +3027,53 @@ function generateRawMission() {
 
   let petName = null;
   let petType = null;
-  // 30 % de chance de retomber sur un animal déjà sitté (du même type) si disponible
-  const P_REPEAT_PET = 0.30;
+  let repeatPayBonusPct = 0;
+  function buildRepeatResult(record) {
+    const repeatCity = findCityFromPetRecord(record, 'first');
+    if (!repeatCity || !record.firstHousing) return null;
+    return {
+      name: record.name,
+      animal: record.animal,
+      city: repeatCity,
+      housing: record.firstHousing,
+      isRepeat: true,
+    };
+  }
   function pickRepeatOr(typeKey, freshGenerator) {
     if (!STATE.petsSeen || !STATE.petsSeen.length) return freshGenerator();
-    const knownOfType = STATE.petsSeen.filter(p => p.type === typeKey);
-    if (knownOfType.length && Math.random() < P_REPEAT_PET) {
+    const knownOfType = STATE.petsSeen
+      .filter(p => p.type === typeKey && p.firstCity && p.firstHousing)
+      .map(buildRepeatResult)
+      .filter(Boolean);
+    if (knownOfType.length && Math.random() < REPEAT_PET_CHANCE) {
       const repeat = rng(knownOfType);
-      return { name: repeat.name, animal: repeat.animal, isRepeat: true };
+      return repeat;
     }
     return freshGenerator();
   }
   let isRepeatPet = false;
   if (type === 'dog') {
-    const r = pickRepeatOr('dog', () => ({ name: rng(PET_NAMES.dog), animal: 'chien', isRepeat: false }));
+    const r = pickRepeatOr('dog', () => ({ name: rng(PET_NAMES.dog), animal: 'chien', isRepeat: false, city: null, housing: null }));
     petName = r.name; petType = 'chien'; isRepeatPet = r.isRepeat;
+    if (r.city) city = r.city;
+    if (r.housing) housing = r.housing;
   } else if (type === 'cat') {
-    const r = pickRepeatOr('cat', () => ({ name: rng(PET_NAMES.cat), animal: 'chat', isRepeat: false }));
+    const r = pickRepeatOr('cat', () => ({ name: rng(PET_NAMES.cat), animal: 'chat', isRepeat: false, city: null, housing: null }));
     petName = r.name; petType = 'chat'; isRepeatPet = r.isRepeat;
+    if (r.city) city = r.city;
+    if (r.housing) housing = r.housing;
   } else if (type === 'bird') {
-    const r = pickRepeatOr('bird', () => ({ name: rng(PET_NAMES.bird), animal: rng(BIRD_TYPES), isRepeat: false }));
+    const r = pickRepeatOr('bird', () => ({ name: rng(PET_NAMES.bird), animal: rng(BIRD_TYPES), isRepeat: false, city: null, housing: null }));
     petName = r.name; petType = r.animal; isRepeatPet = r.isRepeat;
+    if (r.city) city = r.city;
+    if (r.housing) housing = r.housing;
+  }
+  isRareHousing = HOUSING_TYPES.rare.includes(housing);
+  if (isRareHousing) points += 2;
+  if (isRepeatPet) {
+    const repeatMultiplier = rfloat(REPEAT_PET_BONUS_MIN, REPEAT_PET_BONUS_MAX);
+    repeatPayBonusPct = repeatMultiplier - 1;
+    payPerDay *= repeatMultiplier;
   }
 
   const traitDog = rng(DOG_TRAITS);
@@ -2776,6 +3105,7 @@ function generateRawMission() {
     petType,
     animal: petType === 'chien' || petType === 'chat' ? petType : (type === 'bird' ? 'oiseau' : null),
     isRepeatPet,
+    repeatPayBonusPct,
     housing,
     isRareHousing,
     hasPotes,
@@ -2840,7 +3170,7 @@ function buildMissionOffer(baseMission) {
           ? (outboundOptions.find(option => option.mode === nextMission.travelMode) || outboundOptions[0])
           : outboundOptions[0]).mode)
       : null,
-    selectedOutboundCancellable: nextMission && outboundPlanType === 'replace-booked' ? !!nextMission.travelCancellable : false,
+    selectedOutboundCancellable: false,
     overlapMissionId: overlapMission ? overlapMission.id : null,
     overlapMissionTitle: overlapMission
       ? missionLabel(overlapMission) + (overlappingMissions.length > 1 ? ` (+${overlappingMissions.length - 1})` : '')
@@ -2869,10 +3199,354 @@ function buildMissionCardBase(card) {
     petName: card.petName,
     petType: card.petType,
     animal: card.animal,
+    isRepeatPet: !!card.isRepeatPet,
+    repeatPayBonusPct: card.repeatPayBonusPct || 0,
     housing: card.housing,
     isRareHousing: card.isRareHousing,
     hasPotes: card.hasPotes,
     blurb: card.blurb,
+  };
+}
+function getMissionBookedPlanType(mission) {
+  return mission.travelLocked && mission.travelDays > 0.1 && mission.travelFrom && !mission.travelCancellable
+    ? 'catch-booked'
+    : 'replace-booked';
+}
+function getMissionAccessSelectedMode(mission) {
+  return mission.accessDays > 0.1 ? (mission.accessMode || 'none') : 'none';
+}
+function getMissionAccessReplacementCost(mission, selectedInbound, planType) {
+  if (!mission || planType !== 'catch-booked' || !selectedInbound) return 0;
+  if (!(mission.accessDays > 0.1) || mission.accessCancellable) return 0;
+  const currentMode = getMissionAccessSelectedMode(mission);
+  const sameMode = currentMode === selectedInbound.mode;
+  const sameCancellable = !!mission.accessCancellable === !!selectedInbound.cancellable;
+  return sameMode && sameCancellable ? 0 : (mission.accessCost || 0);
+}
+function buildMissionEditCard(missionId) {
+  const mission = STATE.agenda.find(entry => entry.id === missionId);
+  if (!mission || mission.startWeek <= STATE.week) return null;
+  syncMissionShape(mission);
+
+  const timeline = getSortedAgenda().filter(entry => entry.id !== mission.id);
+  let insertIndex = timeline.findIndex(entry => entry.startDay >= mission.startDay);
+  if (insertIndex === -1) insertIndex = timeline.length;
+  const previousMission = insertIndex > 0 ? timeline[insertIndex - 1] : null;
+  const previousCity = previousMission ? previousMission.city : deriveCurrentCityFromState();
+  const previousAvailableDay = previousMission ? previousMission.endDay : weekToDay(STATE.week);
+  if (!previousCity) return null;
+
+  const inboundPlan = buildOutboundPlanState(previousCity, previousAvailableDay, mission, null, 'edit');
+  const initialPlanType = inboundPlan.outboundPlanType;
+  const initialInboundOptions = inboundPlan.outboundOptions || [];
+  const initialMode = initialPlanType === 'catch-booked'
+    ? ((mission.accessDays > 0.1 && initialInboundOptions.some(option => option.mode === mission.accessMode)) ? mission.accessMode : null)
+    : (initialInboundOptions.some(option => option.mode === mission.travelMode) ? mission.travelMode : null);
+
+  const card = {
+    kind: 'edit',
+    id: `edit-${mission.id}`,
+    missionId: mission.id,
+    type: mission.type,
+    city: mission.city,
+    startWeek: mission.startWeek,
+    endWeek: mission.endWeek,
+    startDay: mission.startDay,
+    endDay: mission.endDay,
+    durationDays: mission.durationDays,
+    durationWeeks: mission.durationWeeks,
+    payPerDay: mission.payPerDay,
+    payTotal: mission.payTotal,
+    points: mission.points,
+    petName: mission.petName,
+    petType: mission.petType,
+    animal: mission.animal,
+    housing: mission.housing,
+    isRareHousing: mission.isRareHousing,
+    hasPotes: mission.hasPotes,
+    blurb: mission.blurb,
+    srcCity: previousCity,
+    previousAvailableDay,
+    distance: haversine(previousCity, mission.city),
+    inboundOptions: initialInboundOptions,
+    inboundPlanChoices: inboundPlan.outboundPlanChoices || [],
+    inboundPlanType: initialPlanType,
+    inboundTargetCity: inboundPlan.outboundTargetCity,
+    inboundTargetDay: inboundPlan.outboundTargetDay,
+    inboundPlannerText: inboundPlan.outboundPlannerText,
+    inboundBlockedReason: inboundPlan.outboundBlockedReason,
+    reviewReason: mission.scheduleBrokenReason || '',
+    selectedInboundMode: initialMode,
+    selectedInboundCancellable: initialPlanType === 'catch-booked' ? !!mission.accessCancellable : !!mission.travelCancellable,
+    feasible: true,
+    feasibilityIssues: [],
+  };
+  refreshEditMissionSelections(card);
+  return card;
+}
+function cloneProjectionMission(mission) {
+  return syncMissionShape({ ...mission });
+}
+function cloneProjectionState(source = STATE) {
+  return {
+    phase: 'playing',
+    endReason: null,
+    week: source.week,
+    balance: source.balance,
+    points: source.points,
+    startCity: source.startCity,
+    currentCity: source.currentCity,
+    agenda: source.agenda.map(cloneProjectionMission),
+    completed: source.completed.map(cloneProjectionMission),
+    achievements: new Set(source.achievements),
+    animalsDone: new Set(source.animalsDone),
+    housingsDone: new Set(source.housingsDone),
+    continentsDone: new Set(source.continentsDone),
+    transportModesDone: new Set(source.transportModesDone),
+    typeCount: { ...source.typeCount },
+    potesCount: source.potesCount,
+    activePerk: source.activePerk,
+    socialStarBlocked: source.socialStarBlocked,
+    tookPlane: source.tookPlane,
+    endlessMode: source.endlessMode,
+    atParents: source.atParents,
+    lastReturnHomeWeek: source.lastReturnHomeWeek,
+    reputationPenaltyUntil: source.reputationPenaltyUntil,
+    nomadLastIncomeWeek: source.nomadLastIncomeWeek,
+    urssafYearMarked: source.urssafYearMarked,
+  };
+}
+function getCurrentYearProjectionTarget(week = STATE.week) {
+  const currentDate = dayToDate(weekToDay(week));
+  const year = currentDate.getFullYear();
+  const endDay = dateToDay(new Date(year, 11, 31));
+  return { year, endDay, endWeek: Math.floor(endDay / 7), label: fmtDay(endDay) };
+}
+function recomputeAgendaForProjection(simState) {
+  const backup = {
+    week: STATE.week,
+    agenda: STATE.agenda,
+    completed: STATE.completed,
+    currentCity: STATE.currentCity,
+    startCity: STATE.startCity,
+  };
+  STATE.week = simState.week;
+  STATE.agenda = simState.agenda.map(cloneProjectionMission);
+  STATE.completed = simState.completed.map(cloneProjectionMission);
+  STATE.currentCity = simState.currentCity;
+  STATE.startCity = simState.startCity;
+  recomputeAgenda(false);
+  simState.agenda = STATE.agenda.map(cloneProjectionMission);
+  STATE.week = backup.week;
+  STATE.agenda = backup.agenda;
+  STATE.completed = backup.completed;
+  STATE.currentCity = backup.currentCity;
+  STATE.startCity = backup.startCity;
+}
+function awardProjectionAchievement(simState, key) {
+  if (simState.achievements.has(key)) return;
+  simState.achievements.add(key);
+  simState.points += ACHIEVEMENT_POINTS[key];
+}
+function removeEcoloForProjection(simState) {
+  if (!simState.achievements.has('ecolo')) return;
+  simState.achievements.delete('ecolo');
+  simState.points -= ACHIEVEMENT_POINTS.ecolo;
+}
+function blockSocialStarForProjection(simState) {
+  simState.socialStarBlocked = true;
+  if (simState.activePerk === 'socialStar') simState.activePerk = null;
+}
+function checkAchievementsForProjection(simState) {
+  if (simState.typeCount.dog >= 5) awardProjectionAchievement(simState, 'expert_chien');
+  if (simState.typeCount.house >= 5) awardProjectionAchievement(simState, 'ermite');
+  if (simState.animalsDone.size >= ANIMAL_ORDER.length) awardProjectionAchievement(simState, 'bestiaire');
+  if (simState.housingsDone.size >= HOUSING_ORDER.length) awardProjectionAchievement(simState, 'agent_immo');
+  if (PEKIN_EXPRESS_MODES.every(mode => simState.transportModesDone.has(mode))) awardProjectionAchievement(simState, 'pekin_express');
+  if (simState.continentsDone.size >= CONTINENT_ORDER.length) awardProjectionAchievement(simState, 'globetrotter');
+  if (simState.potesCount >= 5) awardProjectionAchievement(simState, 'kiffeur');
+  if (simState.week - simState.lastReturnHomeWeek >= LOIN_DU_NID_WEEKS) awardProjectionAchievement(simState, 'loin_du_nid');
+}
+function applyProjectionTravelLegDeparture(simState, leg) {
+  const actualCost = leg.cost || 0;
+  if (leg.mode === 'plane') {
+    if (!simState.tookPlane) {
+      simState.tookPlane = true;
+      removeEcoloForProjection(simState);
+    }
+    if (simState.activePerk === 'socialStar') {
+      const loss = Math.max(0, simState.balance - actualCost) * 0.30;
+      simState.balance -= loss;
+    }
+    blockSocialStarForProjection(simState);
+  }
+  if (PEKIN_EXPRESS_MODES.includes(leg.mode)) simState.transportModesDone.add(leg.mode);
+  simState.balance -= actualCost;
+}
+function getProjectionParentsDepartureWeek(simState) {
+  if (!simState.atParents) return null;
+  const upcoming = [...simState.agenda]
+    .sort((a, b) => (a.startWeek !== b.startWeek ? a.startWeek - b.startWeek : a.id - b.id))
+    .filter(mission => mission.endWeek > simState.week);
+  if (!upcoming.length) return null;
+  const nextDepartureDay = Math.min(...upcoming.map(mission => getMissionDepartureDay(mission)));
+  return Math.floor(nextDepartureDay / 7);
+}
+function isShelteredAtParentsForProjection(simState) {
+  if (!simState.atParents) return false;
+  const departureWeek = getProjectionParentsDepartureWeek(simState);
+  return departureWeek == null || simState.week < departureWeek;
+}
+function applyProjectionMissionCancellation(simState, missionId) {
+  const mission = simState.agenda.find(entry => entry.id === missionId);
+  if (!mission || mission.startWeek <= simState.week) return false;
+  const lostTicketCost = getMissionCancellationCost(mission);
+  const isLateCancel = mission.startWeek - simState.week < SAFE_CANCEL_WEEKS;
+  simState.agenda = simState.agenda.filter(entry => entry.id !== mission.id);
+  simState.balance -= lostTicketCost;
+  if (isLateCancel) {
+    simState.reputationPenaltyUntil = Math.max(simState.reputationPenaltyUntil, simState.week + REPUTATION_PENALTY_WEEKS);
+  }
+  return true;
+}
+function buildScheduledMissionFromCard(card) {
+  return syncMissionShape({
+    id: card.id,
+    type: card.type,
+    city: card.city,
+    startWeek: card.startWeek,
+    endWeek: card.endWeek,
+    startDay: card.startDay,
+    endDay: card.endDay,
+    durationDays: card.durationDays,
+    durationWeeks: card.durationWeeks,
+    payPerDay: card.payPerDay,
+    payTotal: card.payTotal,
+    points: card.points,
+    petName: card.petName,
+    petType: card.petType,
+    animal: card.animal,
+    housing: card.housing,
+    isRareHousing: card.isRareHousing,
+    hasPotes: card.hasPotes,
+    blurb: card.blurb,
+    travelMode: card.selectedInbound.mode,
+    travelCancellable: card.selectedInbound.cancellable,
+  });
+}
+function buildAcceptedOpportunityProjectionState(card) {
+  if (!card || card.kind !== 'mission' || !card.selectedInbound) return null;
+  if (!(card.feasible || card.canAcceptByCancellingOverlap || card.canAcceptByCancellingNextMission)) return null;
+  const simState = cloneProjectionState();
+  const overlapMissionIds = (card.overlapMissionIds || []).slice();
+  if (card.canAcceptByCancellingOverlap) {
+    for (const missionId of overlapMissionIds) applyProjectionMissionCancellation(simState, missionId);
+  }
+  if (card.canAcceptByCancellingNextMission && card.blockingNextMissionId) {
+    applyProjectionMissionCancellation(simState, card.blockingNextMissionId);
+  }
+  const mission = buildScheduledMissionFromCard(card);
+  simState.agenda.push(mission);
+  if (card.nextMissionId && card.selectedOutbound) {
+    const nextMission = simState.agenda.find(entry => entry.id === card.nextMissionId);
+    if (nextMission) {
+      if (card.outboundPlanType === 'catch-booked') {
+        if (card.selectedOutbound.days > 0.1 && !sameCity(mission.city, nextMission.travelFrom)) {
+          applyAccessToMission(nextMission, mission.city, card.selectedOutbound);
+        } else {
+          clearMissionAccess(nextMission);
+        }
+      } else {
+        simState.balance -= getMissionCancellationCost(nextMission);
+        clearMissionAccess(nextMission);
+        nextMission.travelLocked = false;
+        nextMission.travelFrom = null;
+        nextMission.travelMode = card.selectedOutbound.mode;
+        nextMission.travelCancellable = card.selectedOutbound.cancellable;
+      }
+    }
+  }
+  recomputeAgendaForProjection(simState);
+  return simState;
+}
+function simulateProjectionToWeek(simState, targetWeek) {
+  while (simState.phase === 'playing' && simState.week < targetWeek) {
+    simState.week++;
+    if (simState.atParents) {
+      const departureWeek = getProjectionParentsDepartureWeek(simState);
+      if (departureWeek != null && simState.week >= departureWeek) simState.atParents = false;
+    }
+
+    const ending = simState.agenda.filter(mission => mission.endWeek === simState.week);
+    for (const mission of ending) {
+      simState.points += mission.points;
+      simState.completed.push(cloneProjectionMission(mission));
+      simState.typeCount[mission.type]++;
+      if (mission.animal) simState.animalsDone.add(mission.animal);
+      if (mission.housing) simState.housingsDone.add(mission.housing);
+      simState.continentsDone.add(mission.city.continent);
+      if (mission.hasPotes) simState.potesCount++;
+      checkAchievementsForProjection(simState);
+    }
+    simState.agenda = simState.agenda.filter(mission => mission.endWeek > simState.week);
+
+    const starting = simState.agenda.filter(mission => mission.startWeek === simState.week);
+    for (const mission of starting) {
+      simState.balance += mission.payTotal;
+      const travelLegs = getMissionTravelLegs(mission).filter(leg => leg.mode !== 'none' && getTravelLegDays(leg) > 0.1);
+      for (const leg of travelLegs) applyProjectionTravelLegDeparture(simState, leg);
+      simState.currentCity = mission.city;
+    }
+
+    if (!isShelteredAtParentsForProjection(simState)) simState.balance -= currentWeeklyFood(simState.week);
+    checkAchievementsForProjection(simState);
+
+    if (simState.balance < 0) {
+      simState.phase = 'over';
+      simState.endReason = 'defeat';
+      break;
+    }
+    if (!simState.endlessMode && simState.points >= VICTORY_POINTS) {
+      simState.phase = 'over';
+      simState.endReason = 'victory';
+      break;
+    }
+  }
+  return simState;
+}
+function getProjectionSummary(simState, target) {
+  const finalState = simulateProjectionToWeek(simState, target.endWeek);
+  const stoppedEarly = finalState.phase === 'over' && finalState.week < target.endWeek;
+  let status = '';
+  if (stoppedEarly) {
+    status = finalState.endReason === 'defeat'
+      ? `Défaite prévue le ${fmtDate(finalState.week)}.`
+      : `Victoire prévue le ${fmtDate(finalState.week)}.`;
+  } else {
+    status = `Toujours en jeu au ${target.label}.`;
+  }
+  return {
+    balance: finalState.balance,
+    points: finalState.points,
+    week: finalState.week,
+    endReason: finalState.endReason,
+    stoppedEarly,
+    status,
+  };
+}
+function getOpportunityAccountantProjection(card) {
+  if (!hasPerk('accountant') || !card || card.kind !== 'mission') return null;
+  const target = getCurrentYearProjectionTarget(STATE.week);
+  const baseline = getProjectionSummary(cloneProjectionState(), target);
+  const acceptedState = buildAcceptedOpportunityProjectionState(card);
+  const accepted = acceptedState ? getProjectionSummary(acceptedState, target) : null;
+  return {
+    target,
+    baseline,
+    accepted,
+    acceptLabel: (card.canAcceptByCancellingOverlap || card.canAcceptByCancellingNextMission)
+      ? 'Si tu acceptes en annulant'
+      : 'Si tu acceptes',
   };
 }
 function refreshPendingMissionFromAgenda() {
@@ -2948,6 +3622,110 @@ function refreshPendingHomeFromAgenda() {
   refreshPendingHomeSelections(refreshed);
   STATE.pendingCard = refreshed;
 }
+function refreshEditMissionSelections(card) {
+  if (!card || card.kind !== 'edit') return;
+  const mission = STATE.agenda.find(entry => entry.id === card.missionId);
+  if (!mission || mission.startWeek <= STATE.week) {
+    STATE.editCard = null;
+    STATE.editCardTab = 'presentation';
+    return;
+  }
+  syncMissionShape(mission);
+
+  const inboundPlan = buildOutboundPlanState(card.srcCity, card.previousAvailableDay, mission, card.inboundPlanType, 'edit');
+  card.inboundOptions = inboundPlan.outboundOptions;
+  card.inboundPlanChoices = inboundPlan.outboundPlanChoices || [];
+  card.inboundPlanType = inboundPlan.outboundPlanType;
+  card.inboundTargetCity = inboundPlan.outboundTargetCity;
+  card.inboundTargetDay = inboundPlan.outboundTargetDay;
+  card.inboundPlannerText = inboundPlan.outboundPlannerText;
+  card.inboundBlockedReason = inboundPlan.outboundBlockedReason;
+  card.reviewReason = mission.scheduleBrokenReason || '';
+
+  if (card.inboundOptions.length && (!card.selectedInboundMode || !card.inboundOptions.some(option => option.mode === card.selectedInboundMode))) {
+    if (card.inboundPlanType === 'catch-booked') {
+      card.selectedInboundMode = (mission.accessDays > 0.1 && card.inboundOptions.some(option => option.mode === mission.accessMode))
+        ? mission.accessMode
+        : null;
+      card.selectedInboundCancellable = !!mission.accessCancellable;
+    } else {
+      card.selectedInboundMode = card.inboundOptions.some(option => option.mode === mission.travelMode)
+        ? mission.travelMode
+        : null;
+      card.selectedInboundCancellable = !!mission.travelCancellable;
+    }
+  }
+
+  card.selectedInbound = getSelectedTransportExact(card.inboundOptions, card.selectedInboundMode, card.selectedInboundCancellable);
+  card.travelMode = card.selectedInbound ? card.selectedInbound.mode : null;
+  card.travelLabel = card.selectedInbound ? card.selectedInbound.label : 'Pas de trajet';
+  card.travelIcon = card.selectedInbound ? card.selectedInbound.icon : '✖';
+  card.travelCost = card.selectedInbound ? card.selectedInbound.cost : 0;
+  card.travelDays = card.selectedInbound ? card.selectedInbound.days : 0;
+  card.travelStartDay = card.selectedInbound
+    ? (card.inboundPlanType === 'catch-booked' ? mission.travelStartDay - card.selectedInbound.days : mission.startDay - card.selectedInbound.days)
+    : mission.startDay;
+  card.arrivalDay = mission.startDay;
+  card.refundCost = card.inboundPlanType === 'replace-booked'
+    ? getMissionCancellationCost(mission)
+    : getMissionAccessReplacementCost(mission, card.selectedInbound, card.inboundPlanType);
+  const travelLegs = getMissionTravelLegs(mission);
+  card.currentBookedLeg = travelLegs.find(leg => leg.kind === 'travel') || null;
+  card.currentAccessLeg = travelLegs.find(leg => leg.kind === 'access') || null;
+  card.originalPlanType = getMissionBookedPlanType(mission);
+  card.originalInboundMode = card.originalPlanType === 'catch-booked' ? getMissionAccessSelectedMode(mission) : mission.travelMode;
+  card.originalInboundCancellable = card.originalPlanType === 'catch-booked' ? !!mission.accessCancellable : !!mission.travelCancellable;
+  card.hasChanges = card.inboundPlanType !== card.originalPlanType
+    || card.selectedInboundMode !== card.originalInboundMode
+    || !!card.selectedInboundCancellable !== !!card.originalInboundCancellable;
+
+  const issues = [];
+  if (!card.selectedInbound) issues.push(card.reviewReason || card.inboundBlockedReason || 'Aucune option réaliste pour ce trajet.');
+  card.feasibilityIssues = issues;
+  card.feasible = issues.length === 0;
+  card.cancelRefundCost = getMissionCancellationCost(mission);
+  card.cancelLate = mission.startWeek - STATE.week < SAFE_CANCEL_WEEKS;
+}
+function refreshEditMissionFromAgenda() {
+  const card = STATE.editCard;
+  if (!card || card.kind !== 'edit') return;
+  const preserved = {
+    missionId: card.missionId,
+    selectedInboundMode: card.selectedInboundMode,
+    selectedInboundCancellable: card.selectedInboundCancellable,
+    inboundPlanType: card.inboundPlanType,
+  };
+  const refreshed = buildMissionEditCard(preserved.missionId);
+  if (!refreshed) {
+    STATE.editCard = null;
+    STATE.editCardTab = 'presentation';
+    return;
+  }
+  if (preserved.inboundPlanType && (refreshed.inboundPlanChoices || []).some(choice => choice.key === preserved.inboundPlanType)) {
+    refreshed.inboundPlanType = preserved.inboundPlanType;
+  }
+  if (preserved.selectedInboundMode) {
+    refreshed.selectedInboundMode = preserved.selectedInboundMode;
+    refreshed.selectedInboundCancellable = !!preserved.selectedInboundCancellable;
+  }
+  refreshEditMissionSelections(refreshed);
+  STATE.editCard = refreshed;
+}
+function openMissionEditor(id) {
+  const card = buildMissionEditCard(id);
+  if (!card) return;
+  STATE.editCard = card;
+  STATE.editCardTab = card.reviewReason ? 'planning' : 'presentation';
+  render();
+}
+function getNextBrokenMission() {
+  return getSortedAgenda().find(mission => mission.startWeek > STATE.week && mission.scheduleBroken) || null;
+}
+function closeMissionEditor() {
+  STATE.editCard = null;
+  STATE.editCardTab = 'presentation';
+  render();
+}
 function generateChanceOffer() {
   if (STATE.activePerk) return null;
   const pool = Object.keys(PERK_DEFS).filter(key => key !== 'socialStar' || !STATE.socialStarBlocked);
@@ -2964,6 +3742,7 @@ function buildMilestoneChanceOffer(perkKey, milestoneReason) {
 function generateMilestoneChanceOffer() {
   if (STATE.activePerk === 'friendInsider') STATE.friendInsiderMilestoneResolved = true;
   if (STATE.activePerk === 'digitalNomad') STATE.digitalNomadMilestoneResolved = true;
+  if (STATE.activePerk === 'accountant') STATE.accountantMilestoneResolved = true;
   if (STATE.activePerk === 'socialStar' || STATE.socialStarBlocked) STATE.socialStarMilestoneResolved = true;
 
   if (!STATE.friendInsiderMilestoneResolved && getCompletedPetSittings() >= PET_SITTER_MENTOR_THRESHOLD) {
@@ -2981,6 +3760,15 @@ function generateMilestoneChanceOffer() {
     return buildMilestoneChanceOffer(
       'digitalNomad',
       `Après ${DIGITAL_NOMAD_STREAK_WEEKS} semaines sous ${fmtMoney(DIGITAL_NOMAD_THRESHOLD)}, tu te mets au freelance pour respirer un peu.`
+    );
+  }
+
+  if (!STATE.accountantMilestoneResolved && STATE.balance >= ACCOUNTANT_BALANCE_THRESHOLD) {
+    if (STATE.activePerk) return null;
+    STATE.accountantMilestoneResolved = true;
+    return buildMilestoneChanceOffer(
+      'accountant',
+      `À partir de ${fmtMoney(ACCOUNTANT_BALANCE_THRESHOLD)}, tu te mets enfin à tout projeter avant de signer.`
     );
   }
 
@@ -3030,7 +3818,7 @@ function refreshPendingMissionSelections(card) {
         ? (card.outboundOptions.find(option => option.mode === nextMission.travelMode) || card.outboundOptions[0])
         : card.outboundOptions[0]).mode;
       if (card.outboundPlanType === 'replace-booked') {
-        card.selectedOutboundCancellable = !!nextMission.travelCancellable;
+        card.selectedOutboundCancellable = false;
       }
     }
   } else {
@@ -3108,11 +3896,12 @@ function refreshPendingMissionSelections(card) {
   }
 }
 function selectPendingTransport(which, mode) {
-  const card = STATE.pendingCard;
-  if (!card || (card.kind !== 'mission' && card.kind !== 'home')) return;
+  const card = STATE.editCard || STATE.pendingCard;
+  if (!card || (card.kind !== 'mission' && card.kind !== 'home' && card.kind !== 'edit')) return;
   if (which === 'inbound') card.selectedInboundMode = mode;
   if (which === 'outbound') card.selectedOutboundMode = mode;
-  if (card.kind === 'home') refreshPendingHomeSelections(card);
+  if (card.kind === 'edit') refreshEditMissionSelections(card);
+  else if (card.kind === 'home') refreshPendingHomeSelections(card);
   else refreshPendingMissionSelections(card);
   render();
 }
@@ -3121,20 +3910,39 @@ function selectPendingOutboundPlanType(planType) {
   if (!card || (card.kind !== 'mission' && card.kind !== 'home')) return;
   if (!card.nextMissionId) return;
   if (!(card.outboundPlanChoices || []).some(choice => choice.key === planType)) return;
+  if (card.outboundPlanType !== planType) {
+    card.selectedOutboundMode = null;
+    card.selectedOutboundCancellable = false;
+  }
   card.outboundPlanType = planType;
   if (card.kind === 'home') refreshPendingHomeSelections(card);
   else refreshPendingMissionSelections(card);
   render();
 }
+function selectEditInboundPlanType(planType) {
+  const card = STATE.editCard;
+  if (!card || card.kind !== 'edit') return;
+  if (!(card.inboundPlanChoices || []).some(choice => choice.key === planType)) return;
+  if (card.inboundPlanType !== planType) {
+    card.selectedInboundMode = null;
+    card.selectedInboundCancellable = false;
+  }
+  card.inboundPlanType = planType;
+  refreshEditMissionSelections(card);
+  render();
+}
 function togglePendingCancellable(which) {
-  const card = STATE.pendingCard;
-  if (!card || (card.kind !== 'mission' && card.kind !== 'home')) return;
+  const card = STATE.editCard || STATE.pendingCard;
+  if (!card || (card.kind !== 'mission' && card.kind !== 'home' && card.kind !== 'edit')) return;
   if (card.kind === 'home' && which === 'inbound') return;
-  const mode = which === 'inbound' ? card.selectedInboundMode : card.selectedOutboundMode;
-  if (isAutoCancellableMode(mode)) return;
+  const selected = which === 'inbound'
+    ? getSelectedTransport(card.inboundOptions, card.selectedInboundMode, card.selectedInboundCancellable)
+    : getSelectedTransport(card.outboundOptions, card.selectedOutboundMode, card.selectedOutboundCancellable);
+  if (selected && isAutoCancellableTransport(selected)) return;
   if (which === 'inbound') card.selectedInboundCancellable = !card.selectedInboundCancellable;
   if (which === 'outbound') card.selectedOutboundCancellable = !card.selectedOutboundCancellable;
-  if (card.kind === 'home') refreshPendingHomeSelections(card);
+  if (card.kind === 'edit') refreshEditMissionSelections(card);
+  else if (card.kind === 'home') refreshPendingHomeSelections(card);
   else refreshPendingMissionSelections(card);
   render();
 }
@@ -3159,6 +3967,71 @@ function applyMissionCancellation(mission, { reflow = true } = {}) {
   }
   if (reflow) recomputeAgenda(true);
   return true;
+}
+function saveEditedMission() {
+  const card = STATE.editCard;
+  if (!card || card.kind !== 'edit') return;
+  if (!card.hasChanges) {
+    closeMissionEditor();
+    return;
+  }
+  const mission = STATE.agenda.find(entry => entry.id === card.missionId);
+  if (!mission || mission.startWeek <= STATE.week || !card.feasible || !card.selectedInbound) return;
+  syncMissionShape(mission);
+
+  let lostTicketCost = 0;
+  if (card.inboundPlanType === 'replace-booked') {
+    lostTicketCost = getMissionCancellationCost(mission);
+    if (lostTicketCost > 0) {
+      STATE.balance -= lostTicketCost;
+      log(`↺ Trajet remplacé pour ${missionLabel(mission)} : billet précédent perdu (−${fmtMoney(lostTicketCost)}).`);
+    }
+    applyTransportToMission(mission, card.srcCity, card.selectedInbound);
+  } else {
+    lostTicketCost = getMissionAccessReplacementCost(mission, card.selectedInbound, card.inboundPlanType);
+    if (lostTicketCost > 0) {
+      STATE.balance -= lostTicketCost;
+      log(`↺ Trajet d'approche remplacé pour ${missionLabel(mission)} : billet précédent perdu (−${fmtMoney(lostTicketCost)}).`);
+    }
+    if (card.selectedInbound.days > 0.1 && !sameCity(card.srcCity, mission.travelFrom)) {
+      applyAccessToMission(mission, card.srcCity, card.selectedInbound);
+    } else {
+      clearMissionAccess(mission);
+    }
+  }
+
+  recomputeAgenda(true);
+  STATE.editCard = null;
+  STATE.editCardTab = 'presentation';
+  log(`✎ Mission modifiée : ${missionLabel(mission)}.`);
+  if (STATE.balance < 0) {
+    STATE.phase = 'over';
+    STATE.endReason = 'defeat';
+    log('✗ DÉFAITE : solde épuisé.');
+    recordScore();
+  }
+  render();
+}
+function cancelEditedMission() {
+  const card = STATE.editCard;
+  if (!card || card.kind !== 'edit') return;
+  const mission = STATE.agenda.find(entry => entry.id === card.missionId);
+  if (!mission || mission.startWeek <= STATE.week) return;
+  const lateWarning = mission.startWeek - STATE.week < SAFE_CANCEL_WEEKS
+    ? ' Ta réputation sera plombée pendant 6 mois.'
+    : '';
+  const ticketWarning = card.cancelRefundCost > 0
+    ? ` Le coût du trajet réservé sera perdu (−${fmtMoney(card.cancelRefundCost)}).`
+    : '';
+  const okay = window.confirm(`Annuler ${missionLabel(mission)} ?${ticketWarning}${lateWarning}`);
+  if (!okay) return;
+
+  STATE.editCard = null;
+  STATE.editCardTab = 'presentation';
+  applyMissionCancellation(mission, { reflow: true });
+  refreshPendingMissionFromAgenda();
+  refreshPendingHomeFromAgenda();
+  render();
 }
 function commitPendingMission(card) {
   if (!card.selectedInbound) return;
@@ -3210,7 +4083,7 @@ function commitPendingMission(card) {
   STATE.pendingCard = null;
   STATE.pendingCardMinimized = false;
   STATE.pendingCardTab = 'presentation';
-  recomputeAgenda(false);
+  recomputeAgenda(true);
   log(`Accepté : ${missionLabel(mission)} (${fmtDate(mission.startWeek)}).`);
   if (STATE.balance < 0) {
     STATE.phase = 'over';
@@ -3263,7 +4136,7 @@ function acceptHomeCard() {
   STATE.pendingCard = null;
   STATE.pendingCardMinimized = false;
   STATE.pendingCardTab = 'presentation';
-  recomputeAgenda(false);
+  recomputeAgenda(true);
   log(`↩ Retour chez les parents à ${STATE.startCity.name} : ${card.travelIcon} ${card.travelLabel} ${fmtMoney(-actualCost)}${costNote}.`);
   if (STATE.balance < 0) {
     STATE.phase = 'over';
@@ -3304,6 +4177,7 @@ function acceptCard() {
     STATE.activePerk = card.perkKey;
     if (card.perkKey === 'friendInsider') STATE.friendInsiderMilestoneResolved = true;
     if (card.perkKey === 'digitalNomad') STATE.digitalNomadMilestoneResolved = true;
+    if (card.perkKey === 'accountant') STATE.accountantMilestoneResolved = true;
     if (card.perkKey === 'socialStar') STATE.socialStarMilestoneResolved = true;
     STATE.pendingCard = null;
     STATE.pendingCardMinimized = false;
@@ -3463,7 +4337,14 @@ function checkAchievements() {
 }
 function nextTurn() {
   if (STATE.phase !== 'playing') return;
+  if (STATE.editCard) return;
   if (STATE.pendingCard && !STATE.pendingCardMinimized) return;
+  const brokenMission = getNextBrokenMission();
+  if (brokenMission) {
+    log(`⚠ ${missionLabel(brokenMission)} doit être revalidée avant d’avancer.`);
+    openMissionEditor(brokenMission.id);
+    return;
+  }
   if (STATE.pendingCard && STATE.pendingCardMinimized) {
     const logText = STATE.pendingCard.kind === 'chance'
       ? 'Carte Chance laissée passer en prenant le tour suivant.'
@@ -3495,13 +4376,19 @@ function nextTurn() {
         known.count = (known.count || 1) + 1;
         known.lastWeek = STATE.week;
         known.lastCity = mission.city.name;
+        known.lastContinent = mission.city.continent;
+        known.lastHousing = mission.housing || known.lastHousing || known.firstHousing || null;
       } else {
         STATE.petsSeen.push({
           type: mission.type,
           name: mission.petName,
           animal: mission.animal,
           firstCity: mission.city.name,
+          firstContinent: mission.city.continent,
           lastCity: mission.city.name,
+          lastContinent: mission.city.continent,
+          firstHousing: mission.housing || null,
+          lastHousing: mission.housing || null,
           firstWeek: STATE.week,
           lastWeek: STATE.week,
           count: 1,
@@ -3561,7 +4448,7 @@ function nextTurn() {
     render();
     return;
   }
-  if (STATE.points >= VICTORY_POINTS) {
+  if (!STATE.endlessMode && STATE.points >= VICTORY_POINTS) {
     STATE.phase = 'over';
     STATE.endReason = 'victory';
     log(`★ VICTOIRE en semaine ${STATE.week} !`);
@@ -3665,9 +4552,9 @@ function renderPetsAlbum() {
   return `<div class="album-grid">${sorted.map(p => {
     const icon = p.type === 'dog' ? '🐕' : p.type === 'cat' ? '🐈' : '🦜';
     const heart = (p.count || 1) > 1 ? `<span class="album-heart" title="${p.count} fois">💛${p.count > 2 ? '×' + p.count : ''}</span>` : '';
-    const sub = p.count > 1
-      ? `${p.firstCity}${p.lastCity !== p.firstCity ? ' → ' + p.lastCity : ''}`
-      : p.firstCity;
+    const hometown = p.firstCity || p.lastCity || 'ville inconnue';
+    const homeHousing = p.firstHousing || p.lastHousing || '';
+    const sub = homeHousing ? `${hometown} · ${homeHousing}` : hometown;
     return `<div class="album-row">
       <span class="album-icon">${icon}</span>
       <div class="album-text">
@@ -3730,18 +4617,20 @@ function renderOfferFilterPanel() {
 }
 function renderReturnHomePanel() {
   const activeMission = getActiveMission();
-  const disabled = STATE.atParents || !!STATE.pendingCard || !!activeMission;
+  const disabled = STATE.atParents || !!STATE.pendingCard || !!STATE.editCard || !!activeMission;
   const text = STATE.atParents
     ? `Tu es déjà chez tes parents à ${STATE.startCity ? STATE.startCity.name : 'la maison'}. Aucune charge hebdomadaire tant que tu n’es pas reparti.`
-    : (STATE.pendingCard
+    : ((STATE.pendingCard || STATE.editCard)
       ? 'Traite d’abord la carte en cours avant de proposer ce retour.'
       : (activeMission
         ? 'Impossible pendant une mission en cours.'
         : `Rentre dans ta ville de départ${STATE.startCity ? ` : ${STATE.startCity.name}` : ''}. Tu paies le trajet, puis plus aucune charge sur place.`));
   return `
     <div class="offer-filter-panel">
-      <button class="primary" onclick="offerReturnHome()" ${disabled ? 'disabled' : ''}>Retour chez les parents</button>
-      <div class="offer-filter-note">${text}</div>
+      <button class="offer-filter-button ${disabled ? '' : 'active'}" onclick="offerReturnHome()" ${disabled ? 'disabled' : ''}>
+        <div class="offer-filter-label">Retour chez les parents</div>
+        <div class="offer-filter-desc">${text}</div>
+      </button>
     </div>
   `;
 }
@@ -3762,8 +4651,9 @@ function renderAgenda() {
         <div class="am-title">${missionTitle(mission)}</div>
         <div class="am-sub">${mission.housing}${mission.isRareHousing ? ' ✦' : ''} · ${mission.durationDays} jours · ${fmtMoney(mission.payTotal)}</div>
         <div class="am-bar">${status} · ${fmtDate(mission.startWeek)} → ${fmtDate(mission.endWeek)}</div>
+        ${mission.scheduleBroken ? `<div class="agenda-warning">⚠ ${esc(mission.scheduleBrokenReason || 'Trajet à revalider manuellement.')}</div>` : ''}
         ${mission.hasPotes ? `<div class="agenda-friends"><strong>Potes invités</strong> · +${POTES_BONUS_POINTS} pt</div>` : ''}
-        ${isFuture ? `<div class="agenda-actions"><button class="danger" onclick="cancelMission(${mission.id})">Annuler</button></div>` : ''}
+        ${isFuture ? `<div class="agenda-actions"><button onclick="openMissionEditor(${mission.id})">Modifier</button></div>` : ''}
       </div>
     `;
   }).join('');
@@ -3835,6 +4725,10 @@ function renderMap(currentCity, options = {}) {
       markers += `<text class="city-label" x="${(point.x + 8).toFixed(2)}" y="${(point.y + 4).toFixed(2)}">${city.name}</text>`;
     }
   }
+  if (STATE.startCity) {
+    const point = proj(STATE.startCity.lat, STATE.startCity.lng);
+    markers += `<text class="home-marker" x="${(point.x + 11).toFixed(2)}" y="${(point.y - 10).toFixed(2)}">🏠</text>`;
+  }
   if (currentCity) {
     const point = proj(currentCity.lat, currentCity.lng);
     markers += `<text class="current-avatar" x="${point.x.toFixed(2)}" y="${(point.y + 5).toFixed(2)}">${STATE.characterIcon}</text>`;
@@ -3855,16 +4749,20 @@ function renderCalendarPane(card) {
   let rows = '';
   let lastMonth = -1;
   const booked = getSortedAgenda();
-  const candidate = card && (card.kind === 'mission' || card.kind === 'home') ? card : null;
+  const candidate = card && isCalendarModalCard(card) ? card : null;
   const candidateNextMission = candidate && candidate.nextMissionId
     ? booked.find(entry => entry.id === candidate.nextMissionId)
     : null;
-  const replacedTravelMissionId = candidate && candidate.selectedOutbound && candidateNextMission && candidate.outboundPlanType === 'replace-booked'
-    ? candidate.nextMissionId
-    : null;
-  const replacedAccessMissionId = candidate && candidate.selectedOutbound && candidateNextMission && candidate.outboundPlanType === 'catch-booked'
-    ? candidate.nextMissionId
-    : null;
+  const replacedTravelMissionId = candidate && candidate.kind === 'edit'
+    ? (candidate.inboundPlanType === 'replace-booked' ? candidate.missionId : null)
+    : (candidate && candidate.selectedOutbound && candidateNextMission && candidate.outboundPlanType === 'replace-booked'
+      ? candidate.nextMissionId
+      : null);
+  const replacedAccessMissionId = candidate && candidate.kind === 'edit'
+    ? candidate.missionId
+    : (candidate && candidate.selectedOutbound && candidateNextMission && candidate.outboundPlanType === 'catch-booked'
+      ? candidate.nextMissionId
+      : null);
   const focusWeek = candidate ? Math.min(endWeek - 1, getPendingCalendarFocusWeek(candidate)) : null;
 
   for (let week = startWeek; week < endWeek; week++) {
@@ -3888,7 +4786,10 @@ function renderCalendarPane(card) {
       })
       .find(Boolean);
     const candidateMission = candidate && candidate.kind === 'mission' && weekOverlapsRange(week, candidate.startDay, candidate.endDay);
-    const candidateTravel = candidate && candidate.travelDays > 0.1 && weekOverlapsRange(week, candidate.travelStartDay, candidate.startDay);
+    const candidateTravelEndDay = candidate && candidate.kind === 'edit' && candidate.inboundPlanType === 'catch-booked' && candidate.currentBookedLeg
+      ? candidate.currentBookedLeg.startDay
+      : (candidate && candidate.kind === 'edit' ? candidate.arrivalDay : candidate && candidate.startDay);
+    const candidateTravel = candidate && candidate.selectedInbound && candidate.travelDays > 0.1 && weekOverlapsRange(week, candidate.travelStartDay, candidateTravelEndDay);
     const candidateOutboundTravel = candidate && candidateNextMission && candidate.selectedOutbound
       && candidate.selectedOutbound.days > 0.1
       && candidate.nextTravelStartDay != null
@@ -3931,9 +4832,9 @@ function renderCalendarPane(card) {
   `;
 }
 function renderTransportPlanner(card, which, title, options, selectedMode, cancellable, extraText) {
-  const selected = getSelectedTransport(options, selectedMode, cancellable);
+  const selected = getSelectedTransportExact(options, selectedMode, cancellable);
   const allowCancellableToggle = !(card.kind === 'home' && which === 'inbound');
-  const showCancellableToggle = allowCancellableToggle && selected && !isAutoCancellableMode(selected.mode);
+  const showCancellableToggle = allowCancellableToggle && selected && !isAutoCancellableTransport(selected);
   const startDay = which === 'inbound' ? card.travelStartDay : card.nextTravelStartDay;
   const endDay = which === 'inbound'
     ? card.startDay
@@ -3949,14 +4850,14 @@ function renderTransportPlanner(card, which, title, options, selectedMode, cance
             return `
               <button class="transport-option ${selectedMode === option.mode ? 'selected' : ''}" onclick="selectPendingTransport('${which}','${option.mode}')">
                 <span>${option.icon} ${option.label}</span>
-                <span>${fmtDays(option.days)} · ${fmtMoney(priced.cost)}</span>
+                <span>${fmtDays(option.days)} · ${formatTransportCostLabel(priced)}</span>
               </button>
             `;
           }).join('')}
         </div>
         ${showCancellableToggle ? `<button class="toggle-chip ${cancellable ? 'on' : ''}" onclick="togglePendingCancellable('${which}')">
           Billet annulable (+${Math.round((CANCELLABLE_MULTIPLIER - 1) * 100)} %)
-        </button>` : (selected && isAutoCancellableMode(selected.mode) ? '<div class="transport-mini">Annulable d\'office, sans surcoût.</div>' : '')}
+        </button>` : (selected ? `<div class="transport-mini">${getTransportAutoCancellableText(selected)}</div>` : '')}
       ` : `<div class="transport-empty">Aucune option réaliste pour ce segment.</div>`}
       ${selected && startDay != null && endDay != null ? `<div class="transport-mini">${selected.icon} ${selected.label} · ${fmtDayRange(startDay, endDay)}</div>` : ''}
     </div>
@@ -3972,6 +4873,130 @@ function renderOutboundPlanChooser(card) {
           <span class="transport-plan-desc">${choice.desc}</span>
         </button>
       `).join('')}
+    </div>
+  `;
+}
+function renderEditInboundPlanChooser(card) {
+  if (!card || card.kind !== 'edit' || (card.inboundPlanChoices || []).length < 2) return '';
+  return `
+    <div class="transport-plan-picker">
+      ${card.inboundPlanChoices.map(choice => `
+        <button class="transport-plan-button ${card.inboundPlanType === choice.key ? 'selected' : ''}" onclick="selectEditInboundPlanType('${choice.key}')">
+          <span class="transport-plan-label">${choice.label}</span>
+          <span class="transport-plan-desc">${choice.desc}</span>
+        </button>
+      `).join('')}
+    </div>
+  `;
+}
+function getEditCardActiveTab(card) {
+  const allowed = ['presentation', 'planning', 'cancellation'];
+  return allowed.includes(STATE.editCardTab) ? STATE.editCardTab : 'presentation';
+}
+function setEditCardTab(tab) {
+  const card = STATE.editCard;
+  if (!card || card.kind !== 'edit') return;
+  STATE.editCardTab = ['presentation', 'planning', 'cancellation'].includes(tab) ? tab : 'presentation';
+  render();
+}
+function renderEditMissionPresentation(card) {
+  return `
+    <div class="listing-panel">
+      <div class="listing-description">"Mission déjà réservée. Tu peux ajuster son trajet d’arrivée, ou annuler la mission proprement si besoin."</div>
+      <div class="listing-grid">
+        <div class="listing-spec">
+          <div class="listing-spec-label">Démarrage</div>
+          <div class="listing-spec-value">${fmtDate(card.startWeek)}</div>
+        </div>
+        <div class="listing-spec">
+          <div class="listing-spec-label">Durée</div>
+          <div class="listing-spec-value">${card.durationDays} jours</div>
+        </div>
+        <div class="listing-spec">
+          <div class="listing-spec-label">Paiement</div>
+          <div class="listing-spec-value">${fmtMoney(card.payTotal)}</div>
+        </div>
+        <div class="listing-spec">
+          <div class="listing-spec-label">Satisfaction</div>
+          <div class="listing-spec-value">+${card.points} pts</div>
+        </div>
+      </div>
+    </div>
+  `;
+}
+function renderEditMissionPlanning(card) {
+  const selectedSummary = card.selectedInbound
+    ? `${fmtDays(card.travelDays)} · ${formatTransportCostLabel(card.selectedInbound)}`
+    : 'Aucune option réaliste';
+  const planLabel = card.inboundPlanType === 'catch-booked'
+    ? 'Billet gardé'
+    : 'Nouveau trajet';
+  const bookedLegText = card.inboundPlanType === 'catch-booked' && card.currentBookedLeg
+    ? `${card.currentBookedLeg.icon} ${card.currentBookedLeg.label} · ${fmtDays(getTravelLegDays(card.currentBookedLeg))} · ${formatTransportCostLabel(card.currentBookedLeg)}`
+    : '';
+  return `
+    <div class="planner-view">
+      <div class="planner-summary">
+        <div class="planner-stat-card">
+          <div class="planner-stat-label">Trajet choisi</div>
+          <div class="planner-stat-value">${card.selectedInbound ? `${card.selectedInbound.icon} ${card.selectedInbound.label}` : 'Impossible'}</div>
+          <div class="planner-stat-sub">${selectedSummary}</div>
+        </div>
+        <div class="planner-stat-card ${card.refundCost > 0 ? 'net-negative' : 'net-positive'}">
+          <div class="planner-stat-label">Billets perdus</div>
+          <div class="planner-stat-value">${card.refundCost > 0 ? `−${fmtMoney(card.refundCost)}` : '0 €'}</div>
+          <div class="planner-stat-sub">${card.refundCost > 0 ? 'Billets non annulables abandonnés' : 'Aucune perte immédiate'}</div>
+        </div>
+        <div class="planner-stat-card">
+          <div class="planner-stat-label">Plan</div>
+          <div class="planner-stat-value">${planLabel}</div>
+          <div class="planner-stat-sub">${card.inboundPlannerText || 'Réorganise l’arrivée sur cette mission.'}</div>
+        </div>
+      </div>
+
+      ${renderEditInboundPlanChooser(card)}
+
+      ${renderTransportPlanner(
+        card,
+        'inbound',
+        card.inboundPlanType === 'catch-booked'
+          ? `Trajet pour rejoindre ${card.inboundTargetCity ? card.inboundTargetCity.name : card.city.name}`
+          : `Trajet vers ${card.city.name}`,
+        card.inboundOptions,
+        card.selectedInboundMode,
+        card.selectedInboundCancellable,
+        `Depuis ${card.srcCity.name} · ${Math.round(haversine(card.srcCity, card.inboundTargetCity || card.city))} km`
+      )}
+
+      <div class="travel-info">
+        ${card.selectedInbound ? `${card.travelIcon} <strong>${card.travelLabel}</strong> · ${fmtDays(card.travelDays)} · ${formatTransportCostLabel(card.selectedInbound)}` : '✖ <strong>Trajet d’arrivée impossible</strong>'}<br>
+        <span class="planner-note">Fenêtre de trajet : <strong>${fmtDayRange(card.travelStartDay, card.arrivalDay)}</strong></span>
+        ${bookedLegText ? `<br><span class="planner-note">Puis ${bookedLegText}</span>` : ''}
+        ${card.refundCost > 0 ? `<br><span class="planner-note">Coût du trajet abandonné : <strong style="color:#a83232;">−${fmtMoney(card.refundCost)}</strong></span>` : ''}
+        ${card.feasibilityIssues.length ? `<div class="travel-warnings">${card.feasibilityIssues.map(issue => `<div>⚠ ${issue}</div>`).join('')}</div>` : ''}
+      </div>
+    </div>
+  `;
+}
+function renderEditMissionCancellation(card) {
+  return `
+    <div class="cancel-panel">
+      <div class="cancel-title">Annuler cette mission</div>
+      <div class="cancel-reason">Si tu annules cette mission, les trajets autour seront recalculés automatiquement à partir du planning restant.</div>
+      <div class="cancel-stack">
+        <div class="cancel-note">
+          <div class="cancel-note-title">${missionTitle(card)}</div>
+          <div class="cancel-note-date">${fmtDate(card.startWeek)}</div>
+          <div class="cancel-note-metrics">
+            <div>Paiement prévu : <strong>${fmtMoney(card.payTotal)}</strong></div>
+            <div>Satisfaction : <strong>+${card.points} pts</strong></div>
+            ${card.cancelRefundCost > 0
+              ? `<div class="cancel-note-cost">Coût du trajet : <strong>−${fmtMoney(card.cancelRefundCost)}</strong></div>`
+              : `<div>Trajet : <strong>annulable sans frais</strong></div>`}
+            ${card.cancelLate ? `<div class="cancel-note-cost">Réputation : <strong>malus 6 mois</strong></div>` : `<div>Réputation : <strong>aucune pénalité</strong></div>`}
+          </div>
+        </div>
+      </div>
     </div>
   `;
 }
@@ -4033,7 +5058,7 @@ function renderHomePlanning(card, nextMission) {
     ? (card.selectedOutbound
       ? (card.outboundPlanType === 'catch-booked'
         ? `Vers ${card.outboundTargetCity.name} · puis ${nextMission.travelIcon} ${nextMission.travelLabel} vers ${nextMission.city.name}`
-        : `Vers ${nextMission.city.name} · ${fmtMoney(card.selectedOutbound.cost)}`)
+        : `Vers ${nextMission.city.name} · ${formatTransportCostLabel(card.selectedOutbound)}`)
       : card.outboundBlockedReason)
     : 'Aucune destination réservée après le retour';
   return `
@@ -4042,7 +5067,7 @@ function renderHomePlanning(card, nextMission) {
         <div class="planner-stat-card">
           <div class="planner-stat-label">Retour</div>
           <div class="planner-stat-value">${card.selectedInbound ? `${card.selectedInbound.icon} ${card.selectedInbound.label}` : 'Impossible'}</div>
-          <div class="planner-stat-sub">${card.selectedInbound ? `${fmtDays(card.travelDays)} · ${fmtMoney(card.travelCost)}` : 'Aucune option réaliste'}</div>
+          <div class="planner-stat-sub">${card.selectedInbound ? `${fmtDays(card.travelDays)} · ${formatTransportCostLabel(card.selectedInbound)}` : 'Aucune option réaliste'}</div>
         </div>
         <div class="planner-stat-card">
           <div class="planner-stat-label">Chez les parents</div>
@@ -4081,9 +5106,9 @@ function renderHomePlanning(card, nextMission) {
       ) : ''}
 
       <div class="travel-info">
-        ${card.selectedInbound ? `${card.travelIcon} <strong>${card.travelLabel}</strong> · ${fmtDays(card.travelDays)} · ${fmtMoney(card.travelCost)}` : '✖ <strong>Retour impossible pour l’instant</strong>'}<br>
+        ${card.selectedInbound ? `${card.travelIcon} <strong>${card.travelLabel}</strong> · ${fmtDays(card.travelDays)} · ${formatTransportCostLabel(card.selectedInbound)}` : '✖ <strong>Retour impossible pour l’instant</strong>'}<br>
         ${card.selectedInbound ? `<span class="planner-note">Arrivée estimée : <strong>${fmtDayRange(card.travelStartDay, card.arrivalDay)}</strong></span>` : ''}
-        ${card.selectedOutbound && nextMission ? `<br><span class="planner-note">Prochain départ : <strong>${fmtMoney(card.selectedOutbound.cost)}</strong> ${card.outboundPlanType === 'catch-booked'
+        ${card.selectedOutbound && nextMission ? `<br><span class="planner-note">Prochain départ : <strong>${formatTransportCostLabel(card.selectedOutbound)}</strong> ${card.outboundPlanType === 'catch-booked'
           ? `pour rejoindre ${card.outboundTargetCity.name}, puis ${nextMission.travelIcon} ${nextMission.travelLabel} vers ${nextMission.city.name}`
           : `pour rejoindre ${nextMission.city.name}`}</span>` : ''}
         ${card.refundCost > 0 ? `<br><span class="planner-note">Coût des trajets remplacés : <strong style="color:#a83232;">−${fmtMoney(card.refundCost)}</strong></span>` : ''}
@@ -4148,6 +5173,7 @@ function renderOpportunityPresentation(card, subjectIcon) {
         </div>
       </div>
       <div class="listing-description">"${esc(card.blurb)}"</div>
+      ${card.isRepeatPet && card.repeatPayBonusPct > 0 ? `<div class="repeat-pet-pill"><strong>Animal déjà connu</strong> · tarif fidélité de +${Math.round(card.repeatPayBonusPct * 100)} %</div>` : ''}
       ${card.hasPotes ? `<div class="potes-pill"><strong>Potes invités</strong> · bonus immédiat de +${POTES_BONUS_POINTS} pt</div>` : ''}
       ${hasPerk('friendInsider') ? (() => {
         const quality = dealQuality(card);
@@ -4179,12 +5205,58 @@ function renderOpportunityPresentation(card, subjectIcon) {
     </div>
   `;
 }
+function renderOpportunityAccountant(card) {
+  const projection = getOpportunityAccountantProjection(card);
+  if (!projection) return '';
+  const accepted = projection.accepted;
+  const deltaMoney = accepted ? accepted.balance - projection.baseline.balance : null;
+  const deltaPoints = accepted ? accepted.points - projection.baseline.points : null;
+  const deltaClass = accepted
+    ? (deltaMoney > 0 || deltaPoints > 0 ? 'positive' : (deltaMoney < 0 || deltaPoints < 0 ? 'negative' : ''))
+    : '';
+  return `
+    <div class="accountant-panel">
+      <div class="accountant-title">🧮 Comptable · projection au ${projection.target.label}</div>
+      <div class="accountant-grid">
+        <div class="accountant-card">
+          <div class="accountant-label">Sans cette mission</div>
+          <div class="accountant-value">${fmtMoney(projection.baseline.balance)}</div>
+          <div class="accountant-sub">${projection.baseline.points} pts prévus</div>
+          <div class="accountant-status">${projection.baseline.status}</div>
+        </div>
+        <div class="accountant-card ${accepted && accepted.endReason === 'defeat' ? 'negative' : ''}">
+          <div class="accountant-label">${projection.acceptLabel}</div>
+          ${accepted ? `
+            <div class="accountant-value">${fmtMoney(accepted.balance)}</div>
+            <div class="accountant-sub">${accepted.points} pts prévus</div>
+            <div class="accountant-status">${accepted.status}</div>
+          ` : `
+            <div class="accountant-value">Impossible</div>
+            <div class="accountant-sub">Cette configuration ne passe pas.</div>
+          `}
+        </div>
+        <div class="accountant-card ${deltaClass}">
+          <div class="accountant-label">Écart</div>
+          ${accepted ? `
+            <div class="accountant-value">${fmtSignedMoney(deltaMoney)}</div>
+            <div class="accountant-sub">${fmtSignedPoints(deltaPoints)}</div>
+            <div class="accountant-status">Comparé à ton planning actuel.</div>
+          ` : `
+            <div class="accountant-value">—</div>
+            <div class="accountant-sub">Pas de projection d’acceptation.</div>
+          `}
+        </div>
+      </div>
+      <div class="accountant-footnote">Prévision sur l’agenda connu uniquement. Les futures annonces et aléas Digital Nomad ne sont pas inclus.</div>
+    </div>
+  `;
+}
 function renderOpportunityPlanning(card, nextMission) {
   const inboundValue = card.selectedInbound
     ? `${card.selectedInbound.icon} ${card.selectedInbound.label}`
     : 'Impossible';
   const inboundSub = card.selectedInbound
-    ? `${fmtDays(card.travelDays)} · ${fmtMoney(card.travelCost)}`
+    ? `${fmtDays(card.travelDays)} · ${formatTransportCostLabel(card.selectedInbound)}`
     : 'Aucune option réaliste';
   const netClass = card.netEstimate >= 0 ? 'net-positive' : 'net-negative';
   const nextValue = nextMission
@@ -4194,7 +5266,7 @@ function renderOpportunityPlanning(card, nextMission) {
     ? (card.selectedOutbound
       ? (card.outboundPlanType === 'catch-booked'
         ? `Vers ${card.outboundTargetCity.name} · puis ${nextMission.travelIcon} ${nextMission.travelLabel} vers ${nextMission.city.name}`
-        : `Vers ${nextMission.city.name} · ${fmtMoney(card.selectedOutbound.cost)}`)
+        : `Vers ${nextMission.city.name} · ${formatTransportCostLabel(card.selectedOutbound)}`)
       : card.outboundBlockedReason)
     : 'Aucun sitting suivant réservé';
   return `
@@ -4216,6 +5288,8 @@ function renderOpportunityPlanning(card, nextMission) {
           <div class="planner-stat-sub">${nextSub}</div>
         </div>
       </div>
+
+      ${renderOpportunityAccountant(card)}
 
       ${renderTransportPlanner(
         card,
@@ -4242,9 +5316,9 @@ function renderOpportunityPlanning(card, nextMission) {
       ) : ''}
 
       <div class="travel-info">
-        ${card.selectedInbound ? `${card.travelIcon} <strong>${card.travelLabel}</strong> · ${fmtDays(card.travelDays)} · ${fmtMoney(card.travelCost)}` : '✖ <strong>Trajet d’arrivée impossible</strong>'}<br>
+        ${card.selectedInbound ? `${card.travelIcon} <strong>${card.travelLabel}</strong> · ${fmtDays(card.travelDays)} · ${formatTransportCostLabel(card.selectedInbound)}` : '✖ <strong>Trajet d’arrivée impossible</strong>'}<br>
         <span class="planner-note">Fenêtre de trajet : <strong>${fmtDayRange(card.travelStartDay, card.startDay)}</strong></span>
-        ${card.selectedOutbound && nextMission ? `<br><span class="planner-note">Suite réservée : <strong>${fmtMoney(card.selectedOutbound.cost)}</strong> ${card.outboundPlanType === 'catch-booked'
+        ${card.selectedOutbound && nextMission ? `<br><span class="planner-note">Suite réservée : <strong>${formatTransportCostLabel(card.selectedOutbound)}</strong> ${card.outboundPlanType === 'catch-booked'
           ? `pour rejoindre ${card.outboundTargetCity.name}, puis ${nextMission.travelIcon} ${nextMission.travelLabel} vers ${nextMission.city.name}`
           : `pour rejoindre ${nextMission.city.name}`}</span>` : ''}
         ${card.refundCost > 0 ? `<br><span class="planner-note">Coût des trajets remplacés : <strong style="color:#a83232;">−${fmtMoney(card.refundCost)}</strong></span>` : ''}
@@ -4347,6 +5421,55 @@ function getPendingCardPrimaryAction(card) {
     note: 'Cette opportunité n’est pas faisable avec la configuration actuelle.',
   };
 }
+function renderEditMissionModal() {
+  const card = STATE.editCard;
+  if (!card || card.kind !== 'edit') return '';
+  const activeTab = getEditCardActiveTab(card);
+  const tabPanel = activeTab === 'planning'
+    ? renderEditMissionPlanning(card)
+    : (activeTab === 'cancellation' ? renderEditMissionCancellation(card) : renderEditMissionPresentation(card));
+  const footerNote = !card.hasChanges
+    ? 'Aucun changement pour l’instant.'
+    : (card.refundCost > 0
+      ? `Cette modification fera perdre ${fmtMoney(card.refundCost)} de trajets non annulables.`
+      : 'La mission restera bookée avec ce nouveau trajet.');
+  return `
+    <div class="modal-overlay" id="edit-mission-modal">
+      <div class="opportunity-modal">
+        <div class="opportunity-shell">
+          <div class="opportunity-topline">
+            <div class="opportunity-title-line">
+              <strong>${esc(card.petName || 'Logement à garder')}</strong>, <span class="opportunity-city">${card.city.name}</span>, <strong class="opportunity-continent">${CONTINENT_LABEL_FR[card.city.continent] || card.city.continent}</strong>, ${card.housing}${card.isRareHousing ? ' ✦' : ''}
+            </div>
+          </div>
+          <div class="opportunity-tabs">
+            <button class="opportunity-tab ${activeTab === 'presentation' ? 'active' : ''}" onclick="setEditCardTab('presentation')">Présentation</button>
+            <button class="opportunity-tab ${activeTab === 'planning' ? 'active' : ''}" onclick="setEditCardTab('planning')">Planification</button>
+            <button class="opportunity-tab ${activeTab === 'cancellation' ? 'active' : ''}" onclick="setEditCardTab('cancellation')">⚠ Annuler la mission</button>
+          </div>
+          <div class="opportunity-body">
+            <div class="opportunity-main">
+              <div class="opportunity-panel-wrap">
+                <div class="opportunity-panel">${tabPanel}</div>
+              </div>
+            </div>
+            <div class="opportunity-side">
+              ${renderCalendarPane(card)}
+            </div>
+          </div>
+        </div>
+        <div class="opportunity-footer">
+          <div class="opportunity-footer-note">${footerNote}</div>
+          <div class="opportunity-footer-main">
+            <button onclick="closeMissionEditor()">Fermer</button>
+            <button class="danger" onclick="cancelEditedMission()">Annuler la mission</button>
+            <button class="primary" onclick="saveEditedMission()" ${card.feasible ? '' : 'disabled'}>${card.hasChanges ? 'Enregistrer' : 'Fermer'}</button>
+          </div>
+        </div>
+      </div>
+    </div>
+  `;
+}
 function renderPendingCardModal() {
   const card = STATE.pendingCard;
   if (!card) return '';
@@ -4386,7 +5509,7 @@ function renderPendingCardModal() {
           <div class="opportunity-shell">
             <div class="opportunity-topline">
               <div class="opportunity-title-line">
-                <strong>Retour chez les parents</strong>, <span class="opportunity-city">${card.city.name}</span>, <strong class="opportunity-continent">${card.city.continent}</strong>
+                <strong>Retour chez les parents</strong>, <span class="opportunity-city">${card.city.name}</span>, <strong class="opportunity-continent">${CONTINENT_LABEL_FR[card.city.continent] || card.city.continent}</strong>
               </div>
             </div>
             <div class="opportunity-tabs">
@@ -4433,7 +5556,7 @@ function renderPendingCardModal() {
         <div class="opportunity-shell">
           <div class="opportunity-topline">
             <div class="opportunity-title-line">
-              <strong>${esc(card.petName || 'Logement à garder')}</strong>${card.isRepeatPet ? ' <span class="repeat-pet-heart" title="Vous avez déjà gardé cet animal">💛</span>' : ''}, <span class="opportunity-city">${card.city.name}</span>, <strong class="opportunity-continent">${card.city.continent}</strong>, ${card.housing}${card.isRareHousing ? ' ✦' : ''}
+              <strong>${esc(card.petName || 'Logement à garder')}</strong>${card.isRepeatPet ? ' <span class="repeat-pet-heart" title="Vous avez déjà gardé cet animal">💛</span>' : ''}, <span class="opportunity-city">${card.city.name}</span>, <strong class="opportunity-continent">${CONTINENT_LABEL_FR[card.city.continent] || card.city.continent}</strong>, ${card.housing}${card.isRareHousing ? ' ✦' : ''}
             </div>
           </div>
           <div class="opportunity-tabs">
@@ -4567,6 +5690,7 @@ function renderEndModal() {
 
         <div class="row" style="justify-content:center;margin-top:16px;">
           <button onclick="returnToMenu()">Menu principal</button>
+          ${win ? `<button onclick="continueAfterVictory()">Continuer</button>` : ''}
           <button class="primary" onclick="resetGame()">Nouvelle partie</button>
         </div>
       </div>
@@ -4624,6 +5748,7 @@ function renderMenu() {
 function renderGame() {
   const currentCity = deriveCurrentCityFromState();
   const pendingCardOpen = !!STATE.pendingCard && !STATE.pendingCardMinimized;
+  const editCardOpen = !!STATE.editCard;
   const pendingCardHidden = !!STATE.pendingCard && STATE.pendingCardMinimized;
 
   app.innerHTML = `
@@ -4632,7 +5757,7 @@ function renderGame() {
         ${renderGameHeaderInner(`
           <div class="row">
             <button onclick="returnToMenu()">Menu</button>
-            <button class="primary" onclick="nextTurn()" ${pendingCardOpen ? 'disabled' : ''} ${STATE.phase !== 'playing' ? 'disabled' : ''}>Tour suivant →</button>
+            <button class="primary" onclick="nextTurn()" ${pendingCardOpen || editCardOpen ? 'disabled' : ''} ${STATE.phase !== 'playing' ? 'disabled' : ''}>Tour suivant →</button>
           </div>
         `)}
       </div>
@@ -4677,6 +5802,7 @@ function renderGame() {
         </div>
       </div>
     </div>
+    ${editCardOpen ? renderEditMissionModal() : ''}
     ${pendingCardOpen ? renderPendingCardModal() : ''}
     ${STATE.phase === 'over' ? renderEndModal() : ''}
   `;
@@ -4701,10 +5827,17 @@ window.refuseCard = refuseCard;
 window.nextTurn = nextTurn;
 window.startGame = startGame;
 window.continueGame = continueGame;
+window.continueAfterVictory = continueAfterVictory;
 window.resetGame = resetGame;
 window.returnToMenu = returnToMenu;
 window.toggleHelp = toggleHelp;
 window.cancelMission = cancelMission;
+window.openMissionEditor = openMissionEditor;
+window.closeMissionEditor = closeMissionEditor;
+window.saveEditedMission = saveEditedMission;
+window.cancelEditedMission = cancelEditedMission;
+window.setEditCardTab = setEditCardTab;
+window.selectEditInboundPlanType = selectEditInboundPlanType;
 window.acceptCardByCancellingOverlap = acceptCardByCancellingOverlap;
 window.acceptCardByCancellingNextMission = acceptCardByCancellingNextMission;
 window.acceptHomeCardByCancellingNextMission = acceptHomeCardByCancellingNextMission;

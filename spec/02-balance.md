@@ -87,9 +87,11 @@ Quand le joueur a déjà gardé des animaux, une opportunité non-`house sitting
 
 Règle actuelle :
 
-- `30 %` de chance qu’un tirage du même type de mission retombe sur un animal déjà vu ;
+- `15 %` de chance qu’un tirage du même type de mission retombe sur un animal déjà vu ;
+- ce re-sitting garde la **même ville d’origine** et le **même type de logement** ;
+- le paiement journalier est alors majoré de `+10 %` à `+20 %` ;
 - la carte affiche alors un cœur `💛` ;
-- cette mécanique alimente surtout l’album, pas un bonus économique direct.
+- cette mécanique alimente l’album et crée aussi un petit bonus économique.
 
 ## 3. Paiements et points de mission
 
@@ -256,6 +258,7 @@ Perks actuels :
 |---|---|
 | Un ami qui s’y connaît | révèle la qualité relative d’une mission |
 | Digital Nomad | revenus freelance ponctuels + risque URSSAF |
+| Comptable | projection de solde et de points au `31 décembre` sur l’agenda connu |
 | Star des réseaux | plus d’opportunités, plus de lointain, certains transports offerts |
 
 Contraintes :
@@ -267,6 +270,7 @@ Déblocages automatiques garantis :
 
 - `Un ami qui s’y connaît` après `10` pet sittings terminés
 - `Digital Nomad` après `13 semaines` consécutives sous `1000 €`
+- `Comptable` au premier passage à `10 000 €` ou plus
 - `Star des réseaux` à partir de `104 semaines`, sauf si elle est déjà devenue impossible à cause d’un avion
 
 ## 8. Retour chez les parents

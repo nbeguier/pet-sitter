@@ -123,6 +123,7 @@ Champs importants :
 - `socialStarBlocked`
 - `friendInsiderMilestoneResolved`
 - `digitalNomadMilestoneResolved`
+- `accountantMilestoneResolved`
 - `socialStarMilestoneResolved`
 - `offerFilter`
 - `atParents`

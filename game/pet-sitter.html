@@ -62,6 +62,7 @@ input[type=text] {
 }
 #menu .avatar.selected { border-color: #2b1f10; border-width: 3px; transform: scale(1.1); }
 #menu .avatar:hover { transform: scale(1.05); }
+#menu .menu-actions { display: flex; gap: 10px; flex-wrap: wrap; justify-content: center; margin-top: 12px; }
 
 #game { display: grid; grid-template-columns: 1fr 320px; gap: 16px; max-width: 1400px; margin: 0 auto; }
 #header-bar { grid-column: 1 / 3; }
@@ -74,6 +75,66 @@ input[type=text] {
 
 #main-area { display: flex; flex-direction: column; gap: 12px; }
 #side-area { display: flex; flex-direction: column; gap: 12px; }
+.tutorial-game-panel {
+  display: flex;
+  flex-direction: column;
+  gap: 10px;
+  border-style: dashed;
+  background: rgba(250, 240, 212, 0.96);
+}
+.tutorial-game-topline {
+  display: flex;
+  justify-content: space-between;
+  align-items: center;
+  gap: 12px;
+  flex-wrap: wrap;
+}
+.tutorial-game-kicker {
+  font-size: 12px;
+  text-transform: uppercase;
+  letter-spacing: 0.12em;
+  color: #6e5532;
+}
+.tutorial-game-cta {
+  font-size: 14px;
+  color: #4a3520;
+  font-style: italic;
+}
+.tutorial-game-title {
+  font-size: 24px;
+  font-weight: 600;
+}
+.tutorial-game-copy {
+  line-height: 1.5;
+  color: #4a3520;
+}
+.tutorial-game-points {
+  margin-left: 18px;
+  color: #4a3520;
+  line-height: 1.45;
+}
+.tutorial-game-actions {
+  display: flex;
+  gap: 10px;
+  flex-wrap: wrap;
+}
+.tutorial-inline-note {
+  margin-top: 10px;
+  padding: 12px 14px;
+  border: 1px dashed #8b6f47;
+  border-radius: 3px;
+  background: rgba(250, 240, 212, 0.92);
+}
+.tutorial-inline-note .tutorial-game-title {
+  font-size: 20px;
+}
+.tutorial-inline-note .tutorial-game-copy {
+  margin-top: 4px;
+  font-size: 15px;
+}
+.tutorial-inline-note .tutorial-game-points {
+  margin-top: 8px;
+}
 
 #map-container { padding: 0; overflow: hidden; }
 #map-svg {
@@ -401,32 +462,99 @@ input[type=text] {
 .cal-week-tag { width: 30px; font-weight: 600; color: #6e5532; font-size: 10px; flex-shrink: 0; }
 .cal-date { width: 70px; font-size: 10px; color: #6e5532; font-style: italic; flex-shrink: 0; }
 .cal-bar { flex: 1; height: 16px; border: 1px solid #d4b896; position: relative; overflow: hidden; background: #fff; }
-.cal-bar.booked { background: #2d6e3e; border-color: #1f4e2c; }
-.cal-bar.travel { background: rgba(140,140,140,0.32); border-color: #8f8f8f; }
-.cal-bar.travel-cancellable {
+.cal-bar.free, .cal-segment.free {
+  background: #fff;
+  border-color: transparent;
+}
+.cal-bar.split {
+  display: grid;
+  grid-template-columns: 1fr 1fr;
+  gap: 1px;
+  border: none;
+  background: #fff;
+  overflow: hidden;
+}
+.cal-segment {
+  min-width: 0;
+  height: 16px;
+  position: relative;
+  overflow: hidden;
+  background: #fff;
+}
+.calendar-compare-head {
+  margin: 0 0 6px 100px;
+  display: grid;
+  grid-template-columns: 1fr 1fr;
+  gap: 1px;
+  font-size: 9px;
+  text-transform: uppercase;
+  letter-spacing: 0.08em;
+  color: #6e5532;
+}
+.calendar-compare-head span {
+  text-align: center;
+  padding: 2px 4px;
+  border: 1px dashed #d4b896;
+  background: rgba(250, 240, 212, 0.9);
+}
+.cal-bar.booked, .cal-segment.booked { background: #2d6e3e; border-color: #1f4e2c; }
+.cal-bar.cancel-booked, .cal-segment.cancel-booked {
+  background: #fff;
+  border-color: #d4b896;
+}
+.cal-bar.travel, .cal-segment.travel { background: rgba(140,140,140,0.32); border-color: #8f8f8f; }
+.cal-bar.travel-cancellable, .cal-segment.travel-cancellable {
   background:
     repeating-linear-gradient(-45deg, rgba(165,165,165,0.45) 0, rgba(165,165,165,0.45) 4px, rgba(232,232,232,0.75) 4px, rgba(232,232,232,0.75) 8px);
   border-color: #8f8f8f;
 }
-.cal-bar.candidate {
+.cal-bar.cancel-travel, .cal-segment.cancel-travel {
+  background: #fff;
+  border-color: #d4b896;
+}
+.cal-bar.candidate, .cal-segment.candidate {
   background-image: repeating-linear-gradient(-45deg, #4a8bc2 0, #4a8bc2 4px, #b6dbf2 4px, #b6dbf2 8px);
   border-color: #2c6896;
 }
-.cal-bar.candidate-travel { background: rgba(74, 139, 194, 0.22); border-color: #2c6896; }
-.cal-bar.candidate-travel-cancellable {
+.cal-bar.candidate-travel, .cal-segment.candidate-travel { background: rgba(74, 139, 194, 0.22); border-color: #2c6896; }
+.cal-bar.candidate-travel-cancellable, .cal-segment.candidate-travel-cancellable {
   background:
     repeating-linear-gradient(-45deg, rgba(74,139,194,0.5) 0, rgba(74,139,194,0.5) 4px, rgba(214,231,245,0.9) 4px, rgba(214,231,245,0.9) 8px);
   border-color: #2c6896;
 }
-.cal-bar.both {
-  background: #2d6e3e;
-  background-image: repeating-linear-gradient(-45deg, transparent 0, transparent 4px, rgba(74, 139, 194, 0.85) 4px, rgba(74, 139, 194, 0.85) 8px);
-  border-color: #1f4e2c;
+.cal-bar.candidate-cancel-travel, .cal-segment.candidate-cancel-travel {
+  background:
+    repeating-linear-gradient(-45deg,
+      rgba(74,139,194,0.9) 0, rgba(74,139,194,0.9) 4px,
+      rgba(214,231,245,0.92) 4px, rgba(214,231,245,0.92) 8px,
+      rgba(241,204,102,0.95) 8px, rgba(241,204,102,0.95) 12px,
+      rgba(255,243,194,0.96) 12px, rgba(255,243,194,0.96) 16px);
+  border-color: #9b7c2b;
+}
+.cal-bar.candidate-cancel-travel-cancellable, .cal-segment.candidate-cancel-travel-cancellable {
+  background:
+    repeating-linear-gradient(-45deg,
+      rgba(74,139,194,0.72) 0, rgba(74,139,194,0.72) 3px,
+      rgba(223,236,246,0.96) 3px, rgba(223,236,246,0.96) 6px,
+      rgba(241,204,102,0.86) 6px, rgba(241,204,102,0.86) 9px,
+      rgba(255,246,210,0.98) 9px, rgba(255,246,210,0.98) 12px);
+  border-color: #9b7c2b;
+}
+.cal-bar.both, .cal-segment.both {
+  background-image: repeating-linear-gradient(-45deg, #4a8bc2 0, #4a8bc2 4px, #b6dbf2 4px, #b6dbf2 8px);
+  border-color: #9b7c2b;
 }
 .cal-label {
   font-size: 9px; color: #fff; font-weight: 600;
   position: absolute; left: 4px; top: 50%; transform: translateY(-50%);
   white-space: nowrap; text-shadow: 0 1px 2px rgba(0,0,0,0.5);
+}
+.cal-bar.cancel-booked .cal-label,
+.cal-segment.cancel-booked .cal-label,
+.cal-bar.cancel-travel .cal-label,
+.cal-segment.cancel-travel .cal-label {
+  color: #4a3520;
+  text-shadow: none;
 }
 .cal-legend {
   font-size: 11px; margin-top: 8px;
@@ -436,13 +564,27 @@ input[type=text] {
 .cal-legend-item { display: flex; align-items: center; gap: 6px; }
 .cal-swatch { width: 14px; height: 12px; border: 1px solid #6e5532; }
 .cal-swatch.booked { background: #2d6e3e; }
+.cal-swatch.cancel-booked { background: #fff; border-color: #d4b896; }
 .cal-swatch.travel { background: rgba(140,140,140,0.32); }
 .cal-swatch.travel-cancellable {
   background:
     repeating-linear-gradient(-45deg, rgba(165,165,165,0.45) 0, rgba(165,165,165,0.45) 3px, rgba(232,232,232,0.75) 3px, rgba(232,232,232,0.75) 6px);
 }
+.cal-swatch.cancel-travel {
+  background: #fff;
+  border-color: #d4b896;
+}
 .cal-swatch.candidate {
   background-image: repeating-linear-gradient(-45deg, #4a8bc2 0, #4a8bc2 3px, #b6dbf2 3px, #b6dbf2 6px);
+}
+.cal-swatch.candidate-cancel-travel {
+  background:
+    repeating-linear-gradient(-45deg,
+      rgba(74,139,194,0.9) 0, rgba(74,139,194,0.9) 3px,
+      rgba(214,231,245,0.92) 3px, rgba(214,231,245,0.92) 6px,
+      rgba(241,204,102,0.95) 6px, rgba(241,204,102,0.95) 9px,
+      rgba(255,243,194,0.96) 9px, rgba(255,243,194,0.96) 12px);
+  border-color: #9b7c2b;
 }
 .cal-swatch.free { background: #fff; }
 
@@ -935,6 +1077,171 @@ input[type=text] {
 #help-overlay p { margin-bottom: 8px; line-height: 1.4; }
 #help-overlay ul { margin: 6px 0 8px 18px; }
 #help-overlay li { margin-bottom: 3px; }
+#tutorial-overlay { z-index: 210; }
+#tutorial-overlay .modal {
+  max-width: 920px;
+  text-align: left;
+  padding: 22px;
+}
+.tutorial-intro {
+  margin: 12px 0 16px;
+  color: #6e5532;
+  line-height: 1.5;
+  font-size: 17px;
+}
+.tutorial-layout {
+  display: grid;
+  grid-template-columns: minmax(0, 1.4fr) minmax(280px, 0.9fr);
+  gap: 16px;
+  align-items: start;
+}
+.tutorial-steps {
+  display: grid;
+  grid-template-columns: 1fr 1fr;
+  gap: 12px;
+}
+.tutorial-step {
+  padding: 14px;
+  border: 1px solid #d4b896;
+  background: rgba(255, 250, 240, 0.94);
+  border-radius: 3px;
+}
+.tutorial-step-head {
+  display: flex;
+  align-items: center;
+  gap: 10px;
+  margin-bottom: 8px;
+}
+.tutorial-step-icon {
+  width: 34px;
+  height: 34px;
+  flex-shrink: 0;
+  display: flex;
+  align-items: center;
+  justify-content: center;
+  border-radius: 50%;
+  background: #ead9b8;
+  border: 1px solid #b59567;
+  font-size: 18px;
+}
+.tutorial-step-title {
+  font-size: 16px;
+  font-weight: 700;
+}
+.tutorial-step p {
+  color: #4a3520;
+  line-height: 1.45;
+  font-size: 14px;
+}
+.tutorial-side {
+  display: flex;
+  flex-direction: column;
+  gap: 12px;
+}
+.tutorial-note {
+  padding: 14px;
+  border: 1px solid #d4b896;
+  background: rgba(234, 217, 184, 0.42);
+  border-radius: 3px;
+}
+.tutorial-note h3 {
+  margin-bottom: 10px;
+}
+.tutorial-note ul {
+  margin: 0 0 0 18px;
+  color: #4a3520;
+}
+.tutorial-note li {
+  margin-bottom: 7px;
+  line-height: 1.4;
+}
+.tutorial-footer {
+  display: flex;
+  justify-content: center;
+  gap: 10px;
+  flex-wrap: wrap;
+  margin-top: 18px;
+}
+.tutorial-script-shell {
+  display: grid;
+  grid-template-columns: minmax(0, 1fr) 240px;
+  gap: 16px;
+  align-items: start;
+}
+.tutorial-script-card {
+  padding: 18px;
+  border: 1px solid #d4b896;
+  background: rgba(255, 250, 240, 0.96);
+  border-radius: 3px;
+}
+.tutorial-script-progress {
+  font-size: 12px;
+  text-transform: uppercase;
+  letter-spacing: 0.12em;
+  color: #6e5532;
+  margin-bottom: 10px;
+}
+.tutorial-script-head {
+  display: flex;
+  align-items: center;
+  gap: 12px;
+  margin-bottom: 10px;
+}
+.tutorial-script-icon {
+  width: 42px;
+  height: 42px;
+  flex-shrink: 0;
+  display: flex;
+  align-items: center;
+  justify-content: center;
+  border-radius: 50%;
+  background: #ead9b8;
+  border: 1px solid #b59567;
+  font-size: 22px;
+}
+.tutorial-script-title {
+  font-size: 20px;
+  font-weight: 700;
+  color: #2f2924;
+}
+.tutorial-script-copy {
+  color: #4a3520;
+  line-height: 1.5;
+  font-size: 15px;
+}
+.tutorial-script-points {
+  margin: 14px 0 0 18px;
+  color: #4a3520;
+}
+.tutorial-script-points li {
+  margin-bottom: 8px;
+  line-height: 1.45;
+}
+.tutorial-script-side {
+  display: flex;
+  flex-direction: column;
+  gap: 12px;
+}
+.tutorial-script-side .tutorial-note {
+  background: rgba(234, 217, 184, 0.55);
+}
+.tutorial-nav {
+  display: flex;
+  justify-content: space-between;
+  align-items: center;
+  gap: 12px;
+  flex-wrap: wrap;
+  margin-top: 18px;
+}
+.tutorial-nav-status {
+  font-size: 13px;
+  color: #6e5532;
+}
+.tutorial-nav-actions {
+  display: flex;
+  gap: 10px;
+  flex-wrap: wrap;
+}
 
 @media (max-width: 1100px) {
   .modal-twocol { flex-direction: column; max-width: 540px; }
@@ -944,6 +1251,8 @@ input[type=text] {
   .accountant-grid { grid-template-columns: 1fr; }
   .listing-grid { grid-template-columns: 1fr 1fr; }
   .opportunity-body { grid-template-columns: minmax(0, 1fr) 280px; }
+  .tutorial-layout { grid-template-columns: 1fr; }
+  .tutorial-script-shell { grid-template-columns: 1fr; }
 }
 @media (max-width: 980px) {
   #game { grid-template-columns: 1fr; }
@@ -972,6 +1281,7 @@ input[type=text] {
   .listing-hero { flex-direction: column; align-items: flex-start; }
   .listing-grid { grid-template-columns: 1fr; }
   .opportunity-side .calendar-pane { max-height: 260px; }
+  .tutorial-steps { grid-template-columns: 1fr; }
 }
 </style>
 <style id="theme-overrides">
@@ -1125,11 +1435,11 @@ input[type=text] {
 </head>
 <body>
 
-<button class="help-button" onclick="toggleHelp()">?</button>
+<button class="help-button" onclick="toggleTutorial(true)">?</button>
 
 <div id="app"></div>
 
-<div id="help-overlay" style="display:none;" class="modal-overlay" onclick="if(event.target.id==='help-overlay')toggleHelp()">
+<div id="help-overlay" style="display:none;" class="modal-overlay" onclick="if(event.target.id==='help-overlay')toggleLegacyHelp()">
   <div class="modal">
     <h1>Aide</h1>
     <h2>But du jeu</h2>
@@ -1159,9 +1469,13 @@ input[type=text] {
     <h2>Annuler une mission</h2>
     <p>Plus de 2 mois avant le départ : pas de pénalité. Moins de 2 mois : malus de réputation pendant 6 mois.</p>
     <div class="row" style="justify-content:center;margin-top:20px;">
-      <button onclick="toggleHelp()">Fermer</button>
+      <button onclick="toggleLegacyHelp()">Fermer</button>
     </div>
   </div>
+</div>
+
+<div id="tutorial-overlay" style="display:none;" class="modal-overlay" onclick="if(event.target.id==='tutorial-overlay')closeTutorial()">
+  <div class="modal tutorial-modal" id="tutorial-modal" onclick="event.stopPropagation()"></div>
 </div>
 
 <script>
@@ -1668,6 +1982,122 @@ const SAVE_KEY = 'petsitter_save_v2';
 const LEGACY_SAVE_KEY = 'petsitter_save_v1';
 const SCORES_KEY = 'petsitter_scores_v1';
 const MAX_SCORES = 5;
+const MENU_TUTORIAL_SCRIPT = [
+  {
+    icon: '🎯',
+    title: 'Une première carte apparaît',
+    text: 'Imagine ton début de partie. Tu cliques sur Tour suivant, une opportunité sort. Le premier réflexe n’est pas de regarder le paiement, mais la date et la faisabilité.',
+    points: [
+      'Une mission qui part trop vite peut être infaisable même si elle paie bien.',
+      'Une mission lointaine peut sembler cool, mais immobiliser tout ton agenda.',
+      'Au début, une petite mission faisable vaut souvent mieux qu’un jackpot casse-gueule.',
+    ],
+    asideTitle: 'Question utile',
+    aside: 'Est-ce que je peux vraiment y aller sans mettre ma trésorerie en danger ?',
+  },
+  {
+    icon: '🗺️',
+    title: 'Tu passes dans Planification',
+    text: 'C’est là que le jeu se décide vraiment. Tu choisis comment rejoindre la mission, puis parfois comment repartir vers la suivante.',
+    points: [
+      'Un trajet pas cher peut prendre tellement de temps qu’il bloque tout.',
+      'Un billet annulable coûte plus, mais protège mieux ton agenda.',
+      'Le bénéfice net estimé est plus utile que le paiement brut affiché en gros.',
+    ],
+    asideTitle: 'Ce que tu compares',
+    aside: 'Temps de trajet, coût, souplesse, et impact sur la mission suivante.',
+  },
+  {
+    icon: '⚖️',
+    title: 'Parfois, accepter veut dire renoncer',
+    text: 'Si une opportunité chevauche une mission réservée, le jeu te montre aussi ce que tu annules. C’est volontaire : tu dois arbitrer.',
+    points: [
+      'Une nouvelle mission peut rapporter moins que celle que tu sacrifies.',
+      'Annuler tard peut abîmer la réputation pendant plusieurs mois.',
+      'Le bon choix est souvent de protéger une mission déjà saine au lieu de courir après la nouveauté.',
+    ],
+    asideTitle: 'Le piège classique',
+    aside: 'Se laisser séduire par une carte “intéressante” qui détruit un agenda plus rentable.',
+  },
+  {
+    icon: '💰',
+    title: 'Le cash te fait vivre, les points te font gagner',
+    text: 'Pendant une partie, tu jongles toujours entre survie et score. Le paiement au départ te sauve à court terme. Les points à la fin te rapprochent de la victoire.',
+    points: [
+      'Tu peux avoir beaucoup de points à venir, et pourtant mourir avant.',
+      'Tu peux aussi survivre longtemps en jouant trop petit et ne jamais monter assez vite.',
+      'L’équilibre du jeu est là : rester solvable sans perdre de vue les 100 points.',
+    ],
+    asideTitle: 'Règle simple',
+    aside: 'Si ton argent est tendu, joue d’abord pour respirer. Si ton agenda est stable, pense davantage aux succès.',
+  },
+  {
+    icon: '🧠',
+    title: 'Refuser est aussi une vraie action',
+    text: 'Le jeu ne te demande pas de tout prendre. Savoir dire non fait partie de la stratégie, surtout quand une carte est moche, risquée, ou trop gourmande en transport.',
+    points: [
+      'Une mauvaise carte refusée vaut mieux qu’un mauvais oui.',
+      'Tu peux temporiser, rentrer chez les parents, ou attendre une meilleure fenêtre.',
+      'Un agenda propre vaut souvent plus qu’une mission de plus.',
+    ],
+    asideTitle: 'Tu as compris le jeu si…',
+    aside: '…tu regardes une opportunité comme une décision de planning, pas comme une récompense automatique.',
+  },
+];
+const GUIDED_TUTORIAL_STEPS = [
+  {
+    title: 'Faire sortir une annonce',
+    text: 'On démarre sur une vraie mini-partie. Le but n’est pas de cliquer partout, mais de voir la boucle principale du jeu dans l’ordre.',
+    points: [
+      'Ton solde te fait survivre semaine après semaine.',
+      'Les opportunités n’apparaissent qu’en avançant le temps.',
+      'La première action utile est simplement de cliquer sur Tour suivant.',
+    ],
+    cta: 'Clique sur Tour suivant → pour faire apparaître une première opportunité.',
+  },
+  {
+    title: 'Lire la carte avant le paiement',
+    text: 'Une annonce scriptée vient d’arriver. Regarde surtout la date, la faisabilité et le net estimé dans Planification avant de penser au montant brut.',
+    points: [
+      'Présentation te donne le contexte de la mission.',
+      'Planification montre le vrai coût du choix.',
+      'Pour la démo, accepte cette mission afin de voir la suite de la boucle.',
+    ],
+    cta: 'Passe par Planification si tu veux, puis accepte la mission.',
+  },
+  {
+    title: 'L’agenda devient ton vrai tableau de bord',
+    text: 'La mission est maintenant réservée. À droite, l’agenda te montre à la fois la période du sitting et le temps de trajet en gris.',
+    points: [
+      'Un agenda propre vaut souvent plus qu’une mission de plus.',
+      'Le paiement n’arrive pas tout de suite : il tombe au départ.',
+      'Avance encore d’une semaine pour voir ce moment-là.',
+    ],
+    cta: 'Clique sur Tour suivant → pour atteindre le départ.',
+  },
+  {
+    title: 'Le départ paie le cash, la fin paie les points',
+    text: 'Tu viens d’entrer dans la mission : le paiement a été crédité, et le transport débité. Les points de satisfaction, eux, n’arrivent qu’à la fin.',
+    points: [
+      'Le cash t’aide à ne pas mourir trop tôt.',
+      'Les points servent à atteindre la victoire.',
+      'Avance encore une fois pour voir la mission se terminer.',
+    ],
+    cta: 'Clique sur Tour suivant → pour terminer cette mission.',
+  },
+  {
+    title: 'Boucle comprise',
+    text: 'Tu as vu la structure de base : annonce, lecture, planification, agenda, départ, fin de mission. Le reste du jeu consiste à refaire cette boucle avec de vrais arbitrages.',
+    points: [
+      'Refuser une mauvaise carte est souvent une bonne décision.',
+      'Le planning compte plus que le paiement brut.',
+      'Les points des succès finissent par faire toute la différence.',
+    ],
+    cta: 'Le tuto est fini. Tu peux revenir au menu ou lancer une vraie partie.',
+  },
+];
+let _tutorialMode = 'rules';
+let _tutorialStep = 0;
 function loadScores() {
   try {
     const raw = localStorage.getItem(SCORES_KEY);
@@ -1677,6 +2107,7 @@ function loadScores() {
   } catch (e) { return []; }
 }
 function recordScore() {
+  if (STATE.tutorialRun) return;
   try {
     const entry = {
       name: STATE.characterName || 'Anonyme',
@@ -1706,6 +2137,9 @@ function recordScore() {
 function rng(arr) { return arr[Math.floor(Math.random() * arr.length)]; }
 function rint(min, max) { return Math.floor(Math.random() * (max - min + 1)) + min; }
 function rfloat(min, max) { return Math.random() * (max - min) + min; }
+function findCityByName(name) {
+  return CITIES.find(city => city.name === name) || null;
+}
 function weighted(items, weights) {
   let total = weights.reduce((a, b) => a + b, 0);
   let r = Math.random() * total;
@@ -1977,6 +2411,8 @@ function buildDefaultState() {
     reputationPenaltyUntil: -1,
     nomadLastIncomeWeek: -1,
     urssafYearMarked: -1,
+    tutorialRun: false,
+    tutorialStep: 0,
   };
 }
 
@@ -2026,6 +2462,48 @@ function hasSaveAvailable() {
   } catch (error) {
     return false;
   }
+}
+function getGuidedTutorialStepMeta() {
+  if (!STATE.tutorialRun) return null;
+  return GUIDED_TUTORIAL_STEPS[Math.max(0, Math.min(GUIDED_TUTORIAL_STEPS.length - 1, STATE.tutorialStep))] || null;
+}
+function renderGuidedTutorialPanel() {
+  const step = getGuidedTutorialStepMeta();
+  if (!step) return '';
+  const isComplete = STATE.tutorialStep >= GUIDED_TUTORIAL_STEPS.length - 1;
+  return `
+    <div class="paper tutorial-game-panel">
+      <div class="tutorial-game-topline">
+        <div class="tutorial-game-kicker">Découverte guidée · Étape ${Math.min(STATE.tutorialStep + 1, GUIDED_TUTORIAL_STEPS.length)} / ${GUIDED_TUTORIAL_STEPS.length}</div>
+        <div class="tutorial-game-cta">${step.cta}</div>
+      </div>
+      <div class="tutorial-game-title">${step.title}</div>
+      <div class="tutorial-game-copy">${step.text}</div>
+      <ul class="tutorial-game-points">
+        ${step.points.map(point => `<li>${point}</li>`).join('')}
+      </ul>
+      ${isComplete ? `
+        <div class="tutorial-game-actions">
+          <button onclick="returnToMenu()">Retour au menu</button>
+          <button class="primary" onclick="startGame()">Commencer une vraie partie</button>
+        </div>
+      ` : ''}
+    </div>
+  `;
+}
+function renderGuidedTutorialInlineNote() {
+  const step = getGuidedTutorialStepMeta();
+  if (!step || STATE.tutorialStep !== 1) return '';
+  return `
+    <div class="tutorial-inline-note">
+      <div class="tutorial-game-kicker">Découverte guidée · Étape 2 / ${GUIDED_TUTORIAL_STEPS.length}</div>
+      <div class="tutorial-game-title">${step.title}</div>
+      <div class="tutorial-game-copy">${step.text}</div>
+      <ul class="tutorial-game-points">
+        ${step.points.map(point => `<li>${point}</li>`).join('')}
+      </ul>
+    </div>
+  `;
 }
 function clearSaves() {
   try {
@@ -2810,6 +3288,8 @@ function normalizeLoadedState(snap) {
   if (STATE.activePerk === 'accountant') STATE.accountantMilestoneResolved = true;
   if (STATE.activePerk === 'socialStar' || STATE.socialStarBlocked) STATE.socialStarMilestoneResolved = true;
   STATE.endlessMode = !!snap.endlessMode;
+  STATE.tutorialRun = false;
+  STATE.tutorialStep = 0;
   STATE.editCard = null;
   STATE.editCardTab = 'presentation';
   STATE.offerFilter = STATE.offerFilter === 'nearby' ? 'nearby' : 'anywhere';
@@ -2837,6 +3317,7 @@ function normalizeLoadedState(snap) {
 }
 function saveGame() {
   try {
+    if (STATE.tutorialRun) return;
     if (STATE.phase === 'menu' && !STATE.startCity) {
       localStorage.removeItem(SAVE_KEY);
       return;
@@ -2870,16 +3351,30 @@ function resetGame() {
   render();
 }
 function returnToMenu() {
-  STATE.phase = 'menu';
+  if (STATE.tutorialRun) {
+    const chosenName = STATE.characterName || '';
+    const chosenIcon = STATE.characterIcon || '🧳';
+    Object.assign(STATE, buildDefaultState());
+    STATE.characterName = chosenName;
+    STATE.characterIcon = chosenIcon;
+  } else {
+    STATE.phase = 'menu';
+  }
   syncMusic(true);
   render();
 }
 function setOfferFilter(mode) {
+  if (STATE.tutorialRun) return;
   if (!OFFER_FILTERS[mode]) return;
   STATE.offerFilter = mode;
   render();
 }
 function offerReturnHome() {
+  if (STATE.tutorialRun) {
+    log('📚 Le retour chez les parents est coupé pendant la découverte guidée.');
+    render();
+    return;
+  }
   if (STATE.phase !== 'playing' || STATE.pendingCard || STATE.editCard || getActiveMission() || STATE.atParents) return;
   const card = buildHomeReturnOffer();
   if (!card) return;
@@ -2912,6 +3407,79 @@ function startGame() {
   log(`Partie commencée à ${STATE.startCity.name}.`);
   syncMusic(true);
   render();
+}
+function buildGuidedTutorialOffer() {
+  const berlin = findCityByName('Berlin') || CITIES[1] || STATE.startCity;
+  const startWeek = STATE.week + 1;
+  const durationDays = 7;
+  const durationWeeks = Math.ceil(durationDays / 7);
+  const offer = buildMissionOffer({
+    kind: 'mission',
+    id: _missionId++,
+    type: 'dog',
+    city: berlin,
+    startWeek,
+    endWeek: startWeek + durationWeeks,
+    startDay: weekToDay(startWeek),
+    endDay: weekToDay(startWeek + durationWeeks),
+    durationDays,
+    durationWeeks,
+    payPerDay: 82,
+    points: 4,
+    petName: 'Pluton',
+    petType: 'chien',
+    animal: 'chien',
+    isRepeatPet: false,
+    repeatPayBonusPct: 0,
+    housing: 'appartement',
+    isRareHousing: false,
+    hasPotes: false,
+    blurb: 'Pluton adore sa routine. Deux sorties simples, de l’eau fraîche et un appartement très facile à vivre.',
+  });
+  offer.isTutorialOffer = true;
+  return offer;
+}
+function startGuidedTutorialGame() {
+  const chosenName = (STATE.characterName || '').trim();
+  const chosenIcon = STATE.characterIcon || '🧳';
+  Object.assign(STATE, buildDefaultState());
+  STATE.characterName = chosenName;
+  STATE.characterIcon = chosenIcon;
+  STATE.startCity = findCityByName('Paris') || rng(CITIES);
+  STATE.currentCity = STATE.startCity;
+  STATE.phase = 'playing';
+  STATE.achievements = new Set(['ecolo']);
+  STATE.points = ACHIEVEMENT_POINTS.ecolo;
+  STATE.tutorialRun = true;
+  STATE.tutorialStep = 0;
+  log(`📚 Découverte guidée : départ à ${STATE.startCity.name}.`);
+  syncMusic(true);
+  render();
+}
+function advanceGuidedTutorial(trigger) {
+  if (!STATE.tutorialRun) return;
+  if (STATE.tutorialStep === 0 && trigger === 'nextTurn') {
+    STATE.tutorialStep = 1;
+    STATE.pendingCard = buildGuidedTutorialOffer();
+    STATE.pendingCardMinimized = false;
+    STATE.pendingCardTab = 'presentation';
+    log(`📚 Première opportunité scriptée : ${TYPE_LABEL[STATE.pendingCard.type]} à ${STATE.pendingCard.city.name}.`);
+    return;
+  }
+  if (STATE.tutorialStep === 1 && trigger === 'accepted-offer') {
+    STATE.tutorialStep = 2;
+    log('📚 Mission ajoutée à l’agenda : observe maintenant le trajet et la date de départ.');
+    return;
+  }
+  if (STATE.tutorialStep === 2 && trigger === 'nextTurn') {
+    STATE.tutorialStep = 3;
+    log('📚 Le départ vient de tomber : le paiement arrive maintenant, les points viendront à la fin.');
+    return;
+  }
+  if (STATE.tutorialStep === 3 && trigger === 'nextTurn') {
+    STATE.tutorialStep = 4;
+    log('📚 Mission terminée : tu as vu la boucle complète du jeu.');
+  }
 }
 function continueGame() {
   if (loadGame() && STATE.phase !== 'menu') {
@@ -3712,6 +4280,11 @@ function refreshEditMissionFromAgenda() {
   STATE.editCard = refreshed;
 }
 function openMissionEditor(id) {
+  if (STATE.tutorialRun) {
+    log('📚 La modification de mission arrive plus tard. Pour cette découverte guidée, on reste sur la boucle de base.');
+    render();
+    return;
+  }
   const card = buildMissionEditCard(id);
   if (!card) return;
   STATE.editCard = card;
@@ -4195,9 +4768,15 @@ function acceptCard() {
 
   if (!card.feasible || !card.selectedInbound) return;
   commitPendingMission(card);
+  advanceGuidedTutorial('accepted-offer');
   render();
 }
 function minimizePendingCard() {
+  if (STATE.tutorialRun && STATE.tutorialStep === 1) {
+    log('📚 Pour la découverte guidée, garde cette première opportunité ouverte et accepte-la après lecture.');
+    render();
+    return;
+  }
   if (!STATE.pendingCard) return;
   STATE.pendingCardMinimized = true;
   render();
@@ -4259,6 +4838,11 @@ function acceptCardByCancellingNextMission() {
   render();
 }
 function refuseCard() {
+  if (STATE.tutorialRun && STATE.tutorialStep === 1 && STATE.pendingCard && STATE.pendingCard.kind === 'mission') {
+    log('📚 Pour la démo, accepte cette première mission. Le tuto te montrera ensuite comment lire l’agenda et le départ.');
+    render();
+    return;
+  }
   if (STATE.pendingCard && STATE.pendingCard.kind === 'chance') discardPendingCard('Carte Chance refusée.');
   else if (STATE.pendingCard && STATE.pendingCard.kind === 'home') discardPendingCard('Retour chez les parents annulé.');
   else discardPendingCard('Opportunité refusée.');
@@ -4337,6 +4921,10 @@ function checkAchievements() {
 }
 function nextTurn() {
   if (STATE.phase !== 'playing') return;
+  if (STATE.tutorialRun && STATE.tutorialStep >= GUIDED_TUTORIAL_STEPS.length - 1) {
+    render();
+    return;
+  }
   if (STATE.editCard) return;
   if (STATE.pendingCard && !STATE.pendingCardMinimized) return;
   const brokenMission = getNextBrokenMission();
@@ -4453,6 +5041,12 @@ function nextTurn() {
     STATE.endReason = 'victory';
     log(`★ VICTOIRE en semaine ${STATE.week} !`);
     recordScore();
+    render();
+    return;
+  }
+
+  if (STATE.tutorialRun) {
+    advanceGuidedTutorial('nextTurn');
     render();
     return;
   }
@@ -4599,6 +5193,13 @@ function renderPerkPanel() {
   `;
 }
 function renderOfferFilterPanel() {
+  if (STATE.tutorialRun) {
+    return `
+      <div class="offer-filter-panel">
+        <div class="offer-filter-note">Pendant la découverte guidée, les annonces sont figées pour te montrer la boucle principale sans bruit autour.</div>
+      </div>
+    `;
+  }
   const currentCity = deriveCurrentCityFromState();
   const nearbyLabel = currentCity ? `Autour de ${currentCity.name}` : 'Autour de toi';
   return `
@@ -4616,6 +5217,13 @@ function renderOfferFilterPanel() {
   `;
 }
 function renderReturnHomePanel() {
+  if (STATE.tutorialRun) {
+    return `
+      <div class="offer-filter-panel">
+        <div class="offer-filter-note">Le retour chez les parents reste volontairement coupé pendant le tuto, pour se concentrer sur la boucle annonce → planification → agenda → mission.</div>
+      </div>
+    `;
+  }
   const activeMission = getActiveMission();
   const disabled = STATE.atParents || !!STATE.pendingCard || !!STATE.editCard || !!activeMission;
   const text = STATE.atParents
@@ -4748,8 +5356,14 @@ function renderCalendarPane(card) {
   const endWeek = startWeek + 52;
   let rows = '';
   let lastMonth = -1;
+  let hasSplitRows = false;
   const booked = getSortedAgenda();
   const candidate = card && isCalendarModalCard(card) ? card : null;
+  const cancellationMissionIds = new Set(
+    candidate
+      ? ((getPendingCardCancellationData(candidate) || { missions: [] }).missions || []).map(mission => mission.id)
+      : []
+  );
   const candidateNextMission = candidate && candidate.nextMissionId
     ? booked.find(entry => entry.id === candidate.nextMissionId)
     : null;
@@ -4764,6 +5378,91 @@ function renderCalendarPane(card) {
       ? candidate.nextMissionId
       : null);
   const focusWeek = candidate ? Math.min(endWeek - 1, getPendingCalendarFocusWeek(candidate)) : null;
+  const candidateTravelEndDay = candidate && candidate.kind === 'edit' && candidate.inboundPlanType === 'catch-booked' && candidate.currentBookedLeg
+    ? candidate.currentBookedLeg.startDay
+    : (candidate && candidate.kind === 'edit' ? candidate.arrivalDay : candidate && candidate.startDay);
+
+  const renderStateCell = (state, split = false) => {
+    const cls = state.cls ? ` ${state.cls}` : ' free';
+    const shell = split ? 'cal-segment' : 'cal-bar';
+    return `<div class="${shell}${cls}">${state.label ? `<span class="cal-label">${state.label}</span>` : ''}</div>`;
+  };
+  const getCurrentState = week => {
+    const mission = booked.find(entry => weekOverlapsRange(week, entry.startDay, entry.endDay));
+    if (mission) {
+      return {
+        cls: 'booked',
+        label: week === mission.startWeek ? mission.city.name : '',
+      };
+    }
+    const travel = booked
+      .map(entry => {
+        const segment = getMissionTravelSegmentForWeek(entry, week);
+        return segment ? { mission: entry, segment } : null;
+      })
+      .find(Boolean);
+    if (travel) {
+      return {
+        cls: travel.segment.cancellable ? 'travel-cancellable' : 'travel',
+        label: Math.floor(travel.segment.startDay / 7) === week ? travel.segment.label : '',
+      };
+    }
+    return { cls: '', label: '' };
+  };
+  const getProjectedState = week => {
+    const projectedMission = booked.find(entry =>
+      !cancellationMissionIds.has(entry.id)
+      && weekOverlapsRange(week, entry.startDay, entry.endDay)
+    );
+    const projectedTravel = booked
+      .map(entry => {
+        if (cancellationMissionIds.has(entry.id) || entry.id === replacedTravelMissionId) return null;
+        const segment = getMissionTravelSegmentForWeek(entry, week);
+        if (!segment) return null;
+        if (entry.id === replacedAccessMissionId && segment.kind === 'access') return null;
+        return { mission: entry, segment };
+      })
+      .find(Boolean);
+    const candidateMission = candidate && candidate.kind === 'mission' && weekOverlapsRange(week, candidate.startDay, candidate.endDay);
+    const candidateTravel = candidate && candidate.selectedInbound && candidate.travelDays > 0.1 && weekOverlapsRange(week, candidate.travelStartDay, candidateTravelEndDay);
+    const candidateOutboundTravel = candidate && candidateNextMission && candidate.selectedOutbound
+      && candidate.selectedOutbound.days > 0.1
+      && candidate.nextTravelStartDay != null
+      && candidate.nextTravelEndDay != null
+      && weekOverlapsRange(week, candidate.nextTravelStartDay, candidate.nextTravelEndDay);
+
+    if (candidateMission) {
+      return {
+        cls: 'candidate',
+        label: week === candidate.startWeek ? candidate.city.name : '',
+      };
+    }
+    if (projectedMission) {
+      return {
+        cls: 'booked',
+        label: week === projectedMission.startWeek ? projectedMission.city.name : '',
+      };
+    }
+    if (candidateOutboundTravel) {
+      return {
+        cls: candidate.selectedOutbound.cancellable ? 'candidate-travel-cancellable' : 'candidate-travel',
+        label: Math.floor(candidate.nextTravelStartDay / 7) === week ? (card.nextTravelLabel || candidate.selectedOutbound.label) : '',
+      };
+    }
+    if (candidateTravel) {
+      return {
+        cls: candidate.selectedInbound && candidate.selectedInbound.cancellable ? 'candidate-travel-cancellable' : 'candidate-travel',
+        label: Math.floor(candidate.travelStartDay / 7) === week ? candidate.travelLabel : '',
+      };
+    }
+    if (projectedTravel) {
+      return {
+        cls: projectedTravel.segment.cancellable ? 'travel-cancellable' : 'travel',
+        label: Math.floor(projectedTravel.segment.startDay / 7) === week ? projectedTravel.segment.label : '',
+      };
+    }
+    return { cls: '', label: '' };
+  };
 
   for (let week = startWeek; week < endWeek; week++) {
     const date = new Date(2026, 0, 1);
@@ -4773,53 +5472,26 @@ function renderCalendarPane(card) {
     const monthStart = date.getMonth() !== lastMonth;
     lastMonth = date.getMonth();
 
-    let cls = '';
-    let label = '';
-    const mission = booked.find(entry => weekOverlapsRange(week, entry.startDay, entry.endDay));
-    const travel = booked
-      .map(entry => {
-        if (entry.id === replacedTravelMissionId) return null;
-        const segment = getMissionTravelSegmentForWeek(entry, week);
-        if (!segment) return null;
-        if (entry.id === replacedAccessMissionId && segment.kind === 'access') return null;
-        return { mission: entry, segment };
-      })
-      .find(Boolean);
-    const candidateMission = candidate && candidate.kind === 'mission' && weekOverlapsRange(week, candidate.startDay, candidate.endDay);
-    const candidateTravelEndDay = candidate && candidate.kind === 'edit' && candidate.inboundPlanType === 'catch-booked' && candidate.currentBookedLeg
-      ? candidate.currentBookedLeg.startDay
-      : (candidate && candidate.kind === 'edit' ? candidate.arrivalDay : candidate && candidate.startDay);
-    const candidateTravel = candidate && candidate.selectedInbound && candidate.travelDays > 0.1 && weekOverlapsRange(week, candidate.travelStartDay, candidateTravelEndDay);
-    const candidateOutboundTravel = candidate && candidateNextMission && candidate.selectedOutbound
-      && candidate.selectedOutbound.days > 0.1
-      && candidate.nextTravelStartDay != null
-      && candidate.nextTravelEndDay != null
-      && weekOverlapsRange(week, candidate.nextTravelStartDay, candidate.nextTravelEndDay);
-
-    if (mission && candidateMission) cls = 'both';
-    else if (mission) cls = 'booked';
-    else if (candidateMission) cls = 'candidate';
-    else if (candidateOutboundTravel) cls = candidate.selectedOutbound.cancellable ? 'candidate-travel-cancellable' : 'candidate-travel';
-    else if (candidateTravel) cls = candidate.selectedInbound && candidate.selectedInbound.cancellable ? 'candidate-travel-cancellable' : 'candidate-travel';
-    else if (travel) cls = travel.segment.cancellable ? 'travel-cancellable' : 'travel';
-
-    if (mission && week === mission.startWeek) label = mission.city.name;
-    else if (candidateOutboundTravel && Math.floor(candidate.nextTravelStartDay / 7) === week) label = card.nextTravelLabel || candidate.selectedOutbound.label;
-    else if (candidateMission && week === candidate.startWeek) label = candidate.city.name;
-    else if (candidateTravel && Math.floor(candidate.travelStartDay / 7) === week) label = candidate.travelLabel;
-    else if (travel && Math.floor(travel.segment.startDay / 7) === week) label = travel.segment.label;
+    const currentState = getCurrentState(week);
+    const projectedState = getProjectedState(week);
+    const splitWeek = !!candidate && ((currentState.cls || '') !== (projectedState.cls || '') || (currentState.label || '') !== (projectedState.label || ''));
+    if (splitWeek) hasSplitRows = true;
+    const barHtml = splitWeek
+      ? `<div class="cal-bar split">${renderStateCell(currentState, true)}${renderStateCell(projectedState, true)}</div>`
+      : renderStateCell(projectedState.cls || projectedState.label ? projectedState : currentState);
 
     rows += `
       <div class="calendar-row ${monthStart ? 'month-start' : ''}"${focusWeek === week ? ` data-focus-week="${week}"` : ''}>
         <div class="cal-week-tag">S${week}</div>
         <div class="cal-date">${dateLabel}</div>
-        <div class="cal-bar ${cls}">${label ? `<span class="cal-label">${label}</span>` : ''}</div>
+        ${barHtml}
       </div>`;
   }
 
   return `
     <div class="calendar-pane">
       <h3>Calendrier (12 mois)</h3>
+      ${hasSplitRows ? `<div class="calendar-compare-head"><span>Actuel</span><span>Si tu acceptes</span></div>` : ''}
       ${rows}
       <div class="cal-legend">
         <div class="cal-legend-item"><span class="cal-swatch free"></span> Libre</div>
@@ -5473,6 +6145,7 @@ function renderEditMissionModal() {
 function renderPendingCardModal() {
   const card = STATE.pendingCard;
   if (!card) return '';
+  const tutorialInlineNote = renderGuidedTutorialInlineNote();
 
   if (card.kind === 'chance') {
     const perk = PERK_DEFS[card.perkKey];
@@ -5481,6 +6154,7 @@ function renderPendingCardModal() {
         <div class="modal chance-modal">
           <div class="seal">☘️</div>
           <h1 style="margin-top:8px;">Carte Chance</h1>
+          ${tutorialInlineNote}
           <p class="chance-icon">${perk.icon}</p>
           <p style="font-size:22px;font-weight:600;">${perk.name}</p>
           <p style="margin-top:10px;line-height:1.5;color:#6e5532;">${perk.desc}</p>
@@ -5506,13 +6180,14 @@ function renderPendingCardModal() {
     return `
       <div class="modal-overlay" id="card-modal">
         <div class="opportunity-modal">
-          <div class="opportunity-shell">
-            <div class="opportunity-topline">
-              <div class="opportunity-title-line">
-                <strong>Retour chez les parents</strong>, <span class="opportunity-city">${card.city.name}</span>, <strong class="opportunity-continent">${CONTINENT_LABEL_FR[card.city.continent] || card.city.continent}</strong>
-              </div>
+        <div class="opportunity-shell">
+          <div class="opportunity-topline">
+            <div class="opportunity-title-line">
+              <strong>Retour chez les parents</strong>, <span class="opportunity-city">${card.city.name}</span>, <strong class="opportunity-continent">${CONTINENT_LABEL_FR[card.city.continent] || card.city.continent}</strong>
             </div>
-            <div class="opportunity-tabs">
+          </div>
+          ${tutorialInlineNote}
+          <div class="opportunity-tabs">
               ${tabs.map(tab => `
                 <button class="opportunity-tab ${activeTab === tab.key ? 'active' : ''}" onclick="setPendingCardTab('${tab.key}')">${tab.label}</button>
               `).join('')}
@@ -5559,6 +6234,7 @@ function renderPendingCardModal() {
               <strong>${esc(card.petName || 'Logement à garder')}</strong>${card.isRepeatPet ? ' <span class="repeat-pet-heart" title="Vous avez déjà gardé cet animal">💛</span>' : ''}, <span class="opportunity-city">${card.city.name}</span>, <strong class="opportunity-continent">${CONTINENT_LABEL_FR[card.city.continent] || card.city.continent}</strong>, ${card.housing}${card.isRareHousing ? ' ✦' : ''}
             </div>
           </div>
+          ${tutorialInlineNote}
           <div class="opportunity-tabs">
             ${tabs.map(tab => `
               <button class="opportunity-tab ${activeTab === tab.key ? 'active' : ''}" onclick="setPendingCardTab('${tab.key}')">${tab.label}</button>
@@ -5697,6 +6373,158 @@ function renderEndModal() {
     </div>
   `;
 }
+function renderTutorialRulesScreen() {
+  const canLaunchGuidedTutorial = STATE.phase === 'menu';
+  return `
+    <div class="seal">🧭</div>
+    <h1>Découvrir le jeu</h1>
+    <p class="tutorial-intro">Le principe est simple : tu fais vivre un pet sitter nomade, tu acceptes des missions, tu planifies les trajets, tu encaisses au départ, puis tu gagnes les points à la fin. L’enjeu, ce n’est pas juste de dire oui à une carte, c’est de garder un agenda qui tient debout.</p>
+
+    <div class="tutorial-layout">
+      <div class="tutorial-steps">
+        <div class="tutorial-step">
+          <div class="tutorial-step-head">
+            <div class="tutorial-step-icon">📆</div>
+            <div class="tutorial-step-title">1. Chaque tour = 1 semaine</div>
+          </div>
+          <p>Quand tu cliques sur <strong>Tour suivant →</strong>, le temps avance. Une opportunité peut apparaître, une mission peut commencer, finir, ou te coûter de l’argent en attendant.</p>
+        </div>
+
+        <div class="tutorial-step">
+          <div class="tutorial-step-head">
+            <div class="tutorial-step-icon">💸</div>
+            <div class="tutorial-step-title">2. Le cash arrive avant les points</div>
+          </div>
+          <p>Au <strong>démarrage</strong> d’une mission, tu touches son paiement et tu paies le trajet. Les <strong>points de satisfaction</strong>, eux, arrivent seulement à la fin.</p>
+        </div>
+
+        <div class="tutorial-step">
+          <div class="tutorial-step-head">
+            <div class="tutorial-step-icon">🧳</div>
+            <div class="tutorial-step-title">3. Une carte se lit en 3 onglets</div>
+          </div>
+          <p><strong>Présentation</strong> pour la mission, <strong>Planification</strong> pour les trajets, et parfois <strong>Mission à annuler</strong> pour voir ce que tu sacrifies si ça se chevauche.</p>
+        </div>
+
+        <div class="tutorial-step">
+          <div class="tutorial-step-head">
+            <div class="tutorial-step-icon">🚆</div>
+            <div class="tutorial-step-title">4. Le vrai jeu, c’est le planning</div>
+          </div>
+          <p>Une mission bien payée peut devenir mauvaise si le transport est trop long, trop cher, ou bloque la suivante. Regarde le <strong>bénéfice net estimé</strong>, pas seulement le paiement.</p>
+        </div>
+
+        <div class="tutorial-step">
+          <div class="tutorial-step-head">
+            <div class="tutorial-step-icon">🗂️</div>
+            <div class="tutorial-step-title">5. L’agenda est ton radar</div>
+          </div>
+          <p>À droite, tu vois les missions futures et les segments de transport. Le bouton <strong>Modifier</strong> sert à retoucher un trajet réservé si la situation change.</p>
+        </div>
+
+        <div class="tutorial-step">
+          <div class="tutorial-step-head">
+            <div class="tutorial-step-icon">🏁</div>
+            <div class="tutorial-step-title">6. Gagner ou juste survivre</div>
+          </div>
+          <p>Tu gagnes à <strong>100 points</strong>. Tu perds si ton <strong>solde passe sous zéro</strong>. Refuser une carte est parfois le bon choix, surtout si elle casse plus qu’elle ne rapporte.</p>
+        </div>
+      </div>
+
+      <div class="tutorial-side">
+        <div class="tutorial-note">
+          <h3>Ton premier bon réflexe</h3>
+          <ul>
+            <li>Accepte d’abord une mission faisable, pas forcément la plus flashy.</li>
+            <li>Vérifie le calendrier avant de courir après un gros paiement.</li>
+            <li>Surveille ta trésorerie pendant les premiers mois.</li>
+            <li>Les retours chez les parents peuvent sauver une partie, mais ralentissent souvent la progression.</li>
+          </ul>
+        </div>
+
+        <div class="tutorial-note">
+          <h3>Ce qu’il faut regarder sur une opportunité</h3>
+          <ul>
+            <li>La date de départ : urgence ou mission lointaine ?</li>
+            <li>Le temps de trajet : gratuit ne veut pas dire pratique.</li>
+            <li>Le net estimé : c’est lui qui raconte la vraie rentabilité.</li>
+            <li>Les conflits : ce que tu annules peut valoir plus que ce que tu gagnes.</li>
+          </ul>
+        </div>
+
+        <div class="tutorial-note">
+          <h3>Besoin du détail complet ?</h3>
+          <ul>
+            <li>Le bouton <strong>?</strong> en haut à droite rouvre exactement cette page pendant la partie.</li>
+            <li>Si tu veux encore plus de détails, une aide longue existe aussi juste en dessous.</li>
+          </ul>
+        </div>
+      </div>
+    </div>
+
+    <div class="tutorial-footer">
+      <button onclick="closeTutorial()">Fermer</button>
+      <button onclick="closeTutorial();toggleLegacyHelp(true)">Voir l’aide détaillée</button>
+      ${canLaunchGuidedTutorial ? `<button class="primary" onclick="startTutorialScript()">Continuer vers la découverte guidée</button>` : ''}
+    </div>
+  `;
+}
+function renderTutorialScriptScreen() {
+  const step = MENU_TUTORIAL_SCRIPT[_tutorialStep] || MENU_TUTORIAL_SCRIPT[0];
+  const isFirst = _tutorialStep === 0;
+  const isLast = _tutorialStep === MENU_TUTORIAL_SCRIPT.length - 1;
+  return `
+    <div class="seal">🗺️</div>
+    <h1>Découverte guidée</h1>
+    <p class="tutorial-intro">Ici, on déroule une petite partie fictive. L’idée n’est pas d’apprendre toutes les règles, mais d’attraper le bon réflexe mental au moment où une carte apparaît.</p>
+
+    <div class="tutorial-script-shell">
+      <div class="tutorial-script-card">
+        <div class="tutorial-script-progress">Étape ${_tutorialStep + 1} / ${MENU_TUTORIAL_SCRIPT.length}</div>
+        <div class="tutorial-script-head">
+          <div class="tutorial-script-icon">${step.icon}</div>
+          <div class="tutorial-script-title">${step.title}</div>
+        </div>
+        <div class="tutorial-script-copy">${step.text}</div>
+        <ul class="tutorial-script-points">
+          ${step.points.map(point => `<li>${point}</li>`).join('')}
+        </ul>
+      </div>
+
+      <div class="tutorial-script-side">
+        <div class="tutorial-note">
+          <h3>${step.asideTitle}</h3>
+          <p>${step.aside}</p>
+        </div>
+        <div class="tutorial-note">
+          <h3>Le bon état d’esprit</h3>
+          <p>Dans ce jeu, tu n’évalues pas une carte comme une récompense. Tu l’évalues comme une <strong>décision de planning</strong> qui peut améliorer ou abîmer tout le reste.</p>
+        </div>
+      </div>
+    </div>
+
+    <div class="tutorial-nav">
+      <div class="tutorial-nav-status">${isLast ? 'Dernière étape de la visite guidée.' : 'Passe à l’étape suivante quand l’idée est claire.'}</div>
+      <div class="tutorial-nav-actions">
+        <button onclick="showTutorialRules()">Retour aux règles</button>
+        <button onclick="changeTutorialStep(-1)" ${isFirst ? 'disabled' : ''}>Précédent</button>
+        ${isLast
+          ? `<button class="primary" onclick="closeTutorial()">J’ai compris</button>`
+          : `<button class="primary" onclick="changeTutorialStep(1)">Suivant</button>`}
+      </div>
+    </div>
+  `;
+}
+function renderTutorialModal() {
+  return _tutorialMode === 'script'
+    ? renderTutorialScriptScreen()
+    : renderTutorialRulesScreen();
+}
+function renderTutorialOverlay() {
+  const modal = document.getElementById('tutorial-modal');
+  if (!modal) return;
+  modal.innerHTML = renderTutorialModal();
+}
 function renderMenu() {
   const scores = loadScores();
   const scoresHtml = scores.length ? `
@@ -5737,7 +6565,10 @@ function renderMenu() {
             ).join('')}
           </div>
         </div>
-        <button class="primary" style="font-size:18px;padding:12px 32px;margin-top:12px;" onclick="startGame()">Commencer la partie</button>
+        <div class="menu-actions">
+          <button class="primary" style="font-size:18px;padding:12px 32px;" onclick="startGame()">Commencer la partie</button>
+          <button onclick="startTutorialScript()">Tutoriel</button>
+        </div>
         <div style="font-size:13px;color:#6e5532;margin-top:8px;">Ville de départ : tirée au sort · Solde initial : ${fmtMoney(INITIAL_BALANCE)} · Écolo démarre déjà actif (+${ACHIEVEMENT_POINTS.ecolo} pts)</div>
         ${hasSaveAvailable() ? '<button onclick="continueGame()">Reprendre la partie sauvegardée</button>' : ''}
         ${scoresHtml}
@@ -5763,6 +6594,7 @@ function renderGame() {
       </div>
 
       <div id="main-area">
+        ${STATE.tutorialRun ? renderGuidedTutorialPanel() : ''}
         ${pendingCardHidden ? renderPendingCardStrip(STATE.pendingCard) : ''}
         <div id="map-container" class="paper">${renderMap(currentCity)}</div>
         <div class="paper">
@@ -5811,15 +6643,57 @@ function render() {
   capturePendingCalendarScroll();
   if (STATE.phase === 'menu') renderMenu();
   else renderGame();
+  renderTutorialOverlay();
   applyFrenchPunctuation(app);
   applyFrenchPunctuation(document.getElementById('help-overlay'));
+  applyFrenchPunctuation(document.getElementById('tutorial-overlay'));
   focusPendingCalendarPane();
   syncMusic();
   saveGame();
 }
-function toggleHelp() {
+function toggleLegacyHelp(forceOpen) {
   const help = document.getElementById('help-overlay');
-  help.style.display = help.style.display === 'none' ? 'flex' : 'none';
+  if (typeof forceOpen === 'boolean') help.style.display = forceOpen ? 'flex' : 'none';
+  else help.style.display = help.style.display === 'none' ? 'flex' : 'none';
+}
+function toggleHelp(forceOpen) {
+  toggleTutorial(forceOpen);
+}
+function closeTutorial() {
+  const tutorial = document.getElementById('tutorial-overlay');
+  tutorial.style.display = 'none';
+}
+function showTutorialRules() {
+  _tutorialMode = 'rules';
+  renderTutorialOverlay();
+  applyFrenchPunctuation(document.getElementById('tutorial-overlay'));
+}
+function startTutorialScript() {
+  const tutorial = document.getElementById('tutorial-overlay');
+  if (tutorial) tutorial.style.display = 'none';
+  startGuidedTutorialGame();
+}
+function changeTutorialStep(delta) {
+  const next = Math.max(0, Math.min(MENU_TUTORIAL_SCRIPT.length - 1, _tutorialStep + delta));
+  _tutorialStep = next;
+  _tutorialMode = 'script';
+  renderTutorialOverlay();
+  applyFrenchPunctuation(document.getElementById('tutorial-overlay'));
+}
+function toggleTutorial(forceOpen) {
+  const tutorial = document.getElementById('tutorial-overlay');
+  const shouldOpen = typeof forceOpen === 'boolean'
+    ? forceOpen
+    : tutorial.style.display === 'none';
+  if (!shouldOpen) {
+    closeTutorial();
+    return;
+  }
+  _tutorialMode = 'rules';
+  _tutorialStep = 0;
+  tutorial.style.display = 'flex';
+  renderTutorialOverlay();
+  applyFrenchPunctuation(document.getElementById('tutorial-overlay'));
 }
 
 window.acceptCard = acceptCard;
@@ -5831,6 +6705,12 @@ window.continueAfterVictory = continueAfterVictory;
 window.resetGame = resetGame;
 window.returnToMenu = returnToMenu;
 window.toggleHelp = toggleHelp;
+window.toggleLegacyHelp = toggleLegacyHelp;
+window.toggleTutorial = toggleTutorial;
+window.closeTutorial = closeTutorial;
+window.showTutorialRules = showTutorialRules;
+window.startTutorialScript = startTutorialScript;
+window.changeTutorialStep = changeTutorialStep;
 window.cancelMission = cancelMission;
 window.openMissionEditor = openMissionEditor;
 window.closeMissionEditor = closeMissionEditor;

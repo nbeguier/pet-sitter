@@ -1572,6 +1572,7 @@ const REPEAT_PET_BONUS_MIN = 1.10;
 const REPEAT_PET_BONUS_MAX = 1.20;
 const NARRATIVE_EVENT_CHANCE = 0.12;
 const NARRATIVE_EVENT_COOLDOWN_WEEKS = 3;
+const FIRST_YEAR_SOCIAL_THREAD_FORCE_WEEK = 20;
 const MAX_MEMORIES = 80;
 function currentWeeklyFood(week) {
   return WEEKLY_FOOD_BASE;
@@ -2286,47 +2287,159 @@ function canStartRomanceInCity(city) {
 function canStartFriendshipInCity(city) {
   return city && !STATE.friendshipThread && (!STATE.romanceThread || STATE.romanceThread.cityName !== city.name);
 }
+function startRomanceThread(city) {
+  if (!city || !canStartRomanceInCity(city)) return false;
+  STATE.romanceThread = { cityName: city.name, continent: city.continent, stage: 1, lastTriggerWeek: STATE.week };
+  STATE.memoryFlags.first_year_social_thread_done = true;
+  addMemory({
+    title: 'Romance locale',
+    text: `Tu as pécho un local à ${city.name}. Pendant quelques jours, la ville n’avait plus tout à fait la même lumière.`,
+    city,
+    tags: ['romance', 'rencontre'],
+    important: true,
+    icon: '💘',
+  });
+  return true;
+}
+function startFriendshipThread(city) {
+  if (!city || !canStartFriendshipInCity(city)) return false;
+  STATE.friendshipThread = { cityName: city.name, continent: city.continent, stage: 1, lastTriggerWeek: STATE.week };
+  STATE.memoryFlags.first_year_social_thread_done = true;
+  addMemory({
+    title: 'Promesse de lettres',
+    text: `Tu t’es fait une amie à ${city.name}. Vous vous êtes promis de vous écrire, pour de vrai, sur du papier.`,
+    city,
+    tags: ['amitié', 'lettres'],
+    important: true,
+    icon: '🤝',
+  });
+  return true;
+}
+function maybeForceFirstYearSocialThread(context) {
+  if (!context.city || STATE.week >= 52 || STATE.week < FIRST_YEAR_SOCIAL_THREAD_FORCE_WEEK) return false;
+  if (STATE.memoryFlags.first_year_social_thread_done) return false;
+  if (STATE.romanceThread || STATE.friendshipThread) {
+    STATE.memoryFlags.first_year_social_thread_done = true;
+    return false;
+  }
+  if (!context.eventWindow) return false;
+  const starters = [];
+  if (canStartRomanceInCity(context.city)) starters.push(startRomanceThread);
+  if (canStartFriendshipInCity(context.city)) starters.push(startFriendshipThread);
+  if (!starters.length) return false;
+  rng(starters)(context.city);
+  STATE.narrativeEventCooldown = NARRATIVE_EVENT_COOLDOWN_WEEKS;
+  return true;
+}
+function getChristmasMemoryVariant(city) {
+  if (!city) return null;
+  if (city.continent === 'Europe') {
+    return {
+      title: 'Colis de Noël',
+      text: `Tu as reçu un colis de tes parents. Il y avait des biscuits, un pull un peu moche, et un mot qui t’a fait sourire malgré toi. Dans le froid de ${city.name}, ça t’a fait l’effet d’un petit bout de maison.`,
+      tags: ['famille', 'hiver', 'noel'],
+      important: true,
+      icon: '🎁',
+    };
+  }
+  if (city.continent === 'Africa') {
+    return {
+      title: 'Colis de Noël',
+      text: `Tu as reçu un colis de tes parents. Dedans, quelques douceurs, un pull sans doute inutile ici, et un mot maladroit qui t’a serré le cœur. Sous la lumière de ${city.name}, Noël avait une forme étrange mais tendre.`,
+      tags: ['famille', 'noel', 'voyage'],
+      important: true,
+      icon: '🎁',
+    };
+  }
+  if (city.continent === 'Asia') {
+    return {
+      title: 'Colis de Noël',
+      text: `Tu as reçu un colis de tes parents. Il avait traversé la moitié du monde pour t’apporter des biscuits cassés, un pull un peu moche et une écriture familière. À ${city.name}, tu t’es senti loin, mais moins seul d’un coup.`,
+      tags: ['famille', 'noel', 'distance'],
+      important: true,
+      icon: '🎁',
+    };
+  }
+  if (city.continent === 'N.America') {
+    return {
+      title: 'Colis de Noël',
+      text: `Tu as reçu un colis de tes parents. Entre deux trucs un peu kitsch et un mot plein de recommandations inutiles, il y avait surtout une attention qui avait traversé l’océan. À ${city.name}, ça t’a pris par surprise.`,
+      tags: ['famille', 'noel', 'distance'],
+      important: true,
+      icon: '🎁',
+    };
+  }
+  return {
+    title: 'Colis de Noël',
+    text: `Tu as reçu un colis de tes parents. Le carton était cabossé, les biscuits en miettes, le pull toujours discutable, mais le mot à l’intérieur a suffi. À ${city.name}, si loin de tout, tu as eu l’impression qu’on avait quand même trouvé le moyen de te rejoindre.`,
+    tags: ['famille', 'noel', 'distance'],
+    important: true,
+    icon: '🎁',
+  };
+}
 function maybeAdvanceThread(threadKey, city) {
   const thread = STATE[threadKey];
-  if (!thread || !city || thread.cityName !== city.name || thread.stage >= 3 || thread.lastTriggerWeek === STATE.week) return false;
+  if (!thread || !city || thread.cityName !== city.name || thread.stage >= 5 || thread.lastTriggerWeek === STATE.week) return false;
   const isRomance = threadKey === 'romanceThread';
   const stage = thread.stage + 1;
   const variants = isRomance
-    ? [
-      null,
-      {
+    ? {
+      2: {
         title: 'Suite de romance',
         text: `Tu es retombé sur cette histoire à ${city.name}. Cette fois, vous avez arrêté de faire semblant que ce n’était qu’un joli hasard.`,
         tags: ['romance', 'suite'],
         icon: '💌',
       },
-      {
-        title: 'Troisième rendez-vous',
-        text: `À force de revenir à ${city.name}, cette romance est devenue un vrai chapitre de ta vie. Vous avez fini par avoir vos habitudes, comme si la ville vous attendait.`,
-        tags: ['romance', 'chapitre'],
+      3: {
+        title: 'Contretemps',
+        text: `À ${city.name}, vous vous êtes retrouvés avec moins d’évidence que la dernière fois. Quelque chose avait bougé, dans vos vies ou dans vos attentes, et ça vous a pris de court.`,
+        tags: ['romance', 'retournement'],
+        icon: '🌀',
+      },
+      4: {
+        title: 'Le mauvais moment',
+        text: `En revenant à ${city.name}, tu as compris que vous vous étiez peut-être rencontrés au bon endroit, mais pas au bon moment. Tu es reparti avec une tristesse douce, celle qui laisse une trace.`,
+        tags: ['romance', 'tristesse'],
+        icon: '🥀',
+      },
+      5: {
+        title: 'Ça finit bien quand même',
+        text: `À ${city.name}, vous vous êtes enfin revus sans vous promettre l’impossible. Quelque chose de plus simple, de plus vrai, a pris sa place, et pour la première fois ça avait l’air de pouvoir tenir.`,
+        tags: ['romance', 'resolution'],
         icon: '❤️',
       },
-    ]
-    : [
-      null,
-      {
+    }
+    : {
+      2: {
         title: 'Des nouvelles par lettre',
         text: `À ${city.name}, tu as retrouvé cette amie avec qui tu t’étais promis d’échanger des lettres. Vous aviez l’impression de reprendre une conversation jamais vraiment interrompue.`,
         tags: ['amitié', 'suite'],
         icon: '💌',
       },
-      {
-        title: 'Une amitié qui tient',
-        text: `En revenant à ${city.name}, tu t’es rendu compte que cette amitié avait pris racine pour de bon. Certaines personnes finissent par compter, même quand on vit entre deux gares.`,
-        tags: ['amitié', 'chapitre'],
-        icon: '🤝',
+      3: {
+        title: 'Petit froid',
+        text: `En revenant à ${city.name}, tu as senti un léger décalage. Des lettres s’étaient perdues, ou peut-être juste un peu de spontanéité, et votre complicité a vacillé sans vraiment casser.`,
+        tags: ['amitié', 'retournement'],
+        icon: '📭',
       },
-    ];
+      4: {
+        title: 'Silence',
+        text: `À ${city.name}, tu as cru pendant un moment que cette amitié s’était dissoute dans les absences et les déménagements. Ça t’a rendu plus triste que tu ne l’aurais imaginé.`,
+        tags: ['amitié', 'tristesse'],
+        icon: '🫥',
+      },
+      5: {
+        title: 'Toujours là',
+        text: `Puis à ${city.name}, vous vous êtes retrouvés pour de bon. Moins souvent, peut-être, mais avec quelque chose de solide qui n’avait plus besoin d’être prouvé.`,
+        tags: ['amitié', 'resolution'],
+        icon: '🫶',
+      },
+    };
   thread.stage = stage;
   thread.lastTriggerWeek = STATE.week;
-  const payload = variants[stage - 1];
+  const payload = variants[stage];
   if (!payload) return false;
-  addMemory({ ...payload, city, important: stage >= 3 });
+  addMemory({ ...payload, city, important: stage >= 4 });
   return true;
 }
 function buildNarrativeEventCandidates(context) {
@@ -2341,12 +2454,8 @@ function buildNarrativeEventCandidates(context) {
       key: 'christmas_package',
       weight: 1.8,
       run: () => addMemory({
-        title: 'Colis de Noël',
-        text: 'Tu as reçu un colis de tes parents. Il y avait des biscuits, un pull un peu moche, et un mot qui t’a fait sourire malgré toi.',
+        ...getChristmasMemoryVariant(city),
         city,
-        tags: ['famille', 'hiver'],
-        important: true,
-        icon: '🎁',
       }),
     });
   }
@@ -2420,6 +2529,28 @@ function buildNarrativeEventCandidates(context) {
 
   if (isBigCity(city)) {
     candidates.push({
+      key: 'borrowed_bike',
+      weight: 0.9,
+      run: () => addMemory({
+        title: 'Vélo emprunté',
+        text: 'Tu as emprunté un vieux vélo pour traverser la ville sans but précis. Tu es rentré avec les jambes lourdes et l’esprit beaucoup plus léger.',
+        city,
+        tags: ['ville', 'balade'],
+        icon: '🚲',
+      }),
+    });
+    candidates.push({
+      key: 'rooftop_evening',
+      weight: 0.8,
+      run: () => addMemory({
+        title: 'Toit-terrasse',
+        text: 'Tu as fini la soirée sur un toit-terrasse improvisé, à regarder les lumières s’allumer une à une.',
+        city,
+        tags: ['ville', 'soir'],
+        icon: '🌇',
+      }),
+    });
+    candidates.push({
       key: 'night_walk',
       weight: 1.0,
       run: () => addMemory({
@@ -2456,7 +2587,53 @@ function buildNarrativeEventCandidates(context) {
       }),
     });
   }
+  if (city.continent === 'Europe') {
+    candidates.push({
+      key: 'secondhand_bookshop',
+      weight: 0.8,
+      run: () => addMemory({
+        title: 'Librairie d’occasion',
+        text: 'Tu es tombé sur une librairie d’occasion minuscule. Tu en es ressorti avec un livre que tu n’étais pas censé acheter.',
+        city,
+        tags: ['ville', 'livres'],
+        icon: '📚',
+      }),
+    });
+    candidates.push({
+      key: 'terrace_chess',
+      weight: 0.7,
+      run: () => addMemory({
+        title: 'Partie en terrasse',
+        text: 'Tu as regardé une partie d’échecs en terrasse pendant presque une heure, sans comprendre toutes les règles mais en trouvant ça parfait.',
+        city,
+        tags: ['europe', 'ville'],
+        icon: '♟️',
+      }),
+    });
+  }
   if (city.continent === 'Africa') {
+    candidates.push({
+      key: 'spice_market',
+      weight: 0.9,
+      run: () => addMemory({
+        title: 'Marché d’épices',
+        text: 'Tu as traversé un marché d’épices et de tissus en te laissant guider par les odeurs plus que par le sens de l’orientation.',
+        city,
+        tags: ['afrique', 'marché'],
+        icon: '🧺',
+      }),
+    });
+    candidates.push({
+      key: 'courtyard_tea',
+      weight: 0.8,
+      run: () => addMemory({
+        title: 'Thé à l’ombre',
+        text: 'Tu as pris un thé à l’ombre dans une cour où tout le monde semblait avoir le temps.',
+        city,
+        tags: ['afrique', 'pause'],
+        icon: '🍵',
+      }),
+    });
     candidates.push({
       key: 'shared_meal',
       weight: 1.0,
@@ -2481,6 +2658,30 @@ function buildNarrativeEventCandidates(context) {
     });
   }
   if (city.continent === 'Asia') {
+    if (isBigCity(city)) {
+      candidates.push({
+        key: 'night_noodles',
+        weight: 0.9,
+        run: () => addMemory({
+          title: 'Bol de nouilles',
+          text: 'Tu as mangé un bol brûlant au milieu de la nuit, assis sur un tabouret trop bas, et tu t’es dit que ça valait tous les restaurants du monde.',
+          city,
+          tags: ['asie', 'table'],
+          icon: '🍜',
+        }),
+      });
+    }
+    candidates.push({
+      key: 'temple_bells',
+      weight: 0.8,
+      run: () => addMemory({
+        title: 'Cloche du matin',
+        text: 'Tu t’es réveillé avec un son de cloche au loin. Pendant quelques minutes, la ville avait l’air de respirer plus doucement.',
+        city,
+        tags: ['asie', 'matin'],
+        icon: '🔔',
+      }),
+    });
     candidates.push({
       key: 'city_at_dawn',
       weight: 1.0,
@@ -2506,6 +2707,30 @@ function buildNarrativeEventCandidates(context) {
   }
   if (city.continent === 'N.America') {
     candidates.push({
+      key: 'diner_booth',
+      weight: 0.8,
+      run: () => addMemory({
+        title: 'Banquette rouge',
+        text: 'Tu as mangé seul dans un diner sur une banquette rouge, avec une part de tarte trop grande et un calme très rare.',
+        city,
+        tags: ['amerique', 'table'],
+        icon: '🥧',
+      }),
+    });
+    if (isBigCity(city)) {
+      candidates.push({
+        key: 'record_store',
+        weight: 0.8,
+        run: () => addMemory({
+          title: 'Disquaire',
+          text: 'Tu es entré dans un disquaire juste pour jeter un œil, puis tu es resté à écouter des morceaux inconnus pendant presque une heure.',
+          city,
+          tags: ['amerique', 'musique'],
+          icon: '💿',
+        }),
+      });
+    }
+    candidates.push({
       key: 'big_coffee',
       weight: 0.9,
       run: () => addMemory({
@@ -2519,6 +2744,28 @@ function buildNarrativeEventCandidates(context) {
   }
   if (city.continent === 'S.America') {
     candidates.push({
+      key: 'river_steps',
+      weight: 0.8,
+      run: () => addMemory({
+        title: 'Au bord du fleuve',
+        text: 'Tu t’es assis au bord du fleuve sans rien faire d’utile. C’était exactement ce qu’il fallait.',
+        city,
+        tags: ['amerique', 'pause'],
+        icon: '🌊',
+      }),
+    });
+    candidates.push({
+      key: 'fruit_juice',
+      weight: 0.8,
+      run: () => addMemory({
+        title: 'Jus frais',
+        text: 'Tu as bu un jus frais acheté à un stand de rue, et tu as eu l’impression de goûter la ville d’un seul coup.',
+        city,
+        tags: ['amerique', 'table'],
+        icon: '🧃',
+      }),
+    });
+    candidates.push({
       key: 'improvised_party',
       weight: 1.0,
       run: () => addMemory({
@@ -2531,6 +2778,30 @@ function buildNarrativeEventCandidates(context) {
     });
   }
   if (city.continent === 'Oceania') {
+    if (isCoastalCity(city)) {
+      candidates.push({
+        key: 'tide_pools',
+        weight: 0.8,
+        run: () => addMemory({
+          title: 'Entre les rochers',
+          text: 'Tu as passé un moment à regarder la mer se retirer entre les rochers, comme si la journée pouvait attendre encore un peu.',
+          city,
+          tags: ['oceanie', 'mer'],
+          icon: '🪸',
+        }),
+      });
+    }
+    candidates.push({
+      key: 'barefoot_evening',
+      weight: 0.8,
+      run: () => addMemory({
+        title: 'Pieds nus',
+        text: 'Tu as fini la journée pieds nus dehors, sans savoir exactement quand tu avais arrêté de regarder l’heure.',
+        city,
+        tags: ['oceanie', 'soir'],
+        icon: '🦶',
+      }),
+    });
     candidates.push({
       key: 'long_light',
       weight: 0.9,
@@ -2562,36 +2833,82 @@ function buildNarrativeEventCandidates(context) {
     candidates.push({
       key: null,
       weight: 0.8,
-      run: () => {
-        STATE.romanceThread = { cityName: city.name, continent: city.continent, stage: 1, lastTriggerWeek: STATE.week };
-        addMemory({
-          title: 'Romance locale',
-          text: `Tu as pécho un local à ${city.name}. Pendant quelques jours, la ville n’avait plus tout à fait la même lumière.`,
-          city,
-          tags: ['romance', 'rencontre'],
-          important: true,
-          icon: '💘',
-        });
-      },
+      run: () => startRomanceThread(city),
     });
   }
   if (canStartFriendshipInCity(city)) {
     candidates.push({
       key: null,
       weight: 0.8,
-      run: () => {
-        STATE.friendshipThread = { cityName: city.name, continent: city.continent, stage: 1, lastTriggerWeek: STATE.week };
-        addMemory({
-          title: 'Promesse de lettres',
-          text: `Tu t’es fait une amie à ${city.name}. Vous vous êtes promis de vous écrire, pour de vrai, sur du papier.`,
-          city,
-          tags: ['amitié', 'lettres'],
-          important: true,
-          icon: '🤝',
-        });
-      },
+      run: () => startFriendshipThread(city),
     });
   }
+  candidates.push({
+    key: 'postcard_written',
+    weight: 0.7,
+    run: () => addMemory({
+      title: 'Carte postale',
+      text: 'Tu as acheté une carte postale et, pour une fois, tu l’as vraiment écrite au lieu de la garder au fond d’un sac.',
+      city,
+      tags: ['souvenir', 'lettres'],
+      icon: '💌',
+    }),
+  });
+  candidates.push({
+    key: 'laundry_sun',
+    weight: 0.7,
+    run: () => addMemory({
+      title: 'Lessive au soleil',
+      text: 'Tu as étendu du linge au soleil avec un sentiment idiot mais très réel d’être exactement à ta place.',
+      city,
+      tags: ['quotidien', 'calme'],
+      icon: '🫧',
+    }),
+  });
+  candidates.push({
+    key: 'long_breakfast',
+    weight: 0.7,
+    run: () => addMemory({
+      title: 'Petit-déjeuner qui traîne',
+      text: 'Tu as pris un petit-déjeuner qui a débordé sur toute la matinée. Rien d’exceptionnel, juste le luxe d’avoir le temps.',
+      city,
+      tags: ['quotidien', 'pause'],
+      icon: '🥐',
+    }),
+  });
+  candidates.push({
+    key: 'balcony_rain',
+    weight: 0.7,
+    run: () => addMemory({
+      title: 'Pluie au balcon',
+      text: 'Tu as regardé la pluie tomber depuis un balcon ou une fenêtre entrouverte, sans chercher à faire autre chose.',
+      city,
+      tags: ['calme', 'météo'],
+      icon: '🌧️',
+    }),
+  });
+  candidates.push({
+    key: 'wrong_street',
+    weight: 0.7,
+    run: () => addMemory({
+      title: 'Bonne erreur',
+      text: 'Tu t’es trompé de rue, puis tu as découvert un coin que tu n’aurais jamais cherché exprès.',
+      city,
+      tags: ['ville', 'hasard'],
+      icon: '🛣️',
+    }),
+  });
+  candidates.push({
+    key: 'stray_cat_hello',
+    weight: 0.7,
+    run: () => addMemory({
+      title: 'Bonjour de trottoir',
+      text: 'Un chat inconnu est venu te saluer dans la rue comme si vous vous connaissiez depuis toujours.',
+      city,
+      tags: ['animaux', 'ville'],
+      icon: '🐈',
+    }),
+  });
   candidates.push({
     key: 'market_trinket',
     weight: 0.8,
@@ -2617,6 +2934,7 @@ function maybeTriggerNarrativeEvent(context) {
     STATE.narrativeEventCooldown = NARRATIVE_EVENT_COOLDOWN_WEEKS;
     return true;
   }
+  if (maybeForceFirstYearSocialThread(context)) return true;
   if (!context.eventWindow) return false;
   if (STATE.narrativeEventCooldown > 0) {
     STATE.narrativeEventCooldown--;

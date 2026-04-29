@@ -258,7 +258,7 @@ Ils impactent :
 - le journal ;
 - le récap de fin de partie ;
 - certains flags persistants (`tatouage`, `surf`, etc.) ;
-- les fils `romance` et `amitié`, qui peuvent continuer au 2e puis au 3e retour dans leur ville ;
+- les fils `romance` et `amitié`, qui peuvent maintenant aller jusqu’à `5 étapes` dans leur ville dédiée ;
 - le cas spécial `Héritage`, qui désactive définitivement `Retour chez les parents`.
 
 ## 7. Fonctions sensibles à connaître

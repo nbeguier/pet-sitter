@@ -176,6 +176,12 @@ Exemples actuels :
 - `Romance locale`
 - `Promesse de lettres`
 
+Détails notables :
+
+- `Colis de Noël` a maintenant plusieurs variantes selon le continent où se trouve le joueur ;
+- les fils `romance` et `amitié` peuvent désormais se dérouler sur `5 étapes`, avec retournement, creux émotionnel, puis résolution positive.
+- si aucun fil `romance` ou `amitié` n’a commencé, le jeu en force un pendant la première année sur une fenêtre narrative normale.
+
 Cas spécial :
 
 - le `8 juin 2027`, l’événement `Héritage` tombe automatiquement ;

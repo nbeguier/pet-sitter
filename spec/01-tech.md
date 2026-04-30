@@ -141,8 +141,12 @@ Champs importants :
 - `memoryFlags`
 - `romanceThread`
 - `friendshipThread`
+- `blueScarfThread`
 - `narrativeEventCooldown`
 - `memorySpotlight`
+- `currentCityPresenceKey`
+- `currentCitySinceWeek`
+- `currentCityVisitToken`
 - sets de progression :
   - `achievements`
   - `animalsDone`

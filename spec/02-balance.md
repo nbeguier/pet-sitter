@@ -21,8 +21,8 @@
 | Surcoût billet annulable | `+15 %` |
 | Fenêtre annulation sans malus | `8 semaines` |
 | Durée du malus réputation | `26 semaines` |
-| Chance de souvenir narratif | `12 %` |
-| Cooldown narratif | `3 semaines` |
+| Chance de souvenir narratif | `8 %` |
+| Cooldown narratif | `5 semaines` |
 
 ## 2. Génération des opportunités
 
@@ -282,8 +282,9 @@ Le jeu contient aussi un petit pool d’événements “carnet de route”.
 Règles actuelles :
 
 - ils ne tombent que sur des fenêtres calmes ou après une fin de mission ;
-- chance de base : `12 %` ;
-- cooldown : `3 semaines` ;
+- jamais quand le joueur est `chez les parents`, sauf pour `Héritage` ;
+- chance de base : `8 %` ;
+- cooldown : `5 semaines` ;
 - ils sont majoritairement positifs et surtout cosmétiques ;
 - certains laissent un souvenir important visible dans l’écran de fin.
 
@@ -292,8 +293,11 @@ Cas spéciaux :
 - `Leçon de surf` et `Tatouage souvenir` sont des souvenirs marquants ;
 - `Romance locale` et `Promesse de lettres` ouvrent chacune un fil narratif lié à une ville ;
 - si le joueur revient dans cette ville, il peut avoir une suite ;
-- au `3e` passage, le fil débouche sur un moment plus fort ;
+- à défaut d’être parti, il faut y être resté au moins `4 semaines` avant qu’une nouvelle étape puisse tomber ;
+- les fils vont maintenant jusqu’à `5 étapes` ;
 - les fils `romance` et `amitié` ne partagent jamais la même ville ;
+- `La personne à l’écharpe bleue` suit aussi un fil de `5 étapes`, mais sur une suite de villes secrètes tirées au sort à chaque partie, avec une résolution finale dans la ville de départ ;
+- si aucun des deux fils n’a commencé, le jeu en force doucement un premier fil pendant la première année ;
 - le `8 juin 2027`, `Héritage` tombe à `100 %` :
   - `+10 000 €`
   - suppression définitive de `Retour chez les parents`

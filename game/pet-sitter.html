@@ -1570,9 +1570,9 @@ const SOCIAL_STAR_MILESTONE_WEEK = 104;
 const REPEAT_PET_CHANCE = 0.15;
 const REPEAT_PET_BONUS_MIN = 1.10;
 const REPEAT_PET_BONUS_MAX = 1.20;
-const NARRATIVE_EVENT_CHANCE = 0.12;
-const NARRATIVE_EVENT_COOLDOWN_WEEKS = 3;
-const FIRST_YEAR_SOCIAL_THREAD_FORCE_WEEK = 20;
+const NARRATIVE_EVENT_CHANCE = 0.08;
+const NARRATIVE_EVENT_COOLDOWN_WEEKS = 5;
+const FIRST_YEAR_SOCIAL_THREAD_FORCE_WEEK = 16;
 const MAX_MEMORIES = 80;
 function currentWeeklyFood(week) {
   return WEEKLY_FOOD_BASE;
@@ -2287,9 +2287,56 @@ function canStartRomanceInCity(city) {
 function canStartFriendshipInCity(city) {
   return city && !STATE.friendshipThread && (!STATE.romanceThread || STATE.romanceThread.cityName !== city.name);
 }
+function ensureBlueScarfThread() {
+  if (STATE.blueScarfThread) return STATE.blueScarfThread;
+  const homeCity = STATE.startCity || deriveCurrentCityFromState();
+  if (!homeCity) return null;
+  const pool = CITIES.filter(city => city && city.name !== homeCity.name);
+  const usedNames = new Set([homeCity.name]);
+  const sequence = [];
+  while (sequence.length < 4 && pool.length) {
+    const available = pool.filter(city => !usedNames.has(city.name));
+    const source = available.length ? available : pool;
+    const chosen = rng(source);
+    if (!chosen) break;
+    sequence.push(chosen.name);
+    usedNames.add(chosen.name);
+  }
+  while (sequence.length < 4) {
+    sequence.push(homeCity.name);
+  }
+  sequence[4] = homeCity.name;
+  STATE.blueScarfThread = {
+    stage: 0,
+    citySequence: sequence,
+    lastTriggerWeek: -1,
+    scarfRecovered: false,
+  };
+  return STATE.blueScarfThread;
+}
+function getCityKey(city) {
+  return city ? `${city.name}|${city.continent}` : '';
+}
+function syncCurrentCityPresence(city) {
+  const key = getCityKey(city);
+  if (!key) return;
+  if (STATE.currentCityPresenceKey !== key) {
+    STATE.currentCityPresenceKey = key;
+    STATE.currentCitySinceWeek = STATE.week;
+    STATE.currentCityVisitToken = (STATE.currentCityVisitToken || 0) + 1;
+  } else if (!Number.isFinite(STATE.currentCitySinceWeek)) {
+    STATE.currentCitySinceWeek = STATE.week;
+  }
+}
 function startRomanceThread(city) {
   if (!city || !canStartRomanceInCity(city)) return false;
-  STATE.romanceThread = { cityName: city.name, continent: city.continent, stage: 1, lastTriggerWeek: STATE.week };
+  STATE.romanceThread = {
+    cityName: city.name,
+    continent: city.continent,
+    stage: 1,
+    lastTriggerWeek: STATE.week,
+    visitTokenAtTrigger: STATE.currentCityVisitToken || 0,
+  };
   STATE.memoryFlags.first_year_social_thread_done = true;
   addMemory({
     title: 'Romance locale',
@@ -2303,7 +2350,13 @@ function startRomanceThread(city) {
 }
 function startFriendshipThread(city) {
   if (!city || !canStartFriendshipInCity(city)) return false;
-  STATE.friendshipThread = { cityName: city.name, continent: city.continent, stage: 1, lastTriggerWeek: STATE.week };
+  STATE.friendshipThread = {
+    cityName: city.name,
+    continent: city.continent,
+    stage: 1,
+    lastTriggerWeek: STATE.week,
+    visitTokenAtTrigger: STATE.currentCityVisitToken || 0,
+  };
   STATE.memoryFlags.first_year_social_thread_done = true;
   addMemory({
     title: 'Promesse de lettres',
@@ -2313,6 +2366,57 @@ function startFriendshipThread(city) {
     important: true,
     icon: '🤝',
   });
+  return true;
+}
+function maybeAdvanceBlueScarfThread(context) {
+  const city = context.city;
+  if (!city || !context.eventWindow) return false;
+  const thread = ensureBlueScarfThread();
+  if (!thread || thread.stage >= 5 || thread.lastTriggerWeek === STATE.week) return false;
+  const targetCityName = thread.citySequence && thread.citySequence[thread.stage];
+  if (!targetCityName || targetCityName !== city.name) return false;
+  const stage = thread.stage + 1;
+  const variants = {
+    1: {
+      title: "La personne à l'écharpe bleue",
+      text: `À ${city.name}, tu aperçois une personne à l’écharpe bleue. Sans comprendre pourquoi, elle te rappelle quelqu’un. Quand tu te retournes une seconde plus tard, elle a déjà disparu.`,
+      tags: ['mystere', 'echarpe_bleue', 'premiere_vision'],
+      icon: '🧣',
+    },
+    2: {
+      title: 'Encore cette silhouette',
+      text: `À ${city.name}, tu reconnais aussitôt l’écharpe bleue. Tu crois pouvoir la rattraper cette fois, mais la silhouette se dissout dans la foule avant que tu arrives jusqu’à elle.`,
+      tags: ['mystere', 'echarpe_bleue', 'poursuite'],
+      icon: '🫥',
+    },
+    3: {
+      title: 'Presque',
+      text: `À ${city.name}, tu la revois encore. Cette fois, tu es sûr d’être tout près d’une réponse, mais il ne reste qu’un courant d’air et cette impression absurde de poursuivre un souvenir.`,
+      tags: ['mystere', 'echarpe_bleue', 'presque'],
+      icon: '🌀',
+    },
+    4: {
+      title: "L'écharpe bleue",
+      text: `À ${city.name}, la personne a disparu une fois de plus. Mais cette fois, son écharpe bleue est restée là. Tu la gardes avec toi sans trop savoir pourquoi, comme si elle t’était destinée depuis le début.`,
+      tags: ['mystere', 'echarpe_bleue', 'souvenir'],
+      important: true,
+      icon: '🧣',
+    },
+    5: {
+      title: 'Enfin',
+      text: `À ${city.name}, tu la retrouves enfin. Tu la reconnais avant même de comprendre d’où. Elle te regarde comme si elle t’avait attendu tout ce temps. Après ça, les choses ne seront plus jamais tout à fait pareilles.`,
+      tags: ['mystere', 'echarpe_bleue', 'resolution'],
+      important: true,
+      icon: '💙',
+    },
+  };
+  const payload = variants[stage];
+  if (!payload) return false;
+  thread.stage = stage;
+  thread.lastTriggerWeek = STATE.week;
+  if (stage >= 4) thread.scarfRecovered = true;
+  addMemory({ ...payload, city });
+  STATE.narrativeEventCooldown = NARRATIVE_EVENT_COOLDOWN_WEEKS;
   return true;
 }
 function maybeForceFirstYearSocialThread(context) {
@@ -2380,6 +2484,10 @@ function getChristmasMemoryVariant(city) {
 function maybeAdvanceThread(threadKey, city) {
   const thread = STATE[threadKey];
   if (!thread || !city || thread.cityName !== city.name || thread.stage >= 5 || thread.lastTriggerWeek === STATE.week) return false;
+  const visitTokenNow = STATE.currentCityVisitToken || 0;
+  const returnedAfterLeaving = visitTokenNow > (thread.visitTokenAtTrigger || 0);
+  const stayedLongEnough = STATE.week - thread.lastTriggerWeek >= 4;
+  if (!returnedAfterLeaving && !stayedLongEnough) return false;
   const isRomance = threadKey === 'romanceThread';
   const stage = thread.stage + 1;
   const variants = isRomance
@@ -2437,6 +2545,7 @@ function maybeAdvanceThread(threadKey, city) {
     };
   thread.stage = stage;
   thread.lastTriggerWeek = STATE.week;
+  thread.visitTokenAtTrigger = visitTokenNow;
   const payload = variants[stage];
   if (!payload) return false;
   addMemory({ ...payload, city, important: stage >= 4 });
@@ -2706,17 +2815,6 @@ function buildNarrativeEventCandidates(context) {
     });
   }
   if (city.continent === 'N.America') {
-    candidates.push({
-      key: 'diner_booth',
-      weight: 0.8,
-      run: () => addMemory({
-        title: 'Banquette rouge',
-        text: 'Tu as mangé seul dans un diner sur une banquette rouge, avec une part de tarte trop grande et un calme très rare.',
-        city,
-        tags: ['amerique', 'table'],
-        icon: '🥧',
-      }),
-    });
     if (isBigCity(city)) {
       candidates.push({
         key: 'record_store',
@@ -2925,7 +3023,9 @@ function buildNarrativeEventCandidates(context) {
 function maybeTriggerNarrativeEvent(context) {
   if (STATE.tutorialRun) return false;
   if (triggerInheritanceMemory()) return true;
+  if (STATE.atParents) return false;
   if (!context.city) return false;
+  if (maybeAdvanceBlueScarfThread(context)) return true;
   if (context.arrived && maybeAdvanceThread('romanceThread', context.city)) {
     STATE.narrativeEventCooldown = NARRATIVE_EVENT_COOLDOWN_WEEKS;
     return true;
@@ -3223,6 +3323,9 @@ function buildDefaultState() {
     reputationPenaltyUntil: -1,
     nomadLastIncomeWeek: -1,
     urssafYearMarked: -1,
+    currentCityPresenceKey: '',
+    currentCitySinceWeek: 0,
+    currentCityVisitToken: 0,
     tutorialRun: false,
     tutorialStep: 0,
     parentsHomeAvailable: true,
@@ -3231,6 +3334,7 @@ function buildDefaultState() {
     memoryFlags: {},
     romanceThread: null,
     friendshipThread: null,
+    blueScarfThread: null,
     narrativeEventCooldown: 0,
     memorySpotlight: null,
   };
@@ -4120,6 +4224,13 @@ function normalizeLoadedState(snap) {
   STATE.memoryFlags = snap.memoryFlags && typeof snap.memoryFlags === 'object' ? snap.memoryFlags : {};
   STATE.romanceThread = snap.romanceThread && typeof snap.romanceThread === 'object' ? snap.romanceThread : null;
   STATE.friendshipThread = snap.friendshipThread && typeof snap.friendshipThread === 'object' ? snap.friendshipThread : null;
+  STATE.blueScarfThread = snap.blueScarfThread && typeof snap.blueScarfThread === 'object' ? snap.blueScarfThread : null;
+  if (STATE.blueScarfThread) {
+    if (!Array.isArray(STATE.blueScarfThread.citySequence)) STATE.blueScarfThread.citySequence = [];
+    STATE.blueScarfThread.stage = Number.isFinite(STATE.blueScarfThread.stage) ? Math.max(0, Math.min(5, STATE.blueScarfThread.stage)) : 0;
+    STATE.blueScarfThread.lastTriggerWeek = Number.isFinite(STATE.blueScarfThread.lastTriggerWeek) ? STATE.blueScarfThread.lastTriggerWeek : -1;
+    STATE.blueScarfThread.scarfRecovered = !!STATE.blueScarfThread.scarfRecovered || STATE.blueScarfThread.stage >= 4;
+  }
   STATE.narrativeEventCooldown = Number.isFinite(snap.narrativeEventCooldown) ? Math.max(0, snap.narrativeEventCooldown) : 0;
   STATE.memorySpotlight = null;
   STATE.atParents = !!STATE.atParents;
@@ -4131,6 +4242,11 @@ function normalizeLoadedState(snap) {
       .reduce((maxWeek, entry) => Math.max(maxWeek, entry.week), 0);
     STATE.lastReturnHomeWeek = lastHomeLogWeek;
   }
+  const normalizedCurrentCity = deriveCurrentCityFromState();
+  STATE.currentCityPresenceKey = getCityKey(normalizedCurrentCity);
+  STATE.currentCitySinceWeek = Number.isFinite(snap.currentCitySinceWeek) ? snap.currentCitySinceWeek : STATE.week;
+  STATE.currentCityVisitToken = Number.isFinite(snap.currentCityVisitToken) ? Math.max(0, snap.currentCityVisitToken) : 1;
+  if (!STATE.blueScarfThread && STATE.startCity) ensureBlueScarfThread();
   if (STATE.week - STATE.lastReturnHomeWeek >= LOIN_DU_NID_WEEKS && !STATE.achievements.has('loin_du_nid')) {
     STATE.achievements.add('loin_du_nid');
     STATE.points += ACHIEVEMENT_POINTS.loin_du_nid;
@@ -4234,6 +4350,7 @@ function startGame() {
   STATE.phase = 'playing';
   STATE.achievements = new Set(['ecolo']);
   STATE.points = ACHIEVEMENT_POINTS.ecolo;
+  ensureBlueScarfThread();
   log(`Partie commencée à ${STATE.startCity.name}.`);
   syncMusic(true);
   render();
@@ -5897,6 +6014,7 @@ function nextTurn() {
   checkAchievements();
 
   const currentCity = deriveCurrentCityFromState();
+  syncCurrentCityPresence(currentCity);
   const arrivedThisWeek = !!currentCity && (
     starting.some(mission => mission.city && mission.city.name === currentCity.name)
     || ending.some(mission => mission.city && mission.city.name === currentCity.name)
